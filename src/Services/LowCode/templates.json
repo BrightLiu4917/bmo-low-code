@@ -1,0 +1,507 @@
+{
+    "normal": [
+        {
+            "list": [
+                {
+                    "admin_name": "全部",
+                    "route_group": [
+                        "/Patient/ManagedPatient"
+                    ],
+                    "preset_condition_json": [
+                        [
+                            "is_deleted",
+                            "=",
+                            0
+                        ]
+                    ],
+                    "default_order_by_json": [
+                        [
+                            "gmt_created",
+                            "desc"
+                        ],
+                        [
+                            "user_id",
+                            "desc"
+                        ]
+                    ],
+                    "list_type": 0
+                },
+                {
+                    "admin_name": "待纳管",
+                    "route_group": [
+                        "/Patient/ManagedPatient"
+                    ],
+                    "preset_condition_json": [
+                        [
+                            "is_deleted",
+                            "=",
+                            0
+                        ],
+                        [
+                            "raw",
+                            "(biz_mng_flg is null or biz_mng_flg = 0)"
+                        ]
+                    ],
+                    "default_order_by_json": [
+                        [
+                            "gmt_created",
+                            "desc"
+                        ],
+                        [
+                            "user_id",
+                            "desc"
+                        ]
+                    ],
+                    "list_type": 0
+                },
+                {
+                    "admin_name": "评估中",
+                    "route_group": [
+                        "/Patient/ManagedPatient"
+                    ],
+                    "preset_condition_json": [
+                        [
+                            "is_deleted",
+                            "=",
+                            0
+                        ],
+                        [
+                            "biz_mng_flg",
+                            "=",
+                            2
+                        ]
+                    ],
+                    "default_order_by_json": [
+                        [
+                            "gmt_created",
+                            "desc"
+                        ],
+                        [
+                            "user_id",
+                            "desc"
+                        ]
+                    ],
+                    "list_type": 0
+                },
+                {
+                    "admin_name": "方案制定中",
+                    "route_group": [
+                        "/Patient/ManagedPatient"
+                    ],
+                    "preset_condition_json": [
+                        [
+                            "is_deleted",
+                            "=",
+                            0
+                        ],
+                        [
+                            "biz_mng_flg",
+                            "in",
+                            [3,4]
+                        ]
+                    ],
+                    "default_order_by_json": [
+                        [
+                            "gmt_created",
+                            "desc"
+                        ],
+                        [
+                            "user_id",
+                            "desc"
+                        ]
+                    ],
+                    "list_type": 0
+                },
+                {
+                    "admin_name": "管理中",
+                    "route_group": [
+                        "/Patient/ManagedPatient"
+                    ],
+                    "preset_condition_json": [
+                        [
+                            "is_deleted",
+                            "=",
+                            0
+                        ],
+                        [
+                            "biz_mng_flg",
+                            "=",
+                            5
+                        ]
+                    ],
+                    "default_order_by_json": [
+                        [
+                            "gmt_created",
+                            "desc"
+                        ],
+                        [
+                            "user_id",
+                            "desc"
+                        ]
+                    ],
+                    "list_type": 0
+                },
+                {
+                    "admin_name": "疗程结束",
+                    "route_group": [
+                        "/Patient/ManagedPatient"
+                    ],
+                    "preset_condition_json": [
+                        [
+                            "is_deleted",
+                            "=",
+                            0
+                        ],
+                        [
+                            "biz_mng_flg",
+                            "=",
+                            6
+                        ]
+                    ],
+                    "default_order_by_json": [
+                        [
+                            "gmt_created",
+                            "desc"
+                        ],
+                        [
+                            "user_id",
+                            "desc"
+                        ]
+                    ],
+                    "list_type": 0
+                },
+                {
+                    "admin_name": "方案终止",
+                    "route_group": [
+                        "/Patient/ManagedPatient"
+                    ],
+                    "preset_condition_json": [
+                        [
+                            "is_deleted",
+                            "=",
+                            0
+                        ],
+                        [
+                            "biz_mng_flg",
+                            "=",
+                            9
+                        ]
+                    ],
+                    "default_order_by_json": [
+                        [
+                            "gmt_created",
+                            "desc"
+                        ],
+                        [
+                            "user_id",
+                            "desc"
+                        ]
+                    ],
+                    "list_type": 0
+                },
+                {
+                    "admin_name": "人群患者列表",
+                    "route_group": [
+                        "/Crowd/Patients"
+                    ],
+                    "preset_condition_json": [
+                        [
+                            "is_deleted",
+                            "=",
+                            0
+                        ]
+                    ],
+                    "default_order_by_json": [
+                        [
+                            "gmt_created",
+                            "desc"
+                        ],
+                        [
+                            "user_id",
+                            "desc"
+                        ]
+                    ],
+                    "list_type": 0,
+                    "templates": {
+                        "filter": {
+                            "name": "通用列表-筛选字段",
+                            "description": "通用列表-筛选字段",
+                            "template_type": 1,
+                            "content_type": 2,
+                            "parts": [
+                                {
+                                    "name": "患者:姓名(筛选)",
+                                    "description": "患者:姓名(筛选)",
+                                    "content": {
+                                        "key": "rsdnt_nm",
+                                        "type": "input",
+                                        "field": "rsdnt_nm",
+                                        "label": "患者姓名",
+                                        "props": {
+                                            "options": [],
+                                            "labelField": null,
+                                            "valueField": null,
+                                            "childrenField": null
+                                        },
+                                        "apiUrl": null,
+                                        "search": "like",
+                                        "showLabel": null,
+                                        "placeholder": "请输入患者姓名"
+                                    }
+                                },
+                                {
+                                    "name": "患者:身份证(筛选)",
+                                    "description": "患者:身份证(筛选)",
+                                    "content": {
+                                        "key": "id_crd_no",
+                                        "type": "input",
+                                        "field": "id_crd_no",
+                                        "label": "患者身份证",
+                                        "props": {
+                                            "options": [],
+                                            "labelField": null,
+                                            "valueField": null,
+                                            "childrenField": null
+                                        },
+                                        "apiUrl": null,
+                                        "search": "like",
+                                        "showLabel": null,
+                                        "placeholder": "请输入患者身份证"
+                                    }
+                                },
+                                {
+                                    "name": "患者:电话号码(筛选)",
+                                    "description": "患者:电话号码(筛选)",
+                                    "content": {
+                                        "key": "slf_tel_no",
+                                        "type": "input",
+                                        "field": "slf_tel_no",
+                                        "label": "患者电话号码",
+                                        "props": {
+                                            "options": [],
+                                            "labelField": null,
+                                            "valueField": null,
+                                            "childrenField": null
+                                        },
+                                        "apiUrl": null,
+                                        "search": "like",
+                                        "showLabel": null,
+                                        "placeholder": "请输入患者电话号码"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "templates": {
+                "column": {
+                    "name": "通用列表-展示字段",
+                    "description": "通用列表-展示字段",
+                    "template_type": 1,
+                    "content_type": 1,
+                    "parts": [
+                        {
+                            "name": "患者:姓名",
+                            "description": "患者姓名",
+                            "content": {
+                                "key": "rsdnt_nm",
+                                "fixed": true,
+                                "title": "姓名"
+                            }
+                        },
+                        {
+                            "name": "患者:身份证",
+                            "description": "患者身份证",
+                            "content": {
+                                "key": "id_crd_no",
+                                "title": "身份证"
+                            }
+                        },
+                        {
+                            "name": "患者:电话号码",
+                            "description": "患者电话号码",
+                            "content": {
+                                "key": "slf_tel_no",
+                                "title": "电话号码"
+                            }
+                        },
+                        {
+                            "name": "患者:状态",
+                            "description": "患者管理状态",
+                            "content": {
+                                "key": "biz_mng_flg",
+                                "title": "状态"
+                            }
+                        },
+                        {
+                            "name": "患者:人群分类",
+                            "description": "患者人群分类",
+                            "content": {
+                                "key": "_crowds",
+                                "title": "人群分类"
+                            }
+                        }
+                    ]
+                },
+                "filter": {
+                    "name": "通用列表-筛选字段",
+                    "description": "通用列表-筛选字段",
+                    "template_type": 1,
+                    "content_type": 2,
+                    "parts": [
+                        {
+                            "name": "患者:人群分类(筛选)",
+                            "description": "患者:人群分类(筛选)",
+                            "content": {
+                                "key": "_crowds",
+                                "type": "select",
+                                "field": "crowd_id",
+                                "label": "人群分类",
+                                "props": {},
+                                "apiUrl": "/api/v2/resident/resident-crowd/optional",
+                                "search": "=",
+                                "showLabel": null,
+                                "placeholder": "请选择人群分类"
+                            }
+                        },
+                        {
+                            "name": "患者:姓名(筛选)",
+                            "description": "患者:姓名(筛选)",
+                            "content": {
+                                "key": "rsdnt_nm",
+                                "type": "input",
+                                "field": "rsdnt_nm",
+                                "label": "患者姓名",
+                                "props": {
+                                    "options": [],
+                                    "labelField": null,
+                                    "valueField": null,
+                                    "childrenField": null
+                                },
+                                "apiUrl": null,
+                                "search": "like",
+                                "showLabel": null,
+                                "placeholder": "请输入患者姓名"
+                            }
+                        },
+                        {
+                            "name": "患者:身份证(筛选)",
+                            "description": "患者:身份证(筛选)",
+                            "content": {
+                                "key": "id_crd_no",
+                                "type": "input",
+                                "field": "id_crd_no",
+                                "label": "患者身份证",
+                                "props": {
+                                    "options": [],
+                                    "labelField": null,
+                                    "valueField": null,
+                                    "childrenField": null
+                                },
+                                "apiUrl": null,
+                                "search": "like",
+                                "showLabel": null,
+                                "placeholder": "请输入患者身份证"
+                            }
+                        },
+                        {
+                            "name": "患者:电话号码(筛选)",
+                            "description": "患者:电话号码(筛选)",
+                            "content": {
+                                "key": "slf_tel_no",
+                                "type": "input",
+                                "field": "slf_tel_no",
+                                "label": "患者电话号码",
+                                "props": {
+                                    "options": [],
+                                    "labelField": null,
+                                    "valueField": null,
+                                    "childrenField": null
+                                },
+                                "apiUrl": null,
+                                "search": "like",
+                                "showLabel": null,
+                                "placeholder": "请输入患者电话号码"
+                            }
+                        }
+                    ]
+                },
+                "button": {
+                    "name": "通用列表-操作栏按钮",
+                    "description": "通用列表-操作栏按钮",
+                    "template_type": 1,
+                    "content_type": 3,
+                    "parts": [
+                        {
+                            "name": "患者:纳管(按钮)",
+                            "description": "患者:纳管(按钮)",
+                            "content": {
+                                "key": "resident_manage",
+                                "label": "去纳管",
+                                "title": "去纳管",
+                                "action": "MANAGE",
+                                "visible": "Number(data.biz_mng_flg) == 0"
+                            }
+                        },
+                        {
+                            "name": "患者:评估(按钮)",
+                            "description": "患者:评估(按钮)",
+                            "content": {
+                                "key": "resident_evaluation",
+                                "label": "去评估",
+                                "title": "去评估",
+                                "action": "EVALUATION",
+                                "visible": "Number(data.biz_mng_flg) == 2"
+                            }
+                        },
+                        {
+                            "name": "患者:制定方案(按钮)",
+                            "description": "患者:制定方案(按钮)",
+                            "content": {
+                                "key": "resident_sop",
+                                "label": "去制定",
+                                "title": "去制定",
+                                "action": "SOP",
+                                "visible": "Number(data.biz_mng_flg) == 3 || Number(data.biz_mng_flg) == 4"
+                            }
+                        },
+                        {
+                            "name": "患者:任务日历(按钮)",
+                            "description": "患者:任务日历(按钮)",
+                            "content": {
+                                "key": "resident_management_tasks",
+                                "label": "任务日历",
+                                "title": "任务日历",
+                                "action": "MANAGEMENT_TASKS",
+                                "visible": "Number(data.biz_mng_flg) == 5"
+                            }
+                        },
+                        {
+                            "name": "患者:制定新方案(按钮)",
+                            "description": "患者:制定新方案(按钮)",
+                            "content": {
+                                "key": "resident_again_sop",
+                                "label": "制定新方案",
+                                "title": "制定新方案",
+                                "action": "AGAIN_SOP",
+                                "visible": "Number(data.biz_mng_flg) == 6 || Number(data.biz_mng_flg) == 9"
+                            }
+                        },
+                        {
+                            "name": "患者:专病档案(按钮)",
+                            "description": "患者:专病档案(按钮)",
+                            "content": {
+                                "key": "resident_archives",
+                                "label": "专病档案",
+                                "title": "专病档案",
+                                "action": "ARCHIVES",
+                                "visible": "true"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
