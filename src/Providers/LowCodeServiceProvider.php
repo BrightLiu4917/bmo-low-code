@@ -47,6 +47,11 @@ class LowCodeServiceProvider extends ServiceProvider
             __DIR__.'/../../config/low-code.php' => config_path('low-code.php'),
         ], 'low-code-config');
 
+        // 配置文件发布
+        $this->publishes([
+            __DIR__.'/../../config/business/bmo-service.php' => config_path('business/bmo-service.php'),
+        ], 'bmo-service-config');
+
 //        $this->publishes([
 //            __DIR__.'/../../resource/ListSource.php' => app_path('Http/Resources/LowCode'),
 //        ], 'low-code-list-resource');
@@ -63,8 +68,9 @@ class LowCodeServiceProvider extends ServiceProvider
         // 可选：同时发布配置和迁移的统一标签
         $this->publishes([
             __DIR__.'/../../config/low-code.php' => config_path('low-code.php'),
+            __DIR__.'/../../config/business/low-code.php' => config_path('business/bmo-service.php'),
             __DIR__.'/../../database/migrations' => database_path('migrations'),
-            __DIR__.'/../../resource' => app_path('Http/Resources/LowCode'),
+//            __DIR__.'/../../resource' => app_path('Http/Resources/LowCode'),
         ], 'low-code-package');
     }
 
