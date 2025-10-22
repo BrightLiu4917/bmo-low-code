@@ -1,4 +1,4 @@
-# bmo-low-code
+# 低代码包 bmo-low-code
 ### 安装 Composer 包
 ```text
 composer require bright-liu4917/bmo-low-code
@@ -35,10 +35,10 @@ php artisan migrate
 ```
 ### 注意事项
 ```text
-前端必须header入参
-X-Gp-Org-Id 机构id
-X-Gp-System-Code 系统编码
-X-Gp-Disease-Code 疾病编码（场景编码）
+通知前端必须header入参
+X-Gp-Org-Id 机构ID 前端自己申请写死
+X-Gp-System-Code 系统编码 研发PM定义
+X-Gp-Disease-Code 疾病编码（场景编码）后端开发定义
 ```
 ### 内置方法
 ```text
@@ -46,7 +46,7 @@ X-Gp-Disease-Code 疾病编码（场景编码）
 QueryEngineService::instance()
         ->autoClient()//自动获取客户端入参数信息
         
-        // 设置查询条件 内置多种查询方法 whereUserId
+        // 设置查询条件 内置多种查询方法 whereUserId、 whereManageOrgCode、 whereIdCrdNo
         ->whereMixed(
                         [
                             ["ptt_crwd_clsf_cd", "=", "9efe2444eaf14606896bc68290abc5e7"],//模糊查询
