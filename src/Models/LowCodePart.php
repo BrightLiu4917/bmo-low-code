@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\LowCode;
+namespace BrightLiu\LowCode\Models;
 
 use BrightLiu\LowCode\Models\Traits\ModelFetch;
 use BrightLiu\LowCode\Models\Traits\OrgRelation;
@@ -10,7 +10,7 @@ use BrightLiu\LowCode\Models\Traits\OrgDiseaseRelation;
 use BrightLiu\LowCode\Models\Traits\UniqueCodeRelation;
 use BrightLiu\LowCode\Models\Traits\AdministratorRelation;
 use BrightLiu\LowCode\Enums\Model\LowCode\LowCodePart\PartTypeEnum;
-use BrightLiu\LowCode\Enums\Model\LowCodeTemplate\ContentTypeEnum;
+use BrightLiu\LowCode\Enums\Model\LowCode\LowCodePart\ContentTypeEnum;
 
 /**
  * @Class
@@ -35,8 +35,6 @@ class LowCodePart extends LowCodeBaseModel
         ModelFetch,
         SoftDeletes,
         OrgRelation,
-
-//        AdministratorRelation
          UniqueCodeRelation;
     protected $fillable = [
         "id",//bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -60,22 +58,23 @@ class LowCodePart extends LowCodeBaseModel
     /**
      * @var string[]
      */
-    protected $casts = [
-        'id' => 'integer',
-        'name' => 'string',
-        'code' => 'string',
-        'org_code' => 'string',
-        'part_type' => 'integer',
-        'description' => 'string',
-        'content_type' => 'integer',
-        'content' => 'array',
-        'weight' => 'integer',
-        'creator_id' => 'integer',
-        'updater_id' => 'integer',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
-    ];
+    protected $casts
+        = [
+            'id'           => 'integer',
+            'name'         => 'string',
+            'code'         => 'string',
+            'org_code'     => 'string',
+            'part_type'    => 'integer',
+            'description'  => 'string',
+            'content_type' => 'integer',
+            'content'      => 'array',
+            'weight'       => 'integer',
+            'creator_id'   => 'integer',
+            'updater_id'   => 'integer',
+            'created_at'   => 'datetime',
+            'updated_at'   => 'datetime',
+            'deleted_at'   => 'datetime',
+        ];
 
     /**
      * @return Attribute

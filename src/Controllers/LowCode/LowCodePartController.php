@@ -6,9 +6,8 @@ namespace BrightLiu\LowCode\Controllers\LowCode;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Models\LowCode\LowCodePart;
+use BrightLiu\LowCode\Models\LowCodePart;
 use Gupo\BetterLaravel\Http\BaseController;
-use App\Services\LowCode\LowCodeQueryEngineService;
 use BrightLiu\LowCode\Services\LowCode\LowCodePartService;
 use BrightLiu\LowCode\Resources\LowCode\LowCodePart\ListSource;
 use BrightLiu\LowCode\Requests\LowCode\LowCodePartRequest;
@@ -20,19 +19,11 @@ use BrightLiu\LowCode\Resources\LowCode\LowCodePart\ShowSource;
 final class LowCodePartController extends BaseController
 {
 
-    /**
-     * @param \BrightLiu\LowCode\Services\LowCode\LowCodePartService $service
-     */
-    public function __construct(private readonly LowCodePartService $service)
+    public function __construct(private LowCodePartService $service)
     {
 
     }
 
-    /**
-     * @param \BrightLiu\LowCode\Requests\LowCode\LowCodePartRequest $request
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function create(LowCodePartRequest $request): JsonResponse
     {
         $args = $request->except(['id','code']);
@@ -65,11 +56,7 @@ final class LowCodePartController extends BaseController
             $query->where('name', $name);
         }
         )->orderByDesc('created_at')
-//         ->with(
-//            ['updater:id,realname', 'creator:id,realname']
-//        )
          ->customPaginate(true);
-
         return $this->responseData($data, ListSource::class);
 
     }

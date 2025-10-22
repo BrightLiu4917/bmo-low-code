@@ -88,7 +88,7 @@ final class DbConnectionManager
         } catch (ServiceException $e) {
             throw $e;
         } catch (\Throwable $exception) {
-            Log::error("数据库连接失败 [{$code}]：" . $exception->getMessage(), [
+            Log::error("低代码动态链接数据库连接失败 [{$code}]：" . $exception->getMessage(), [
                 'code' => $code,
                 'exception' => $exception,
             ]);

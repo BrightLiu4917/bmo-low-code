@@ -4,16 +4,18 @@ namespace BrightLiu\LowCode\Core\Abstracts;
 
 use Illuminate\Support\Arr;
 use Illuminate\Database\Connection;
+use BrightLiu\LowCode\Enums\HeaderEnum;
+use BrightLiu\LowCode\Traits\InstanceMake;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Query\Builder;
 use BrightLiu\LowCode\Core\DbConnectionManager;
 use Illuminate\Support\Facades\DB;
-//use WithDiseaseContext;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
 use BrightLiu\LowCode\Core\Traits\DynamicWhereTrait;
 use BrightLiu\LowCode\Exceptions\QueryEngineException;
+use BrightLiu\LowCode\Traits\Context\WithDiseaseContext;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use BrightLiu\LowCode\Core\Contracts\QueryEngineContract;
 use BrightLiu\LowCode\Core\Traits\DynamicMultiOrderTrait;
@@ -28,7 +30,8 @@ abstract class QueryEngineAbstract implements QueryEngineContract
 {
     use
         DynamicWhereTrait,
-//        WithDiseaseContext,
+        WithDiseaseContext,
+        InstanceMake,
         DynamicMultiOrderTrait;
 
     // 查询构建器
@@ -41,12 +44,8 @@ abstract class QueryEngineAbstract implements QueryEngineContract
     protected ?string $code = '';
     //是否打印SQL
     protected ?bool $printSql = false;
-    //是否初始化
-
-
 
     // 连接和表配置
-    protected string $connectionName = '';
     public string $database = '';
     public string $table = '';
     public string $databaseTable = '';
@@ -69,14 +68,11 @@ abstract class QueryEngineAbstract implements QueryEngineContract
                 return $this;
             }
 
+            $contextCode = $this->getDiseaseCode() ?:
+                request()->header(HeaderEnum::DISEASE_CODE);
             // 模式2：自动上下文（常规请求）
-//            $this->getDiseaseCode();
-            if (!empty($contextCode = request()?->header('X-Gp-Disease-Code'))) {
+            if (!empty($contextCode)) {
                 // 尝试从上下文获取疾病编码
-                if (empty($contextCode)) {
-                    throw new ServiceException('无法自动获取疾病编码');
-                }
-
                 $this->initWithDiseaseCode($contextCode);
             }
 
@@ -93,7 +89,7 @@ abstract class QueryEngineAbstract implements QueryEngineContract
     {
         try {
             $sourceCode = LowCodeDatabaseSourceService::instance()
-                ->getDataByDiseaseCode($diseaseCode);
+                                                      ->getDataByDiseaseCode($diseaseCode);
             $this->clientConnByCode($sourceCode);
             $this->useTable();
             $this->fillableFields();
@@ -123,9 +119,9 @@ abstract class QueryEngineAbstract implements QueryEngineContract
             $code
         );
         //  获取数据库表
-        $config = $this->connection->getConfig();
+        $config         = $this->connection->getConfig();
         $this->database = data_get($config, 'database', '');
-        $this->table = data_get($config, 'table', '');
+        $this->table    = data_get($config, 'table', '');
         return $this;
     }
 
@@ -151,7 +147,7 @@ abstract class QueryEngineAbstract implements QueryEngineContract
                 throw new QueryEngineException('请先指定数据库和表名');
             }
             $this->databaseTable = $this->database.'.'.$this->table;
-            $this->queryBuilder = $this->connection->table(
+            $this->queryBuilder  = $this->connection->table(
                 $this->databaseTable
             );
         }
@@ -167,10 +163,10 @@ abstract class QueryEngineAbstract implements QueryEngineContract
      */
     public function useTable(string $table = '', string $database = ''): self
     {
-        $this->table = $table ?: $this->table;
-        $this->database = $database ?: $this->database;
+        $this->table         = $table ?: $this->table;
+        $this->database      = $database ?: $this->database;
         $this->databaseTable = $this->database.'.'.$this->table;
-        $this->queryBuilder = $this->connection->table($this->databaseTable);
+        $this->queryBuilder  = $this->connection->table($this->databaseTable);
         return $this;
     }
 
@@ -188,7 +184,7 @@ abstract class QueryEngineAbstract implements QueryEngineContract
      */
     protected function generateCacheKey(string $randomKey = ''): string
     {
-        $sql = $this->queryBuilder->toSql();
+        $sql      = $this->queryBuilder->toSql();
         $bindings = json_encode($this->queryBuilder->getBindings());
         return md5($sql.$bindings.$randomKey);
     }
@@ -202,7 +198,8 @@ abstract class QueryEngineAbstract implements QueryEngineContract
      *
      * @return mixed 查询结果
      */
-    protected function executeQuery(callable $callback, array $columns = ['*'],
+    protected function executeQuery(
+        callable $callback, array $columns = ['*'],
         bool $useCache = true, string $randomKey = '',
     ) {
         try {
@@ -307,8 +304,7 @@ abstract class QueryEngineAbstract implements QueryEngineContract
                 $this->randomKey(column: $column, method: __FUNCTION__)
             );
         } catch (\Throwable $e) {
-            Log::error('查询单个字段异常：'.$e->getMessage(), ['exception' => $e]
-            );
+            Logger::LOW_CODE_LIST->error('查询单个字段异常：'.$e->getMessage(), ['exception' => $e]);
             throw new QueryEngineException('查询单个字段异常');
         }
     }
@@ -347,7 +343,7 @@ abstract class QueryEngineAbstract implements QueryEngineContract
                 $this->randomKey(column: $column, method: __FUNCTION__)
             );
         } catch (\Throwable $e) {
-            Log::error('查询单个集合异常：'.$e->getMessage(), ['exception' => $e]
+            Logger::LOW_CODE_LIST->error('查询单个集合异常：'.$e->getMessage(), ['exception' => $e]
             );
             throw new QueryEngineException('查询单个集合异常');
         }
@@ -362,7 +358,8 @@ abstract class QueryEngineAbstract implements QueryEngineContract
      *
      * @return self
      */
-    public function whereRaw(string $sql, array $bindings = [],
+    public function whereRaw(
+        string $sql, array $bindings = [],
         string $boolean = 'and',
     ): self {
         $this->queryBuilder = $this->queryBuilder->whereRaw(
@@ -380,7 +377,8 @@ abstract class QueryEngineAbstract implements QueryEngineContract
      *
      * @return self
      */
-    public function whereSub(\Closure $callback, string $boolean = 'and',
+    public function whereSub(
+        \Closure $callback, string $boolean = 'and',
         bool $not = false,
     ): self {
         $this->queryBuilder = $not ? $this->queryBuilder->whereNotExists(
@@ -443,7 +441,8 @@ abstract class QueryEngineAbstract implements QueryEngineContract
      *
      * @return mixed
      */
-    public function getRawResult(string $rawSql, array $bindings = [],
+    public function getRawResult(
+        string $rawSql, array $bindings = [],
         bool $useCache = true, string $randomKey = '',
     ): mixed {
         return $this->executeQuery(
@@ -461,21 +460,24 @@ abstract class QueryEngineAbstract implements QueryEngineContract
         if (empty($this->database) || empty($this->table)) {
             throw new \InvalidArgumentException("缺少 database 或 table 属性");
         }
-
         try {
-            $cacheKey = "fillable_fields:{$this->database}:{$this->table}";
+            $cacheKey       = "fillable_fields:{$this->database}:{$this->table}";
             $this->fillable = Cache::remember($cacheKey, 86400, function() {
                 return $this->connection->table('INFORMATION_SCHEMA.COLUMNS')
-                    ->where(
-                        ['TABLE_SCHEMA' => $this->database,
-                         'TABLE_NAME'   => $this->table,]
-                    )->pluck('COLUMN_NAME')->toArray();
+                                        ->where(
+                                            [
+                                                'TABLE_SCHEMA' => $this->database,
+                                                'TABLE_NAME'   => $this->table,
+                                            ]
+                                        )->pluck('COLUMN_NAME')->toArray();
             });
         } catch (\Throwable $e) {
             Logger::WIDTH_TABLE_DATA_RESIDENT->error(
                 '获取 fillable 字段失败',
-                ['database' => $this->database, 'table' => $this->table,
-                 'error'    => $e->getMessage(),]
+                [
+                    'database' => $this->database, 'table' => $this->table,
+                    'error'    => $e->getMessage(),
+                ]
             );
             $this->fillable = []; // 防止后续使用时报错
         }
@@ -492,7 +494,7 @@ abstract class QueryEngineAbstract implements QueryEngineContract
     public function upsert(?array $args = null, ?string $uniqueKey = null)
     {
         try {
-            $fillabes = $this->filterFillableFields($args, $this->fillable);
+            $fillabes    = $this->filterFillableFields($args, $this->fillable);
             $columnsKeys = count($args) !== count($args, COUNT_RECURSIVE)
                 ? array_keys(Arr::first($fillabes)) : array_keys($fillabes);
             return $this->queryBuilder->upsert(
@@ -513,18 +515,19 @@ abstract class QueryEngineAbstract implements QueryEngineContract
      *
      * @return array
      */
-    protected function appendDefaultData($array = [],
+    protected function appendDefaultData(
+        $array = [],
         ?array $fillableFields = [],
     ): array {
         $nowTime = now()->format('Y-m-d H:i:s');
-        $array = Arr::only($array, $fillableFields);
-        $array = array_filter($array, function($value) {
+        $array   = Arr::only($array, $fillableFields);
+        $array   = array_filter($array, function($value) {
             return $value !== '';
         }, ARRAY_FILTER_USE_BOTH);
 
         if (isset($array['id_crd_no'])) {
             $array['user_id'] = md5($array['id_crd_no']);
-            $array['crt_tm'] = $nowTime;
+            $array['crt_tm']  = $nowTime;
         }
         return $array;
     }
@@ -535,7 +538,8 @@ abstract class QueryEngineAbstract implements QueryEngineContract
      *
      * @return array
      */
-    protected function filterFillableFields(?array $attributes = [],
+    protected function filterFillableFields(
+        ?array $attributes = [],
         ?array $fillable = [],
     ): array {
         // 检查属性数组是否为二维数组
@@ -560,7 +564,7 @@ abstract class QueryEngineAbstract implements QueryEngineContract
         try {
             $fillabes = $this->filterFillableFields($args, $this->fillable);
             return $this->queryBuilder->insert($fillabes);
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             Logger::WIDTH_TABLE_DATA_RESIDENT->error(
                 '宽表写入失败'.$e->getMessage(),
             );
@@ -578,8 +582,8 @@ abstract class QueryEngineAbstract implements QueryEngineContract
         try {
             $fillabes = $this->filterFillableFields($args, $this->fillable);
             //销毁唯一主键不做更新条件 宽表会报错
-            unset($fillabes['user_id'],$fillabes['id_crd_no']);
-            unset($args['user_id'],$args['id_crd_no']);
+            unset($fillabes['user_id'], $fillabes['id_crd_no']);
+            unset($args['user_id'], $args['id_crd_no']);
             return $this->queryBuilder->update($fillabes);
         } catch (\Exception $e) {
             Logger::WIDTH_TABLE_DATA_RESIDENT->error(

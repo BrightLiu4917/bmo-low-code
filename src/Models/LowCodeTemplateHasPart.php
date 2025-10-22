@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models\LowCode;
+namespace BrightLiu\LowCode\Models;
 
 /**
  * @Class
- * @Description:
+ * @Description: 关系模型
  * @created    : 2025-10-01 11:52:04
  * @modifier   : 2025-10-01 11:52:04
  */

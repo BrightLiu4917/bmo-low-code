@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\LowCode;
+namespace BrightLiu\LowCode\Models;
 use Gupo\BetterLaravel\Database\BaseModel;
 
 class LowCodeBaseModel extends BaseModel

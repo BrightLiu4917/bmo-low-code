@@ -102,21 +102,6 @@ final class AuthContext
     {
         return $this->requestSource;
     }
-
-    /**
-     * @return Collection
-     */
-    public function getAllowDiseases(): Collection
-    {
-        if (is_null($this->allowDiseases)) {
-            $this->allowDiseases = $this->fetchAllowDiseases();
-        }
-
-        return collect($this->allowDiseases);
-    }
-
-
-
     /**
      * @param string $value
      *

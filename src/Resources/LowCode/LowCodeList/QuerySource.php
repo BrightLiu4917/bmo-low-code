@@ -2,11 +2,11 @@
 
 declare(strict_types = 1);
 
-namespace App\Resources\LowCode\LowCodeList;
+namespace BrightLiu\LowCode\Resources\LowCode\LowCodeList;
 
 use BrightLiu\LowCode\Tools\Mask;
 use Illuminate\Http\Request;
-use App\Models\LowCode\LowCodeList;
+use BrightLiu\LowCode\Models\LowCodeList;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**

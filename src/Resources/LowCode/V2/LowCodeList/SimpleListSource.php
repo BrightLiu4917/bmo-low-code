@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Resources\LowCode\V2\LowCodeList;
 
-use App\Models\LowCode\LowCodeList;
+use BrightLiu\LowCode\Models\LowCodeList;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -31,8 +31,8 @@ final class SimpleListSource extends JsonResource
             ]),
 
             // TODO: 兼容原逻辑，待完善
-            'crowd_type_code' => $this->code,
-            'crowd_type_name' => $this->admin_name,
+            'crowd_type_code' => $this->code ?? '',
+            'crowd_type_name' => $this->admin_name ?? '',
             'crowd_type_color' => null,
             'crowd_type_weight' => 0,
         ];

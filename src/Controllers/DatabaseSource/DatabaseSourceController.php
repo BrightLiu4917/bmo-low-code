@@ -47,7 +47,6 @@ final class DatabaseSourceController extends BaseController
         $list = DatabaseSource::query()
             //todo 权限还没确认
 //            ->byContextDisease()
-
 //            ->with(
 //                ['creator:id,realname', 'updater:id,realname',
 //                 'disease:code,name']

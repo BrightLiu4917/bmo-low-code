@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace BrightLiu\LowCode\Resources\LowCode\LowCodePart;
+namespace BrightLiu\LowCode\Resources\LowCode\LowCodeList;
 
 use Illuminate\Http\Request;
-use App\Models\LowCode\LowCodePart;
+use BrightLiu\LowCode\Models\LowCodePart;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -35,7 +35,7 @@ final class ShowSource extends JsonResource
             ]),
             'creator_name' => $this->creator_name ?? '',
             'updater_name' => $this->updater_name ?? '',
-//            'content_type_definition' => $this->content_type_definition ?? '',
+            'content_type_definition' => $this->content_type_definition ?? '',
             'part_type_definition' => $this->part_type_definition ?? '',
         ];
     }

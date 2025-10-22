@@ -4,18 +4,15 @@ declare(strict_types = 1);
 
 namespace BrightLiu\LowCode\Models\Traits;
 
-use App\Models\LowCode\LowCodeDisease;
+use BrightLiu\LowCode\Models\LowCodeDisease;
 use BrightLiu\LowCode\Context\DiseaseContext;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * @method QueryBuilder|EloquentBuilder|static|$this byContextDisease() 按 病种上下文 查询
- * @method QueryBuilder|EloquentBuilder|static|$this byDisease(string $diseaseCode) 按 病种code 查询
- * @property string $disease_code 病种code
- * @property string $disease_name 病种名称
+/*
+ *
  */
 trait DiseaseRelation
 {

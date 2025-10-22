@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models\LowCode;
+namespace BrightLiu\LowCode\Models;
 
 use BrightLiu\LowCode\Models\Traits\OrgDiseaseRelation;
 

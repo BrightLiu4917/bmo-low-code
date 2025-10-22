@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BrightLiu\LowCode\Resources\LowCode\LowCodeTemplate;
 
 use Illuminate\Http\Request;
-use App\Models\LowCode\LowCodeTemplate;
+use BrightLiu\LowCode\Models\LowCodeTemplate;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**

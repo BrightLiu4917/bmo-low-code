@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 // app/Models/ApiUser.php
-namespace App\Models\LowCode;
+namespace BrightLiu\LowCode\Models;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 

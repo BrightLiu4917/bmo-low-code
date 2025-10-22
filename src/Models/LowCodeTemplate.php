@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\LowCode;
+namespace BrightLiu\LowCode\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;

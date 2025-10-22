@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace App\Models\LowCode;
+namespace BrightLiu\LowCode\Models;
 
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Database\Eloquent\SoftDeletes;

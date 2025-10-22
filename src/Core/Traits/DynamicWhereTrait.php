@@ -4,7 +4,7 @@ namespace BrightLiu\LowCode\Core\Traits;
 
 use Closure;
 use Illuminate\Support\Arr;
-use App\Models\LowCode\LowCodeList;
+use BrightLiu\LowCode\Models\LowCodeList;
 
 /**
  * 混合查询
@@ -171,6 +171,16 @@ trait DynamicWhereTrait
     public function whereId(string $value = ''): self
     {
         return $this->whereField($value, 'id');
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return \BrightLiu\LowCode\Core\Traits\DynamicWhereTrait|\BrightLiu\LowCode\Core\Abstracts\QueryEngineAbstract
+     */
+    public function whereDiseaseCode(string $value = ''): self
+    {
+        return $this->whereField($value, 'disease_code');
     }
 
     /**

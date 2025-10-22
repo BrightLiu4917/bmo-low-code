@@ -2,18 +2,18 @@
 
 declare(strict_types = 1);
 
-namespace BrightLiu\LowCode\Services\LowCode;
+namespace BrightLiu\LowCode\Services;
 
+use Throwable;
 use Illuminate\Support\Facades\Http;
 use App\Models\LowCode\DatabaseSource;
+use Illuminate\Http\Client\RequestException;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
-use BrightLiu\LowCode\Services\LowCodeBaseService;
 use App\Services\LowCode\LowCodeQueryEngineService;
 use BrightLiu\LowCode\Traits\Context\WithOrgContext;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
 use BrightLiu\LowCode\Traits\Context\WithDiseaseContext;
-use Illuminate\Http\Client\RequestException;
-use Throwable;
+
 
 /**
  * @Class
@@ -291,26 +291,20 @@ class BusinessMiddlePlatformService extends LowCodeBaseService
     }
 
     /**
-     * 获取患者的人群分类
+     * 获取患者人群分类
      * @param array $userIds
      *
      * @return mixed
      */
-    public function getResidentCrowds(array $userIds = [])
+    public function getPatientCrowds(array $userIds = [])
     {
-       return LowCodeQueryEngineService::instance()
-                                ->autoClient()
-                                 ->useTable('feature_user_detail')//这个表是 java 定死不会更改的
-                                 ->whereMixed([
-                                     [
-                                         'user_id', 'in',
-                                         $userIds,
-                                     ],
-                                 ])
-                                 ->select([
-                                     'user_id', 'group_id',
-                                     'group_name',
-                                 ])
+        return QueryEngineService::instance()
+                                 ->autoClient()
+                                 ->useTable(config('low-code.bmo-business-center.crowd-type-table'))
+                                 ->setCache(50)
+                                 ->whereDiseaseCode($this->diseaseCode)
+                                 ->whereBatchUserIds($userIds)
+                                 ->select(['user_id', 'group_id', 'group_name'])
                                  ->getAllResult();
     }
 }
