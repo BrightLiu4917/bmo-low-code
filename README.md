@@ -17,8 +17,8 @@ php artisan vendor:publish --provider="BrightLiu\LowCode\Providers\LowCodeServic
 ### env配置文件
 ```text
 BMO_ORG_ID=用户中心ID
-BMP_BASELINE_CROWD_URI=模型服务URI
-BMP_CHEETAH_MEDICAL_CROWD_KIT_URI
+BMP_CHEETAH_MEDICAL_PLATFORM_URI=业务中台接口地址 宝庆老师
+BMP_CHEETAH_MEDICAL_CROWD_KIT_URI=人群基线接口地址 童java
 BMO_BUSINESS_CENTER_CROWD_TYPE_TABLE=患者标签关系表一般是 "feature_user_detail"
 
 
