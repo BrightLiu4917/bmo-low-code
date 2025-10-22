@@ -14,7 +14,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @created    : 2025-10-22 14:31:43
  * @modifier   : 2025-10-22 14:31:43
  */
-final class ListSource extends JsonResource
+final class ListResource extends JsonResource
 {
     /**
      * @param Request $request
