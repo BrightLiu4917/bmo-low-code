@@ -6,7 +6,7 @@ namespace BrightLiu\LowCode\Traits\Context;
 
 trait WithContext
 {
-    use  WithDiseaseContext, WithOrgContext;
+    use  WithDiseaseContext, WithOrgContext, WithAdminContext;
 
     /**
      * @param object $contextService

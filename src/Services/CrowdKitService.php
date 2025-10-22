@@ -6,8 +6,6 @@ namespace BrightLiu\LowCode\Services;
 
 use Illuminate\Support\Collection;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
-use App\Services\Api\Bmp\BmpCheetahMedicalCrowdkitApiService;
-use function BrightLiu\LowCode\Services\LowCode\collect;
 
 /**
  * 服务人群工具模块 处理相关
