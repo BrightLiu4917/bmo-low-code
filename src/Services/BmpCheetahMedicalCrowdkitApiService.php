@@ -2,16 +2,18 @@
 
 declare(strict_types=1);
 
-namespace BrightLiu\LowCode\Services\LowCode;
+namespace BrightLiu\LowCode\Services;
 
-use Illuminate\Support\Facades\Http;
-use BrightLiu\LowCode\Services\LowCodeBaseService;
-use BrightLiu\LowCode\Traits\Context\WithAuthContext;
-use BrightLiu\LowCode\Traits\Context\WithContext;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
+use BrightLiu\LowCode\Traits\Context\WithContext;
+use BrightLiu\LowCode\Traits\Context\WithAuthContext;
 
 /**
- * 业务平台-服务人群工具模块  自己去实现吧 跟低代码无关
+ * @Class
+ * @Description:
+ * @created    : 2025-10-22 15:07:39
+ * @modifier   : 2025-10-22 15:07:39
  */
 final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
 {
@@ -22,7 +24,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
      */
     protected function baseUriVia(): string
     {
-        return config('business.api-service.bmp_cheetah_medical_crowdkit.uri', '');
+        return config('business.bmo-service.bmp_cheetah_medical_crowd_kit.uri', '');
     }
 
     /**

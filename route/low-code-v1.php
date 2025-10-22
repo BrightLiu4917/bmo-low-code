@@ -34,6 +34,7 @@ Route::prefix('v1/low-code')->group([
         Route::post('query', [LowCodeListController::class, 'query']);
         Route::post('pre', [LowCodeListController::class, 'pre']);
     });
+
     Route::prefix('template')->group(function () {
         Route::get('list', [LowCodeTemplateController::class, 'list']);
         Route::get('show', [LowCodeTemplateController::class, 'show']);

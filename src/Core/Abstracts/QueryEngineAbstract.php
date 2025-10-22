@@ -19,7 +19,7 @@ use BrightLiu\LowCode\Traits\Context\WithDiseaseContext;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use BrightLiu\LowCode\Core\Contracts\QueryEngineContract;
 use BrightLiu\LowCode\Core\Traits\DynamicMultiOrderTrait;
-use BrightLiu\LowCode\Services\LowCode\LowCodeDatabaseSourceService;
+use BrightLiu\LowCode\Services\LowCode\DatabaseSourceService;
 
 /**
  * 查询引擎抽象类
@@ -88,8 +88,8 @@ abstract class QueryEngineAbstract implements QueryEngineContract
     private function initWithDiseaseCode(string $diseaseCode): void
     {
         try {
-            $sourceCode = LowCodeDatabaseSourceService::instance()
-                                                      ->getDataByDiseaseCode($diseaseCode);
+            $sourceCode = DatabaseSourceService::instance()
+                                               ->getDataByDiseaseCode($diseaseCode);
             $this->clientConnByCode($sourceCode);
             $this->useTable();
             $this->fillableFields();

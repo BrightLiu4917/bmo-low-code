@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace BrightLiu\LowCode\Services\LowCode;
+namespace BrightLiu\LowCode\Services;
 
-use BrightLiu\LowCode\Services\LowCodeBaseService;
-use App\Services\Api\Bmp\BmpCheetahMedicalCrowdkitApiService;
-use BrightLiu\LowCode\Traits\Context\WithAuthContext;
 use Illuminate\Support\Collection;
+use BrightLiu\LowCode\Traits\Context\WithAuthContext;
+use App\Services\Api\Bmp\BmpCheetahMedicalCrowdkitApiService;
+use function BrightLiu\LowCode\Services\LowCode\collect;
 
 /**
  * 服务人群工具模块 处理相关

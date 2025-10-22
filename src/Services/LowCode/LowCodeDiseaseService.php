@@ -14,7 +14,7 @@ use BrightLiu\LowCode\Services\LowCodeBaseService;
 use BrightLiu\LowCode\Models\Traits\Cacheable\CacheableModel;
 use BrightLiu\LowCode\Enums\Model\DatabaseSource\SourceTypeEnum;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
-use BrightLiu\LowCode\Services\LowCode\LowCodeDatabaseSourceService;
+use BrightLiu\LowCode\Services\LowCode\DatabaseSourceService;
 
 /*
  * 疾病编码

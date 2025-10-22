@@ -6,10 +6,9 @@ namespace BrightLiu\LowCode\Services;
 
 use Throwable;
 use Illuminate\Support\Facades\Http;
-use App\Models\LowCode\DatabaseSource;
+use BrightLiu\LowCode\Models\DatabaseSource;
 use Illuminate\Http\Client\RequestException;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
-use App\Services\LowCode\LowCodeQueryEngineService;
 use BrightLiu\LowCode\Traits\Context\WithOrgContext;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
 use BrightLiu\LowCode\Traits\Context\WithDiseaseContext;
@@ -21,7 +20,7 @@ use BrightLiu\LowCode\Traits\Context\WithDiseaseContext;
  * @created    : 2025-10-18 17:15:59
  * @modifier   : 2025-10-18 17:15:59
  */
-class BusinessMiddlePlatformService extends LowCodeBaseService
+class BmpBaseLineService extends LowCodeBaseService
 {
     use WithOrgContext, WithDiseaseContext, WithAuthContext;
 
@@ -88,7 +87,7 @@ class BusinessMiddlePlatformService extends LowCodeBaseService
      * @throws \Illuminate\Http\Client\RequestException
      * @throws \Throwable
      */
-    public function updateResidentData(
+    public function updatePatientData(
         array $args = [],
     ): array {
         try {
@@ -105,14 +104,14 @@ class BusinessMiddlePlatformService extends LowCodeBaseService
             return $responseData;
         } catch (RequestException $e) {
 
-            Logger::BUSINESS_MIDDLE_PLATFORM_ERROR->error('业务中台请求失败', [
+            Logger::BMP_BASE_LINE_ERROR->error('业务中台请求失败', [
                 'url'     => $this->baseUrl(),
                 'error'   => $e->getMessage(),
                 'payload' => $payload ?? null,
             ]);
             throw $e;
         } catch (Throwable $e) {
-            Logger::WIDTH_TABLE_DATA_RESIDENT->error('保存居民数据时发生意外错误',
+            Logger::BMP_BASE_LINE_ERROR->error('保存居民数据时发生意外错误',
                 [
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),
@@ -193,7 +192,7 @@ class BusinessMiddlePlatformService extends LowCodeBaseService
      * @throws \Illuminate\Http\Client\RequestException
      * @throws \Throwable
      */
-    public function manageResident(array $args)
+    public function managePatient(array $args)
     {
         $user = auth()->user();
 
@@ -210,7 +209,7 @@ class BusinessMiddlePlatformService extends LowCodeBaseService
         // 合并数据
         $fullPayload = array_merge($args, $defaults);
 
-        return $this->updateResidentData($fullPayload);
+        return $this->updatePatientData($fullPayload);
         /**
          * 纳管状态           manage_status         int      // 状态标识（0:待纳管 1:已纳管 2:拒绝纳管 3:退出纳管）
          * 纳管机构编码       manage_org_code         string   // 机构唯一标识
@@ -234,7 +233,7 @@ class BusinessMiddlePlatformService extends LowCodeBaseService
      * @throws \Illuminate\Http\Client\RequestException
      * @throws \Throwable
      */
-    public function removeManagetResident(array $args = [],bool $isMoveMangeInfo = true)
+    public function removeManagetPatient(array $args = [],bool $isMoveMangeInfo = true)
     {
         $movedArgs = [];
             $args['manage_end_at'] ?? now()->format('Y-m-d H:i:s');
@@ -242,7 +241,7 @@ class BusinessMiddlePlatformService extends LowCodeBaseService
         if ($isMoveMangeInfo){
             $movedArgs = $this->moveManageInfo();
         }
-        return $this->updateResidentData(array_merge($args,$movedArgs));
+        return $this->updatePatientData(array_merge($args,$movedArgs));
     }
 
     /** 删除纳管相关信息
@@ -270,7 +269,7 @@ class BusinessMiddlePlatformService extends LowCodeBaseService
      * @return array|mixed|void
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function createResident(array $args)
+    public function createPatient(array $args)
     {
         if (empty($args)) {
             return;
@@ -300,9 +299,8 @@ class BusinessMiddlePlatformService extends LowCodeBaseService
     {
         return QueryEngineService::instance()
                                  ->autoClient()
-                                 ->useTable(config('low-code.bmo-business-center.crowd-type-table'))
+                                 ->useTable(config('low-code.bmo-baseline.crowd-type-table'))
                                  ->setCache(50)
-//                                 ->whereDiseaseCode($this->diseaseCode)
                                  ->whereBatchUserIds($userIds)
                                  ->select(['user_id', 'group_id', 'group_name'])
                                  ->getAllResult();

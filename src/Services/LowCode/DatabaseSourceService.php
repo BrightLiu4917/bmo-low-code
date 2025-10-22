@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 /**
  * 数据库源
  */
-final class LowCodeDatabaseSourceService extends LowCodeBaseService
+final class DatabaseSourceService extends LowCodeBaseService
 {
     use CacheableModel, DiseaseRelation,CastDefaultFixHelper;
 

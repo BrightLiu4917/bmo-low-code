@@ -6,13 +6,12 @@ namespace BrightLiu\LowCode\Services\LowCode;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Services\LowCodeBaseService;
 use BrightLiu\LowCode\Enums\Model\DatabaseSource\SourceTypeEnum;
-use App\Models\LowCode\DatabaseSource;
-use App\Models\LowCode\LowCodeList;
-use App\Models\LowCode\LowCodePart;
-use App\Models\LowCode\LowCodeTemplate;
-use App\Models\LowCode\LowCodeTemplateHasPart;
-use App\Services\Api\Bmp\BmpCheetahMedicalCrowdkitApiService;
-use BrightLiu\LowCode\Services\LowCode\LowCodeDatabaseSourceService;
+use BrightLiu\LowCode\Models\DatabaseSource;
+use BrightLiu\LowCode\Models\LowCodeList;
+use BrightLiu\LowCode\Models\LowCodePart;
+use BrightLiu\LowCode\Models\LowCodeTemplate;
+use BrightLiu\LowCode\Models\LowCodeTemplateHasPart;
+use BrightLiu\LowCode\Services\BmpCheetahMedicalCrowdkitApiService;
 use BrightLiu\LowCode\Tools\Uuid;
 use BrightLiu\LowCode\Traits\Context\WithContext;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
@@ -72,7 +71,6 @@ final class InitOrgDiseaseService extends LowCodeBaseService
     {
         try {
             $data = BmpCheetahMedicalCrowdkitApiService::instance()->getPatientCrowdInfo(1);
-
             return $data['db_name'];
         } catch (\Throwable $e) {
             throw new ServiceException('获取人员信息表失败失败');
@@ -111,10 +109,8 @@ final class InitOrgDiseaseService extends LowCodeBaseService
      */
     protected function initDataSource(string $dataTableName): ?DatabaseSource
     {
-        $dataWarehouseConfig = (array) config('business.medical-platform.data_warehouse.default', []);
-
+        $dataWarehouseConfig = (array) config('low-code.bmo-baseline.database.default', []);
         $data =  [];
-
         $data['disease_code'] = $this->getDiseaseCode();
         $data['name'] = $this->getDiseaseCode();
         $data['host'] = $dataWarehouseConfig['host'] ?? '';
@@ -125,8 +121,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
         $data['password'] = $dataWarehouseConfig['password'] ?? '';
         $data['options'] = $dataWarehouseConfig['options'] ?? [];
         $data['source_type'] = SourceTypeEnum::NO;
-
-        return LowCodeDatabaseSourceService::instance()->create($data);
+        return DatabaseSourceService::instance()->create($data);
     }
 
     /**
@@ -150,7 +145,6 @@ final class InitOrgDiseaseService extends LowCodeBaseService
                         $sceneTemplateMapping->toArray(),
                         $this->initTemplates($item['templates'])->toArray()
                     );
-
                     unset($item['templates']);
                 } else {
                     $templateMapping = $sceneTemplateMapping;
@@ -181,51 +175,12 @@ final class InitOrgDiseaseService extends LowCodeBaseService
         }
     }
 
-//    protected function initTemplates(array $templates): Collection
-//    {
-//        return collect($templates)->map(function ($templateItem) {
-//            // 初始化template
-//            $listTemplate = LowCodeTemplate::query()->create($templateItem);
-//
-//            // 预置parts公共信息
-//            $partCommonInfo = [
-//                'org_code' => $this->getOrgCode(),
-//                'part_type' => 1,
-//                'content_type' => $templateItem['content_type'],
-////                'creator_id' => $this->getAdminId(),
-////                'updater_id' => $this->getAdminId(),
-//                'created_at' => date('Y-m-d H:i:s'),
-//                'updated_at' => date('Y-m-d H:i:s'),
-//            ];
-//
-//            $parts = collect($templateItem['parts'] ?? [])
-//                ->map(fn ($item, $index) => [
-//                    ...$item,
-//                    ...$partCommonInfo,
-//                    'content' => json_encode($item['content'] ?? [], JSON_UNESCAPED_UNICODE),
-//                    'code' => Uuid::generate(),
-//                    'weight' => $index,
-//                ]);
-//
-//            // 初始化parts
-//            LowCodePart::query()->insert($parts->toArray());
-//
-//            // 维护template与part的关联关系
-//            LowCodeTemplateHasPart::query()->insert(
-//                $parts->map(fn ($item, $index) => [
-//                    'part_code' => $item['code'],
-//                    'template_code' => $listTemplate['code'],
-//                    'weight' => $index,
-//                    'created_at' => date('Y-m-d H:i:s'),
-//                    'updated_at' => date('Y-m-d H:i:s'),
-//                ])->reverse()->toArray()
-//            );
-//
-//            return $listTemplate;
-//        });
-//    }
-
-
+    /**
+     * 优化后版本 by:lwl 兼容所有的json格式
+     * @param array $templates
+     *
+     * @return mixed
+     */
     protected function initTemplates(array $templates)
     {
         try {
@@ -295,7 +250,12 @@ final class InitOrgDiseaseService extends LowCodeBaseService
     protected function loadTemplates(): array
     {
         try {
-            return json_decode(file_get_contents(storage_path('templates.json')), true);
+            $fileContent = file_get_contents(storage_path('templates.json'));
+            $array = json_decode($fileContent, true);
+            if (!is_array($array)){
+                throw new ServiceException('模板文件格式错误');
+            }
+            return $array;
         } catch (\Throwable $e) {
             // TODO: ...
         }

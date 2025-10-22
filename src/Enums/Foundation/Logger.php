@@ -51,6 +51,10 @@ enum Logger: string
     //开放接口错误日志
     case OPEN_API_ERROR = 'open-api-error';
 
-    case BUSINESS_MIDDLE_PLATFORM_ERROR = 'business_middle_platform_error';
+    case BMP_BASE_LINE_ERROR = 'bmp_base_line_error';
+
+    case BMP_CHEETAH_MEDICAL_CROWDKIT_ERROR = 'bmp_cheetah_medical_crowdkit_error';
+
+
 
 }

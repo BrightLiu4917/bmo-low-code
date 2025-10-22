@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Exceptions\ServiceException;
-use BrightLiu\LowCode\Services\LowCode\LowCodeDatabaseSourceService;
+use BrightLiu\LowCode\Services\LowCode\DatabaseSourceService;
 use Illuminate\Database\Connection;
 use PDO;
 
@@ -76,7 +76,7 @@ final class DbConnectionManager
 
         try {
             $dbConfig = Cache::remember($cacheKey, now()->addMinutes(60), function () use ($code) {
-                $source = LowCodeDatabaseSourceService::instance()->fetchDataByCode($code);
+                $source = DatabaseSourceService::instance()->fetchDataByCode($code);
                 if (empty($source)) {
                     throw new ServiceException("数据源 '{$code}' 不存在");
                 }

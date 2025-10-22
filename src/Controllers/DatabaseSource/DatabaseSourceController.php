@@ -9,7 +9,7 @@ use App\Models\LowCode\DatabaseSource;
 use Gupo\BetterLaravel\Http\BaseController;
 use BrightLiu\LowCode\Resources\DatabaseSource\ShowResource;
 use BrightLiu\LowCode\Resources\DatabaseSource\ListResource;
-use BrightLiu\LowCode\Services\LowCode\LowCodeDatabaseSourceService;
+use BrightLiu\LowCode\Services\LowCode\DatabaseSourceService;
 use BrightLiu\LowCode\Requests\Foundation\DatabaseSourceRequest\DatabaseSourceRequest;
 
 /**
@@ -21,9 +21,9 @@ use BrightLiu\LowCode\Requests\Foundation\DatabaseSourceRequest\DatabaseSourceRe
 final class DatabaseSourceController extends BaseController
 {
     /**
-     * @param LowCodeDatabaseSourceService $service
+     * @param DatabaseSourceService $service
      */
-    public function __construct(private readonly LowCodeDatabaseSourceService $service)
+    public function __construct(private readonly DatabaseSourceService $service)
     {
 
     }

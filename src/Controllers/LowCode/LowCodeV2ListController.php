@@ -8,7 +8,7 @@ use App\Http\Resources\LowCode\ListResource;
 use App\Http\Resources\LowCode\BasicInfoResource;
 use BrightLiu\LowCode\Enums\Model\AdminPreference\SceneEnum;
 use BrightLiu\LowCode\Services\QueryEngineService;
-use BrightLiu\LowCode\Services\BusinessMiddlePlatformService;
+use BrightLiu\LowCode\Services\BmpBaseLineService;
 use BrightLiu\LowCode\Services\LowCode\LowCodeResidentService;
 use BrightLiu\LowCode\Enums\Model\LowCode\LowCodeList\ListTypeEnum;
 use App\Http\Resources\LowCode\LowCodeList\QuerySource;
@@ -160,7 +160,7 @@ final class LowCodeListV2Controller extends BaseController
             $userIds = $data->pluck('user_id')->toArray();
 
             //查询人群分类表里人群
-            $crowds = BusinessMiddlePlatformService::instance()->getPatientCrowds($userIds);
+            $crowds = BmpBaseLineService::instance()->getPatientCrowds($userIds);
             $grouped = [];
             foreach ($crowds as $item) {
                 $userId = $item->user_id;
