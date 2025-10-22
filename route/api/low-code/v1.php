@@ -12,7 +12,7 @@ Route::prefix('v1/disease')->group(function () {
     Route::get('show', [DiseaseController::class, 'show']);
     Route::post('update', [DiseaseController::class, 'update']);
     Route::post('delete', [DiseaseController::class, 'delete']);
-})->middleware(['auth.disease']);
+});
 
 //数据源
 Route::prefix('v1/database-source')->group(function () {
@@ -20,12 +20,10 @@ Route::prefix('v1/database-source')->group(function () {
     Route::get('show', [DatabaseSourceController::class, 'show']);
     Route::post('update', [DatabaseSourceController::class, 'update']);
     Route::post('delete', [DatabaseSourceController::class, 'delete']);
-})->middleware(['auth.disease']);
+});
 
-Route::prefix('v1/low-code')->group([
-    'middleware' => ['auth.disease'],//登陆中间件
-], function () {
-    Route::prefix('list')->group(function () {
+
+    Route::prefix('v1/low-code/list')->group(function () {
         Route::get('list', [LowCodeListController::class, 'list']);
         Route::get('show', [LowCodeListController::class, 'show']);
         Route::post('simple-list', [LowCodeListController::class, 'simpleList']);
@@ -35,11 +33,11 @@ Route::prefix('v1/low-code')->group([
         Route::post('pre', [LowCodeListController::class, 'pre']);
     });
 
-    Route::prefix('template')->group(function () {
+    Route::prefix('v1/low-code/template')->group(function () {
         Route::get('list', [LowCodeTemplateController::class, 'list']);
         Route::get('show', [LowCodeTemplateController::class, 'show']);
         Route::post('update', [LowCodeTemplateController::class, 'update']);
         Route::post('delete', [LowCodeTemplateController::class, 'delete']);
     });
-    Route::post('template-bind-parts', [LowCodeTemplateController::class, 'bindPart']);
-});
+    Route::post('v1/low-code/template-bind-parts', [LowCodeTemplateController::class, 'bindPart']);
+

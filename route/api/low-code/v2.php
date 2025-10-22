@@ -1,20 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LowCode\LowCodeListController;
-use App\Http\Controllers\LowCode\LowCodePersonalizeModuleController;
-use App\Http\Controllers\LowCode\LowCodeListV2Controller;
+use BrightLiu\LowCode\Controllers\LowCode\LowCodePersonalizeModuleController;
+use BrightLiu\LowCode\Controllers\LowCode\LowCodeListV2Controller;
 use BrightLiu\LowCode\Controllers\LowCode\ResidentCrowdController;
 
-Route::group(['prefix' => 'v2/resident', 'middleware' => ['bmp.disease.auth.inner']], function () {
-    Route::get('resident-crowd/optional', [ResidentCrowdController::class, 'optional']);
-});
-
 Route::group([
-    'middleware' => ['auth.disease'],//登陆中间件
 ], function () {
 
     Route::prefix('v2/resident')->group(function () {
+
+        Route::get('resident-crowd/optional', [ResidentCrowdController::class, 'optional']);
+
         //患者相关
         Route::any('resident-archive/basic-info', [LowCodeListV2Controller::class, 'basicInfo']);
     });
