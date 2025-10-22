@@ -3,6 +3,9 @@
 namespace BrightLiu\LowCode\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Foundation\CachesRoutes;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 class LowCodeServiceProvider extends ServiceProvider
 {
@@ -16,6 +19,8 @@ class LowCodeServiceProvider extends ServiceProvider
             __DIR__.'/../../config/low-code.php',
             'low-code'
         );
+
+        $this->loadDependencies();
     }
 
     /**
@@ -24,6 +29,8 @@ class LowCodeServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishResources();
+
+        $this->registerModuleRoutes();
     }
 
     /**
@@ -59,5 +66,45 @@ class LowCodeServiceProvider extends ServiceProvider
             __DIR__.'/../../database/migrations' => database_path('migrations'),
             __DIR__.'/../../resource' => app_path('Http/Resources/LowCode'),
         ], 'low-code-package');
+    }
+
+    /**
+     * 注册模块路由收集
+     */
+    protected function registerModuleRoutes(): void
+    {
+        if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
+            return;
+        }
+
+        $rootPath = __DIR__ . '/../../route';
+
+        transform(
+            config('low-code.http.modules', []),
+            function ($modules) use ($rootPath) {
+                foreach ($modules as $moduleName => $options) {
+                    Route::group(
+                        $options,
+                        array_map(
+                            fn ($file) => "{$rootPath}/{$file}",
+                            Storage::build($rootPath)->files($moduleName, true)
+                        )
+                    );
+                }
+            }
+        );
+    }
+
+    protected function loadDependencies(): void
+    {
+        $dependencies = (array) config('low-code.dependencies', []);
+
+        foreach ($dependencies as $source => $dependency) {
+            if ($source === $dependency) {
+                continue;
+            }
+
+            $this->app->alias($dependency, $source);
+        }
     }
 }

@@ -44,5 +44,17 @@ return [
             ]
     ],
 
+    /**
+     * Http模块
+     */
+    'http' => [
+        'modules' => [
+            'api' => [
+                'prefix' => 'api',
+                'middleware' => ['api', 'auth.disease'],
+            ]
+        ],
+    ],
 
+    'dependencies' => []
 ];

@@ -1,6 +1,6 @@
 # low-code
 ### 安装 Composer 包
-```text 
+```text
 composer require bright-liu4917/low-code:v1.0.0
 ```
 ### 在 config/app.php配置文件中注册服务提供者：
@@ -154,8 +154,8 @@ $routeMiddleware = [
 #### 日志
 ```text
     在 config/logging.php配置文件中注册服务提供者：
-    
-    'low-code-list' => 
+
+    'low-code-list' =>
         [
             'driver' => 'daily',
             'path' => storage_path('logs/low-code-list/daily.log'),
@@ -351,6 +351,27 @@ CREATE TABLE `personalize_modules` (
   KEY `idx_disease_code_org_code` (`disease_code`(8)),
   KEY `idx_module_id` (`module_id`(8))
 ) ENGINE=InnoDB  COMMENT='个性化模块表';
+
+CREATE TABLE `follow_residents` (
+    `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `disease_code` varchar(32) NOT NULL DEFAULT '' COMMENT '病种编码',
+    `admin_id` bigint UNSIGNED NOT NULL DEFAULT 0 COMMENT '管理员ID',
+    `resident_user_id` varchar(32) NOT NULL DEFAULT '' COMMENT '居民user_id',
+    `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_disease_code_org_code` (`disease_code`(8))
+) ENGINE = InnoDB COMMENT = '关注居民表';
+
+CREATE TABLE `resident_monitor_metrics` (
+    `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `disease_code` varchar(32) NOT NULL DEFAULT '' COMMENT '病种编码',
+    `resident_user_id` varchar(32) NOT NULL DEFAULT '' COMMENT '居民user_id',
+    `metric_title` varchar(64) NOT NULL DEFAULT '' COMMENT '指标标题',
+    `metric_id` varchar(64) NOT NULL DEFAULT '' COMMENT '指标ID',
+    `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_disease_code_org_code` (`disease_code`(8))
+) ENGINE = InnoDB COMMENT = '居民监测指标表';
 ```
 
 ```text
@@ -368,29 +389,29 @@ use BrightLiu\LowCode\Context\OrgContext;
         $this->app->singleton('context:disease', DiseaseContext::class);
         //其他代码
     }
-     
+
      获取用户当前信息
      auth()->user();
-     
+
      //初始化病种用户信息等 中间件 DiseaseAuthenticate
      App\Http.Kernel.$routeMiddleware = [
          'auth.disease' => DiseaseAuthenticate::class
      ]
-     
+
      创建文件 并配置用户中心请求地址
-     config('business.bmo-service.auth.base_uri',env('BMO_AUTH_BASE_URI')) 
-     
+     config('business.bmo-service.auth.base_uri',env('BMO_AUTH_BASE_URI'))
+
      创建文件 并配置业务中台请求地址
      //有可能 第一个请求 java 第二请求另一个java 所以分开
      config('business.api-service.bmp_cheetah_medical_crowdkit.uri', env('BMP_CHEETAH_MEDICAL_CROWDKIT_URI'))
      config('business.api-service.bmp_cheetah_medical_platform.uri', env('BMP_CHEETAH_MEDICAL_CROWDKIT_URI'))
-     
-     
-     
 
-     
-     
-     
+
+
+
+
+
+
     Env 添加
     BMP_CHEETAH_MEDICAL_CROWDKIT_URI=业务中台api
     BMO_AUTH_BASE_URI=用户中心api
@@ -923,7 +944,7 @@ chmod -R 777 storage
 
 ### 创建 config('business.medical-platform') 追加以下内容
 
-```text 
+```text
 <?php
 
 return [
