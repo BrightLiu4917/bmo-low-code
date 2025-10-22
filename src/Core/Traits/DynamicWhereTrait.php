@@ -213,7 +213,7 @@ trait DynamicWhereTrait
      */
     public function whereManageOrgCode(string $value = ''): self
     {
-        return $this->whereField($value, 'incprt_into_mng_org_cd');
+        return $this->whereField($value, 'manage_org_code');
     }
 
     /**
@@ -238,7 +238,7 @@ trait DynamicWhereTrait
      */
     public function whereManageFlag(string $value = '1'): self
     {
-        return $this->whereField($value, 'incprt_into_mng_flg');
+        return $this->whereField($value, 'manage_status');
     }
 
     /**
@@ -254,17 +254,6 @@ trait DynamicWhereTrait
         return $this;
     }
 
-    /**
-     * 人群分类条件
-     *
-     * @param array $value
-     *
-     * @return DynamicWhereTrait|\App\Support\LowCode\Core\Abstracts\QueryEngineAbstract
-     */
-    public function whereCrowdType(string $value = ''): self
-    {
-        return $this->whereField($value, 'ptt_crwd_clsf_cd');
-    }
 
     /**
      * 添加批量用户ID条件

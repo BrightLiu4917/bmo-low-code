@@ -86,10 +86,11 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
     }
 
     /**
-     * 更新患者信息
+     * @param string $userId
+     * @param array  $attributes
      *
-     * @param string $userId 居民主索引
-     * @param array $attributes 更新属性
+     * @return void
+     * @throws \Illuminate\Http\Client\RequestException
      */
     public function updatePatientInfo(string $userId, array $attributes): void
     {
@@ -130,7 +131,6 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                    ])
                    ->throw()
                    ->json();
-
         return $data['data'] ?? [];
     }
 }

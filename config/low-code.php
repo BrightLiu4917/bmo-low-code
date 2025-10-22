@@ -55,7 +55,7 @@ return [
             ],
             'low-code' => [
                 'prefix' => 'api',
-                'middleware' => [],
+                'middleware' => ['api', 'auth.disease'],
             ]
         ],
     ],

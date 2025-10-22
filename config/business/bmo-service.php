@@ -1,7 +1,7 @@
 <?php
 return [
     'auth'=>[
-        'org_id' => env("BMO_ORG_id",''),
+        'org_id' => env("BMO_ORG_ID",''),
     ],
 
     //宝庆老师业务中台uri
