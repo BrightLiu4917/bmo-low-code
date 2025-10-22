@@ -4,7 +4,8 @@ declare(strict_types = 1);
 
 namespace BrightLiu\LowCode\Controllers\LowCode;
 
-use BrightLiu\LowCode\Resources\patient\BasicInfoResource;
+use App\Http\Resources\LowCode\ListSource;
+use App\Http\Resources\LowCode\BasicInfoResource;
 use BrightLiu\LowCode\Enums\Model\AdminPreference\SceneEnum;
 use BrightLiu\LowCode\Services\QueryEngineService;
 use BrightLiu\LowCode\Services\BusinessMiddlePlatformService;
@@ -160,11 +161,6 @@ final class LowCodeListV2Controller extends BaseController
 
             //查询人群分类表里人群
             $crowds = BusinessMiddlePlatformService::instance()->getPatientCrowds($userIds);
-//                QueryEngineService::instance()
-//                                               ->useTable('feature_user_detail')
-//                                               ->whereMixed([['user_id', 'in', $userIds,]])
-//                                               ->select(['user_id', 'group_id', 'group_name'])
-//                                               ->getAllResult();
             $grouped = [];
             foreach ($crowds as $item) {
                 $userId = $item->user_id;
@@ -180,13 +176,15 @@ final class LowCodeListV2Controller extends BaseController
             //$grouped 将患者的人群分类收集到一起
 
             $data = $data->each(function($item) use ($grouped) {
-                $res = (array)$grouped[$item->user_id ?? ''];
-                return $item->_crowds = implode(',',
-                    array_column($res ?? [], 'group_name'));
+                if (isset($grouped[$item->user_id])){
+                    $res = (array)$grouped[($item->user_id ?? '')];
+                    return $item->_crowds = implode(',',
+                        array_column($res ?? [], 'group_name'));
+                }
             });
         } catch (\Throwable $exception) {
         }
-        return $this->responseData($data, QuerySource::class);
+        return $this->responseData($data, ListSource::class);
     }
 
     /**

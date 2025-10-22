@@ -302,7 +302,7 @@ class BusinessMiddlePlatformService extends LowCodeBaseService
                                  ->autoClient()
                                  ->useTable(config('low-code.bmo-business-center.crowd-type-table'))
                                  ->setCache(50)
-                                 ->whereDiseaseCode($this->diseaseCode)
+//                                 ->whereDiseaseCode($this->diseaseCode)
                                  ->whereBatchUserIds($userIds)
                                  ->select(['user_id', 'group_id', 'group_name'])
                                  ->getAllResult();

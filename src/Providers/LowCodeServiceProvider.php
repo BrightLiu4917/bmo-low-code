@@ -40,6 +40,14 @@ class LowCodeServiceProvider extends ServiceProvider
             __DIR__.'/../../config/low-code.php' => config_path('low-code.php'),
         ], 'low-code-config');
 
+        $this->publishes([
+            __DIR__.'/../../source/ListSource.php' => app_path('Http/Resources/LowCode'),
+        ], 'low-code-list-source');
+
+        $this->publishes([
+            __DIR__.'/../../source/BasicInfoSource.php' => app_path('Http/Resources/LowCode'),
+        ], 'low-code-basic-info-source');
+
         // 迁移文件发布
         $this->publishes([
             __DIR__.'/../../database/migrations' => database_path('migrations'),
@@ -49,6 +57,7 @@ class LowCodeServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../../config/low-code.php' => config_path('low-code.php'),
             __DIR__.'/../../database/migrations' => database_path('migrations'),
+            __DIR__.'/../../source' => app_path('Http/Resources/LowCode'),
         ], 'low-code-package');
     }
 }
