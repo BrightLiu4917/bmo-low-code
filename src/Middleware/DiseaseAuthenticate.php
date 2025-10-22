@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Middleware;
 
-use App\Models\LowCode\ApiAccount;
 use BrightLiu\LowCode\Context\AdminContext;
 use BrightLiu\LowCode\Context\OrgContext;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
@@ -45,8 +44,6 @@ final class DiseaseAuthenticate
 
             // 初始化上下文
             $this->autoContext($bmoAccount);
-            $bmoApiAccount = new ApiAccount($bmoAccount);
-            auth()->setUser($bmoApiAccount);
         } catch (\Throwable $e) {
             Logger::AUTHING->error(
                 sprintf('DiseaseAuthenticate failed: %s', $e->getMessage()),
@@ -68,14 +65,12 @@ final class DiseaseAuthenticate
         OrgContext::init(
             orgCode: (string) $request->header(HeaderEnum::ORG_ID, ''),
         );
-
         AuthContext::init(
             systemCode: (string) $request->header(HeaderEnum::SYSTEM_CODE, ''),
             orgId: (int) $request->header(HeaderEnum::ORG_ID, ''),
             token: (string) $request->header(HeaderEnum::AUTHORIZATION, ''),
             requestSource: (string) $request->header(HeaderEnum::REQUEST_SOURCE, '')
         );
-
         AdminContext::init($admin);
     }
 }

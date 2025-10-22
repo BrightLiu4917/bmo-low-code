@@ -7,7 +7,7 @@ namespace BrightLiu\LowCode\Support;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use BrightLiu\LowCode\Tools\BetterArr;
-use BrightLiu\LowCode\Services\LowCode\LowCodeDatabaseSourceService;
+use BrightLiu\LowCode\Services\LowCode\DatabaseSourceService;
 use BrightLiu\LowCode\Core\DbConnectionManager;
 use BrightLiu\LowCode\Context\DiseaseContext;
 
@@ -37,6 +37,6 @@ class CrowdConnection
         $diseaseCode ??= DiseaseContext::instance()->getDiseaseCode();
 
         return DbConnectionManager::getInstance()
-            ->getConnection(LowCodeDatabaseSourceService::instance()->getDataByDiseaseCode($diseaseCode));
+            ->getConnection(DatabaseSourceService::instance()->getDataByDiseaseCode($diseaseCode));
     }
 }

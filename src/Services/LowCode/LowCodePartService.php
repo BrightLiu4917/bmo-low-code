@@ -5,11 +5,11 @@ declare(strict_types = 1);
 namespace BrightLiu\LowCode\Services\LowCode;
 
 use Illuminate\Support\Facades\DB;
-use App\Models\LowCode\LowCodePart;
+use BrightLiu\LowCode\Models\LowCodePart;
 use BrightLiu\LowCode\Traits\CastDefaultFixHelper;
 use BrightLiu\LowCode\Services\LowCodeBaseService;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
-use BrightLiu\LowCode\Enums\Model\LowCodePart\PartTypeEnum;
+use BrightLiu\LowCode\Enums\Model\LowCode\LowCodePart\PartTypeEnum;
 
 /**
  * 低代码-零件

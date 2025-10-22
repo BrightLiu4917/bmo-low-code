@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Services\LowCode;
 
-use App\Traits\Context\WithDiseaseContext;
-use App\Models\LowCode\LowCodePersonalizeModule;
+use BrightLiu\LowCode\Traits\Context\WithDiseaseContext;
+use BrightLiu\LowCode\Models\LowCodePersonalizeModule;
 use BrightLiu\LowCode\Services\LowCodeBaseService;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
 use Gupo\BetterLaravel\Service\BaseService;
@@ -16,12 +16,12 @@ use Illuminate\Support\Facades\DB;
  */
 final class LowCodePersonalizeModuleService extends LowCodeBaseService
 {
-//    use WithDiseaseContext;
+    use WithDiseaseContext;
 
     public function save(array $items, string $defaultModuleType = ''): bool
     {
         $formattedItems = collect($items)->map(fn ($item, $index) => [
-//            'disease_code' => $this->getDiseaseCode(),
+            'disease_code' => $this->getDiseaseCode(),
             'title' => $item['title'] ?? '',
             'metadata' => json_encode($item['metadata'] ?? []),
             'module_id' => $item['module_id'] ?? '',

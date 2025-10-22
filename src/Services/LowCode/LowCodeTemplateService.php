@@ -5,12 +5,12 @@ declare(strict_types = 1);
 namespace BrightLiu\LowCode\Services\LowCode;
 
 use Illuminate\Support\Facades\DB;
-use App\Models\LowCode\LowCodePart;
-use App\Models\LowCode\LowCodeList;
+use BrightLiu\LowCode\Models\LowCodePart;
+use BrightLiu\LowCode\Models\LowCodeList;
 use BrightLiu\LowCode\Traits\CastDefaultFixHelper;
 use BrightLiu\LowCode\Services\LowCodeBaseService;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
-use App\Models\LowCode\LowCodeTemplate;
+use BrightLiu\LowCode\Models\LowCodeTemplate;
 use BrightLiu\LowCode\Core\TemplatePartCacheManager;
 
 /**

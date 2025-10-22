@@ -5,11 +5,11 @@ declare(strict_types = 1);
 namespace BrightLiu\LowCode\Services\LowCode;
 
 
-use App\Models\LowCode\Disease;
+use BrightLiu\LowCode\Models\LowCodeDisease;
 use Illuminate\Support\Facades\DB;
 use BrightLiu\LowCode\Traits\CastDefaultFixHelper;
 use GuzzleHttp\Exception\GuzzleException;
-use App\Models\LowCode\DatabaseSource;
+use BrightLiu\LowCode\Models\DatabaseSource;
 use BrightLiu\LowCode\Services\LowCodeBaseService;
 use BrightLiu\LowCode\Models\Traits\Cacheable\CacheableModel;
 use BrightLiu\LowCode\Enums\Model\DatabaseSource\SourceTypeEnum;
@@ -27,11 +27,11 @@ final class LowCodeDiseaseService extends LowCodeBaseService
     /**
      * @param array $data
      *
-     * @return Disease|null
+     * @return LowCodeDisease|null
      */
-    public function create(array $data): Disease|null
+    public function create(array $data): LowCodeDisease|null
     {
-        $filterArgs = $this->fixInputDataByCasts($data, Disease::class);
+        $filterArgs = $this->fixInputDataByCasts($data, LowCodeDisease::class);
         if (empty($filterArgs['extraction_pattern'])){
             $filterArgs['extraction_pattern'] = '/^慢病配药管理平台-(.*)$/';
         }
@@ -50,7 +50,7 @@ final class LowCodeDiseaseService extends LowCodeBaseService
             if (!$this->syncCreateDataSource(diseaseCode:$filterArgs['code'],diseaseName:$filterArgs['name'])){
                 throw new ServiceException('初始化数据仓库失败');
             }
-           return Disease::query()->create($filterArgs);
+           return LowCodeDisease::query()->create($filterArgs);
         });
         return $data;
     }
@@ -61,9 +61,9 @@ final class LowCodeDiseaseService extends LowCodeBaseService
      * @return Disease|null
      * @throws ServiceException
      */
-    public function show(int $id = 0): Disease|null
+    public function show(int $id = 0): LowCodeDisease|null
     {
-        if (!$result = Disease::fetch($id)) {
+        if (!$result = LowCodeDisease::fetch($id)) {
             throw new ServiceException("ID:{$id}不存在");
         }
         return $result;
@@ -77,7 +77,7 @@ final class LowCodeDiseaseService extends LowCodeBaseService
      */
     public function delete(int $id = 0): bool
     {
-        if (!$result = Disease::fetch($id)) {
+        if (!$result = LowCodeDisease::fetch($id)) {
             throw new ServiceException("ID:{$id}不存在");
         }
         return $result->forceDelete();
@@ -92,10 +92,10 @@ final class LowCodeDiseaseService extends LowCodeBaseService
      */
     public function update(array $data, int $id = 0)
     {
-        if (!$result = Disease::fetch($id)) {
+        if (!$result = LowCodeDisease::fetch($id)) {
             throw new ServiceException("ID:{$id}不存在");
         }
-        $filterArgs = $this->fixInputDataByCasts($filterArgs, Disease::class);
+        $filterArgs = $this->fixInputDataByCasts($data, LowCodeDisease::class);
         return $result->update($filterArgs);
     }
 

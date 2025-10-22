@@ -11,7 +11,6 @@ use BrightLiu\LowCode\Services\QueryEngineService;
 use BrightLiu\LowCode\Services\BmpBaseLineService;
 use BrightLiu\LowCode\Services\LowCode\LowCodeResidentService;
 use BrightLiu\LowCode\Enums\Model\LowCode\LowCodeList\ListTypeEnum;
-use App\Http\Resources\LowCode\LowCodeList\QuerySource;
 use BrightLiu\LowCode\Resources\LowCode\V2\LowCodeList\SimpleListSource;
 use BrightLiu\LowCode\Models\AdminPreference;
 use BrightLiu\LowCode\Models\LowCodePersonalizeModule;

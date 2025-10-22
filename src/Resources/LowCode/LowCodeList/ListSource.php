@@ -26,7 +26,6 @@ final class ListSource extends JsonResource
                 "admin_name",
                 "code",
                 "parent_code",
-//                "crowd_type_code",
                 "route_group",
                 "admin_weight",
                 "creator_id",
@@ -36,6 +35,7 @@ final class ListSource extends JsonResource
             ]),
             'creator_name' => $this->creator_name ?? '',
             'updater_name' => $this->updater_name ?? '',
+            //"crowd_type_code",
 
 //            'crowd_type_name' => $this->crowdType->name ?? '',
 //            'crowd_type_color' => $this->crowdType->color ?? null,

@@ -82,6 +82,9 @@ class LowCodeList extends LowCodeBaseModel
         'default_order_by_json'  => 'json',
         // Assuming it's a JSON field that should be cast to array
         'preset_condition_json'  => 'json', // JSON DEFAULT NULL
+        'data_permission_code'   => 'string'
+
+
     ];
 
     /**
@@ -100,7 +103,7 @@ class LowCodeList extends LowCodeBaseModel
             "remove_column_json", "remove_button_json",
             "remove_top_button_json", 'default_order_by_json',
             "creator_id", "updater_id", "created_at", "updated_at",
-            "deleted_at", 'list_type', 'preset_condition_json',
+            "deleted_at", 'list_type', 'preset_condition_json','data_permission_code',
         ];
 
 

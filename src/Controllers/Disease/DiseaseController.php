@@ -6,7 +6,7 @@ namespace BrightLiu\LowCode\Controllers\Disease;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Models\LowCode\Disease;
+use BrightLiu\LowCode\Models\LowCodeDisease;
 use Gupo\BetterLaravel\Http\BaseController;
 use BrightLiu\LowCode\Requests\Disease\DiseaseRequest;
 use BrightLiu\LowCode\Resources\Disease\ShowResource;
@@ -51,7 +51,7 @@ final class DiseaseController extends BaseController
     public function list(Request $request): JsonResponse
     {
         $name = (string)$request->input('name','');
-        $list = Disease::query()
+        $list = LowCodeDisease::query()
             ->when($name !== '',function($query)use($name){
             $query->where('name','like',"%{$name}%");
         })

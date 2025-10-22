@@ -6,16 +6,15 @@ namespace BrightLiu\LowCode\Services\LowCode;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use App\Models\LowCode\LowCodeList;
+use BrightLiu\LowCode\Models\LowCodeList;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Traits\CastDefaultFixHelper;
 use BrightLiu\LowCode\Services\LowCodeBaseService;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
-use BrightLiu\LowCode\Enums\Model\LowCodeList\ListTypeEnum;
+use BrightLiu\LowCode\Enums\Model\LowCode\LowCodeList\ListTypeEnum;
 use BrightLiu\LowCode\Core\TemplatePartCacheManager;
-use App\Services\Common\QueryEngine\QueryEngineService;
+use BrightLiu\LowCode\Services\QueryEngineService;
 use BrightLiu\LowCode\Exceptions\QueryEngineException;
-use App\Services\LowCode\LowCodeQueryEngineService;
 use Gupo\BetterLaravel\Database\CustomLengthAwarePaginator;
 
 /**
@@ -176,7 +175,7 @@ class LowCodeListService extends LowCodeBaseService
             $list = $this->getLowCodeListByCodes(collect($inputArgs)->pluck('code')->toArray());
 
             // 2.初始化查询
-            $queryEngine = LowCodeQueryEngineService::instance()->autoClient();
+            $queryEngine = QueryEngineService::instance()->autoClient();
             foreach ($inputArgs as $value) {
                 $listCode = $value['code'] ?? '';
                 $config = $list[$listCode] ?? [];

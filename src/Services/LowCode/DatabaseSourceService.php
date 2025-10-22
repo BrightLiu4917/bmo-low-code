@@ -8,7 +8,7 @@ use BrightLiu\LowCode\Traits\CastDefaultFixHelper;
 use Illuminate\Support\Facades\Cache;
 use BrightLiu\LowCode\Services\LowCodeBaseService;
 use BrightLiu\LowCode\Models\Traits\Cacheable\CacheableModel;
-use App\Models\LowCode\DatabaseSource;
+use BrightLiu\LowCode\Models\DatabaseSource;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
 use BrightLiu\LowCode\Models\Traits\DiseaseRelation;
 use BrightLiu\LowCode\Core\DbConnectionManager;

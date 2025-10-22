@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace BrightLiu\LowCode\Controllers\DatabaseSource;
 
 use Illuminate\Http\JsonResponse;
-use App\Models\LowCode\DatabaseSource;
+use BrightLiu\LowCode\Models\DatabaseSource;
 use Gupo\BetterLaravel\Http\BaseController;
 use BrightLiu\LowCode\Resources\DatabaseSource\ShowResource;
 use BrightLiu\LowCode\Resources\DatabaseSource\ListResource;
