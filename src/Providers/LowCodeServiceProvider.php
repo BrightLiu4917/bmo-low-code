@@ -41,11 +41,11 @@ class LowCodeServiceProvider extends ServiceProvider
         ], 'low-code-config');
 
         $this->publishes([
-            __DIR__.'/../../source/ListSource.php' => app_path('Http/Resources/LowCode'),
+            __DIR__.'/../../resource/ListSource.php' => app_path('Http/Resources/LowCode'),
         ], 'low-code-list-resource');
 
         $this->publishes([
-            __DIR__.'/../../source/BasicInfoSource.php' => app_path('Http/Resources/LowCode'),
+            __DIR__.'/../../resource/BasicInfoSource.php' => app_path('Http/Resources/LowCode'),
         ], 'low-code-basic-info-resource');
 
         // 迁移文件发布
