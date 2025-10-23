@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use BrightLiu\LowCode\Controllers\LowCode\LowCodePersonalizeModuleController;
-use BrightLiu\LowCode\Controllers\LowCode\LowCodeListV2Controller;
+use BrightLiu\LowCode\Controllers\LowCode\LowCodeV2ListController;
 use BrightLiu\LowCode\Controllers\LowCode\ResidentCrowdController;
 
 Route::group([
@@ -23,12 +23,12 @@ Route::group([
 
     // 列表v2版本
     Route::prefix('v2/low-code/list')->group(function () {
-        Route::get('simple-list', [LowCodeListV2Controller::class, 'simpleList']);
-        Route::post('query', [LowCodeListV2Controller::class, 'query']);
-        Route::post('pre', [LowCodeListV2Controller::class, 'pre']);
-        Route::post('query-count', [LowCodeListV2Controller::class, 'queryCount']);
-        Route::get('optional-columns', [LowCodeListV2Controller::class, 'optionalColumns']);
-        Route::get('get-column-preference', [LowCodeListV2Controller::class, 'getColumnPreference']);
-        Route::post('update-column-preference', [LowCodeListV2Controller::class, 'updateColumnPreference']);
+        Route::get('simple-list', [LowCodeV2ListController::class, 'simpleList']);
+        Route::post('query', [LowCodeV2ListController::class, 'query']);
+        Route::post('pre', [LowCodeV2ListController::class, 'pre']);
+        Route::post('query-count', [LowCodeV2ListController::class, 'queryCount']);
+        Route::get('optional-columns', [LowCodeV2ListController::class, 'optionalColumns']);
+        Route::get('get-column-preference', [LowCodeV2ListController::class, 'getColumnPreference']);
+        Route::post('update-column-preference', [LowCodeV2ListController::class, 'updateColumnPreference']);
     });
 });
