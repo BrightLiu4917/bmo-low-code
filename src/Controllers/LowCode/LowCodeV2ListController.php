@@ -9,7 +9,6 @@ use App\Http\Resources\LowCode\BasicInfoResource;
 use BrightLiu\LowCode\Enums\Model\AdminPreference\SceneEnum;
 use BrightLiu\LowCode\Services\QueryEngineService;
 use BrightLiu\LowCode\Services\BmpBaseLineService;
-use BrightLiu\LowCode\Services\LowCode\LowCodeResidentService;
 use BrightLiu\LowCode\Enums\Model\LowCode\LowCodeList\ListTypeEnum;
 use BrightLiu\LowCode\Resources\LowCode\V2\LowCodeList\SimpleListSource;
 use BrightLiu\LowCode\Models\AdminPreference;
@@ -27,7 +26,7 @@ use BrightLiu\LowCode\Services\CrowdKitService;
 /**
  * 低代码-列表
  */
-final class LowCodeListV2Controller extends BaseController
+final class LowCodeV2ListController extends BaseController
 {
     /**
      * @param \BrightLiu\LowCode\Services\LowCode\LowCodeListService $service
