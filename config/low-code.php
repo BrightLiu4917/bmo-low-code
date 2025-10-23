@@ -22,6 +22,8 @@ return [
 
             // 基线数据库
             'database'=>[
+                //人员宽表 主表
+                'crowd_psn_wdth_table'=>env('DB_MEDICAL_CROWD_PSN_WDTH','crowd_psn_wdth'),
                 'default' => [
                     'driver' => 'mysql',
                     'host' => env('DB_MEDICAL_PLATFORM_HOST', '127.0.0.1'),

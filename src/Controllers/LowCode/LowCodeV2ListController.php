@@ -4,11 +4,11 @@ declare(strict_types = 1);
 
 namespace BrightLiu\LowCode\Controllers\LowCode;
 
-use App\Http\Resources\LowCode\ListResource;
 use App\Http\Resources\LowCode\BasicInfoResource;
 use BrightLiu\LowCode\Enums\Model\AdminPreference\SceneEnum;
 use BrightLiu\LowCode\Services\QueryEngineService;
 use BrightLiu\LowCode\Services\BmpBaseLineService;
+use BrightLiu\LowCode\Resources\LowCode\LowCodeList\QuerySource;
 use BrightLiu\LowCode\Enums\Model\LowCode\LowCodeList\ListTypeEnum;
 use BrightLiu\LowCode\Resources\LowCode\V2\LowCodeList\SimpleListSource;
 use BrightLiu\LowCode\Models\AdminPreference;
@@ -184,7 +184,7 @@ final class LowCodeV2ListController extends BaseController
             });
         } catch (\Throwable $exception) {
         }
-        return $this->responseData($data, ListResource::class);
+        return $this->responseData($data, QuerySource::class);
     }
 
     /**

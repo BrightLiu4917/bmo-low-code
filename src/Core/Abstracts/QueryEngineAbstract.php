@@ -50,6 +50,14 @@ abstract class QueryEngineAbstract implements QueryEngineContract
     public string $table = '';
     public string $databaseTable = '';
 
+    public array $joins  = [];
+
+    // JOIN 类型常量
+    const JOIN_INNER = 'inner';
+    const JOIN_LEFT = 'left';
+    const JOIN_RIGHT = 'right';
+    const JOIN_CROSS = 'cross';
+
     /**
      * 自动连接数据库（双模式支持）
      *
@@ -69,7 +77,7 @@ abstract class QueryEngineAbstract implements QueryEngineContract
             }
 
             $contextCode = $this->getDiseaseCode() ?:
-                request()->header(HeaderEnum::DISEASE_CODE);
+                request()?->header(HeaderEnum::DISEASE_CODE);
             // 模式2：自动上下文（常规请求）
             if (!empty($contextCode)) {
                 // 尝试从上下文获取疾病编码
@@ -629,5 +637,334 @@ abstract class QueryEngineAbstract implements QueryEngineContract
     public function getQueryBuilder(): Builder
     {
         return $this->queryBuilder;
+    }
+
+
+    /**
+     * 添加 JOIN 关系
+     *
+     * @param string $table     要连接的表
+     * @param string $first     第一个连接条件字段
+     * @param string $operator  操作符
+     * @param string $second    第二个连接条件字段
+     * @param string $type      JOIN 类型 (inner, left, right, cross)
+     *
+     * @return self
+     */
+    public function join(
+        string $table,
+        string $first,
+        string $operator = '=',
+        string $second = null,
+        string $type = self::JOIN_INNER
+    ): self {
+        $this->joins[] = [
+            'type' => $type,
+            'table' => $table,
+            'first' => $first,
+            'operator' => $operator,
+            'second' => $second ?: $first
+        ];
+
+        // 如果查询构建器已初始化，立即应用 JOIN
+        if ($this->queryBuilder) {
+            $method = $type . 'Join';
+
+            if (method_exists($this->queryBuilder, $method)) {
+                $this->queryBuilder->{$method}($table, $first, $operator, $second);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * 添加 LEFT JOIN 关系
+     *
+     * @param string $table     要连接的表
+     * @param string $first     第一个连接条件字段
+     * @param string $operator  操作符
+     * @param string $second    第二个连接条件字段
+     *
+     * @return self
+     */
+    public function leftJoin(
+        string $table,
+        string $first,
+        string $operator = '=',
+        string $second = null
+    ): self {
+        return $this->join($table, $first, $operator, $second, self::JOIN_LEFT);
+    }
+
+    /**
+     * 添加 RIGHT JOIN 关系
+     *
+     * @param string $table     要连接的表
+     * @param string $first     第一个连接条件字段
+     * @param string $operator  操作符
+     * @param string $second    第二个连接条件字段
+     *
+     * @return self
+     */
+    public function rightJoin(
+        string $table,
+        string $first,
+        string $operator = '=',
+        string $second = null
+    ): self {
+        return $this->join($table, $first, $operator, $second, self::JOIN_RIGHT);
+    }
+
+    /**
+     * 添加 CROSS JOIN 关系
+     *
+     * @param string $table     要连接的表
+     *
+     * @return self
+     */
+    public function crossJoin(string $table): self
+    {
+        return $this->join($table, '', '', '', self::JOIN_CROSS);
+    }
+
+    /**
+     * 添加 JOIN 关系（使用闭包）
+     *
+     * @param string $table     要连接的表
+     * @param \Closure $closure JOIN 条件闭包
+     * @param string $type      JOIN 类型 (inner, left, right)
+     *
+     * @return self
+     */
+    public function joinWhere(
+        string $table,
+        \Closure $closure,
+        string $type = self::JOIN_INNER
+    ): self {
+        $this->joins[] = [
+            'type' => $type,
+            'table' => $table,
+            'closure' => $closure
+        ];
+
+        // 如果查询构建器已初始化，立即应用 JOIN
+        if ($this->queryBuilder) {
+            $method = $type . 'Join';
+
+            if (method_exists($this->queryBuilder, $method)) {
+                $this->queryBuilder->{$method}($table, $closure);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * 添加 LEFT JOIN 关系（使用闭包）
+     *
+     * @param string $table     要连接的表
+     * @param \Closure $closure JOIN 条件闭包
+     *
+     * @return self
+     */
+    public function leftJoinWhere(string $table, \Closure $closure): self
+    {
+        return $this->joinWhere($table, $closure, self::JOIN_LEFT);
+    }
+
+    /**
+     * 添加 RIGHT JOIN 关系（使用闭包）
+     *
+     * @param string $table     要连接的表
+     * @param \Closure $closure JOIN 条件闭包
+     *
+     * @return self
+     */
+    public function rightJoinWhere(string $table, \Closure $closure): self
+    {
+        return $this->joinWhere($table, $closure, self::JOIN_RIGHT);
+    }
+
+    /**
+     * 添加 JOIN 关系（使用原始表达式）
+     *
+     * @param string $table     要连接的表
+     * @param string $raw       RAW SQL 表达式
+     * @param array $bindings   绑定参数
+     * @param string $type      JOIN 类型 (inner, left, right)
+     *
+     * @return self
+     */
+    public function joinRaw(
+        string $table,
+        string $raw,
+        array $bindings = [],
+        string $type = self::JOIN_INNER
+    ): self {
+        $this->joins[] = [
+            'type' => $type,
+            'table' => $table,
+            'raw' => $raw,
+            'bindings' => $bindings
+        ];
+
+        // 如果查询构建器已初始化，立即应用 JOIN
+        if ($this->queryBuilder) {
+            $method = $type . 'Join';
+
+            if (method_exists($this->queryBuilder, $method)) {
+                $this->queryBuilder->{$method}($table, function($join) use ($raw, $bindings) {
+                    $join->whereRaw($raw, $bindings);
+                });
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * 添加 LEFT JOIN 关系（使用原始表达式）
+     *
+     * @param string $table     要连接的表
+     * @param string $raw       RAW SQL 表达式
+     * @param array $bindings   绑定参数
+     *
+     * @return self
+     */
+    public function leftJoinRaw(string $table, string $raw, array $bindings = []): self
+    {
+        return $this->joinRaw($table, $raw, $bindings, self::JOIN_LEFT);
+    }
+
+    /**
+     * 添加 RIGHT JOIN 关系（使用原始表达式）
+     *
+     * @param string $table     要连接的表
+     * @param string $raw       RAW SQL 表达式
+     * @param array $bindings   绑定参数
+     *
+     * @return self
+     */
+    public function rightJoinRaw(string $table, string $raw, array $bindings = []): self
+    {
+        return $this->joinRaw($table, $raw, $bindings, self::JOIN_RIGHT);
+    }
+
+    /**
+     * 添加 JOIN 关系（使用子查询）
+     *
+     * @param \Closure|\Illuminate\Database\Query\Builder|string $query 子查询
+     * @param string $as 别名
+     * @param string $first 第一个连接条件字段
+     * @param string $operator 操作符
+     * @param string $second 第二个连接条件字段
+     * @param string $type JOIN 类型 (inner, left, right)
+     *
+     * @return self
+     */
+    public function joinSub(
+        $query,
+        string $as,
+        string $first,
+        string $operator = '=',
+        string $second = null,
+        string $type = self::JOIN_INNER
+    ): self {
+        $this->joins[] = [
+            'type' => $type,
+            'subquery' => $query,
+            'as' => $as,
+            'first' => $first,
+            'operator' => $operator,
+            'second' => $second ?: $first
+        ];
+
+        // 如果查询构建器已初始化，立即应用 JOIN
+        if ($this->queryBuilder) {
+            $method = $type . 'JoinSub';
+
+            if (method_exists($this->queryBuilder, $method)) {
+                $this->queryBuilder->{$method}($query, $as, $first, $operator, $second);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * 添加 LEFT JOIN 关系（使用子查询）
+     *
+     * @param \Closure|\Illuminate\Database\Query\Builder|string $query 子查询
+     * @param string $as 别名
+     * @param string $first 第一个连接条件字段
+     * @param string $operator 操作符
+     * @param string $second 第二个连接条件字段
+     *
+     * @return self
+     */
+    public function leftJoinSub(
+        $query,
+        string $as,
+        string $first,
+        string $operator = '=',
+        string $second = null
+    ): self {
+        return $this->joinSub($query, $as, $first, $operator, $second, self::JOIN_LEFT);
+    }
+
+    /**
+     * 添加 RIGHT JOIN 关系（使用子查询）
+     *
+     * @param \Closure|\Illuminate\Database\Query\Builder|string $query 子查询
+     * @param string $as 别名
+     * @param string $first 第一个连接条件字段
+     * @param string $operator 操作符
+     * @param string $second 第二个连接条件字段
+     *
+     * @return self
+     */
+    public function rightJoinSub(
+        $query,
+        string $as,
+        string $first,
+        string $operator = '=',
+        string $second = null
+    ): self {
+        return $this->joinSub($query, $as, $first, $operator, $second, self::JOIN_RIGHT);
+    }
+
+    /**
+     * 清除所有 JOIN 关系
+     *
+     * @return self
+     */
+    public function clearJoins(): self
+    {
+        $this->joins = [];
+
+        // 如果查询构建器已初始化，需要重新初始化
+        if ($this->queryBuilder) {
+            $this->queryBuilder = $this->connection->table($this->databaseTable);
+            $this->applyJoins();
+        }
+
+        return $this;
+    }
+
+    protected function applyJoins(): void
+    {
+        foreach ($this->joins as $join) {
+            $method = $join['type'] . 'Join';
+
+            if (method_exists($this->queryBuilder, $method)) {
+                $this->queryBuilder->{$method}(
+                    $join['table'],
+                    $join['first'],
+                    $join['operator'] ?? null,
+                    $join['second'] ?? null
+                );
+            }
+        }
     }
 }

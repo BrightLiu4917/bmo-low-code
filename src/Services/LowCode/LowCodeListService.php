@@ -175,7 +175,9 @@ class LowCodeListService extends LowCodeBaseService
             $list = $this->getLowCodeListByCodes(collect($inputArgs)->pluck('code')->toArray());
 
             // 2.初始化查询
-            $queryEngine = QueryEngineService::instance()->autoClient();
+            $secondTable = config('low-code.bmo-baseline.database.crowd_psn_wdth_table','');
+            $queryEngine = QueryEngineService::instance()->autoClient()->leftJoin($secondTable,
+                first: 'empi',operator: '=', second: 'empi');
             foreach ($inputArgs as $value) {
                 $listCode = $value['code'] ?? '';
                 $config = $list[$listCode] ?? [];

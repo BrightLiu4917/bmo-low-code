@@ -19,13 +19,14 @@ final class QuerySource extends JsonResource
      *
      * @return array
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
+        // 以下字段是数据库字段，请根据实际需求修改
         return [
             "id_crd_no"                     => $this->id_crd_no ?? '',
-            "id_crd_no.variant"              => Mask::idcard($this->id_crd_no ??
+            "id_crd_no.variant"             => Mask::idcard($this->id_crd_no ??
                 ''),
-            "ctct_tel_no.variant"            => Mask::phone($this->ctct_tel_no ??
+            "ctct_tel_no.variant"           => Mask::phone($this->ctct_tel_no ??
                 ''),
             "user_id"                       => $this->user_id ?? '',
             "diet_rcd_bsns_rcd_tm"          => $this->diet_rcd_bsns_rcd_tm ??
@@ -68,7 +69,7 @@ final class QuerySource extends JsonResource
             "dscg_mng_tp_nm"                => $this->dscg_mng_tp_nm ?? '',
             "ptt_dscg_tp"                   => $this->ptt_dscg_tp ?? '',
             "slf_tel_no"                    => $this->slf_tel_no ?? '',
-            "slf_tel_no.variant"             => Mask::phone($this->slf_tel_no ??
+            "slf_tel_no.variant"            => Mask::phone($this->slf_tel_no ??
                 ''),
             "hrgst_tp_cd"                   => $this->hrgst_tp_cd ?? '',
             "dscg_mng_tp"                   => $this->dscg_mng_tp ?? '',
@@ -119,7 +120,8 @@ final class QuerySource extends JsonResource
                 '',
             "abo_cd"                        => $this->abo_cd ?? '',
             "curr_addr_vlg_nm"              => $this->curr_addr_vlg_nm ?? '',
-            "gdr_cd.variant"                => ($this->gdr_cd ?? '') == 1 ? "男":'女',
+            "gdr_cd.variant"                => ($this->gdr_cd ?? '') == 1 ?
+                "男" : '女',
             "ntn_cd"                        => $this->ntn_cd ?? '',
             "ctct_nm"                       => $this->ctct_nm ?? '',
             "rct_vst_dpt_nm"                => $this->rct_vst_dpt_nm ?? '',
@@ -177,22 +179,25 @@ final class QuerySource extends JsonResource
                 ?? '',
 
             // 状态字段的文本描述
-            "dscg_mng_flg.variant"               => match (($this->dscg_mng_flg ?? 0)) {
+            "dscg_mng_flg.variant"          => match (($this->dscg_mng_flg ??
+                0)) {
                 0       => '否',
                 1       => '是',
                 default => '--',
             },
-            "dth_flg.variant"                    => match (($this->dth_flg ?? 0)) {
+            "dth_flg.variant"               => match (($this->dth_flg ?? 0)) {
                 0       => '否',
                 1       => '是',
                 default => '--',
             },
-            "is_testing.variant"                 => match (($this->is_testing ?? 0)) {
+            "is_testing.variant"            => match (($this->is_testing ??
+                0)) {
                 0       => '否',
                 1       => '是',
                 default => '--',
             },
-            "is_deleted.variant"                 => match (($this->is_deleted ?? 0)) {
+            "is_deleted.variant"            => match (($this->is_deleted ??
+                0)) {
                 0       => '正常',
                 1       => '删除',
                 default => '--',
@@ -200,49 +205,72 @@ final class QuerySource extends JsonResource
 
 
             //业务字段
-            "join_time" => $this->join_time ?? null,
-            "refuse_time" => $this->refuse_time ?? null,
-            "exit_time" => $this->exit_time ?? null,
-            "circulation_time" => $this->circulation_time ?? null,
+            "refuse_time"                   => $this->refuse_time ?? null,
+            "exit_time"                     => $this->exit_time ?? null,
+            "circulation_time"              => $this->circulation_time ?? null,
 
-            "site_name" => $this->site_name ?? '',
+            "site_name"     => $this->site_name ?? '',
             "operator_name" => $this->operator_name ?? '',
-            "join_org_code" => $this->join_org_code ?? '',
 
-            "crowd_type_nm" => $this->crowd_type_nm ?? '',
-            "join_org_name" => $this->join_org_name ?? '',
-            "aid_phone" => $this->aid_phone ?? '',
+            "crowd_type_nm"    => $this->crowd_type_nm ?? '',
+            "aid_phone"        => $this->aid_phone ?? '',
             "masked_aid_phone" => Mask::phone($this->aid_phone ?? ''),
-            "aid_contact" => $this->aid_contact ?? '',
-            "out_title" => $this->out_title ?? '',
-            "out_remark" => $this->out_remark ?? '',
+            "aid_contact"      => $this->aid_contact ?? '',
+            "out_title"        => $this->out_title ?? '',
+            "out_remark"       => $this->out_remark ?? '',
             "circulation_name" => $this->circulation_name ?? '',
-            "now_twn_code" => $this->now_twn_code ?? '',
-            "now_twn_name" => $this->now_twn_name ?? '',
-            "now_vlg_code" => $this->now_vlg_code ?? '',
-            "now_vlg_name" => $this->now_vlg_name ?? '',
+            "now_twn_code"     => $this->now_twn_code ?? '',
+            "now_twn_name"     => $this->now_twn_name ?? '',
+            "now_vlg_code"     => $this->now_vlg_code ?? '',
+            "now_vlg_name"     => $this->now_vlg_name ?? '',
 
-            "service_center_site_id" => $this->service_center_site_id ?? 0,
-            "operator_id" => $this->operator_id ?? 0,
-            "service_center_site_vlg_id" => $this->service_center_site_vlg_id ?? 0,
+            "service_center_site_id"     => $this->service_center_site_id ?? 0,
+            "operator_id"                => $this->operator_id ?? 0,
+            "service_center_site_vlg_id" => $this->service_center_site_vlg_id ??
+                0,
             "circulation_status" => $this->circulation_status ?? -1,
-            "invitaiton_status" => $this->invitaiton_status ?? -1,
-            '_crowds'=> $this->crowds ?? '',
+            "invitaiton_status"  => $this->invitaiton_status ?? -1,
+            '_crowds'            => $this->crowds ?? '',
 
-            "circulation_status.variant" => match (($this->circulation_status ?? -1)) {
-                0 => '待流转',
-                1 => '已流转',
-                2 => '流转拒绝',
-                3 => '流转同意',
+            "circulation_status.variant" => match (($this->circulation_status ??
+                -1)) {
+                0       => '待流转',
+                1       => '已流转',
+                2       => '流转拒绝',
+                3       => '流转同意',
                 default => '--',
             },
-            "invitaiton_status.variant" => match (($this->invitaiton_status ?? -1)) {
-                0 => '待邀请',
-                1 => '已邀请',
-                2 => '已拒绝',
-                3 => '已同意',
+            "invitaiton_status.variant"  => match (($this->invitaiton_status ??
+                -1)) {
+                0       => '待邀请',
+                1       => '已邀请',
+                2       => '已拒绝',
+                3       => '已同意',
                 default => '--',
             },
+
+            "manage_status.variant"  => match (($this->manage_status ?? -1)) {
+                0       => '待纳管',
+                1       => '已纳管',
+                2       => '拒绝纳管',
+                3       => '退出纳管',
+                default => '--',
+            },
+            "manage_org_name"        => $this->manage_org_name ?? '',
+            "manage_doctor_code"     => $this->manage_doctor_code ?? '',
+            "manage_doctor_name"     => $this->manage_doctor_name ?? '',
+            "manage_start_at"        => $this->manage_start_at ?? null,
+            "manage_team_code"       => $this->manage_team_code ?? '',
+            "manage_team_name"       => $this->manage_team_name ?? '',
+            "manage_dept_code"       => $this->manage_dept_code ?? '',
+            "manage_dept_name"       => $this->manage_dept_name ?? '',
+            "manage_end_at"          => $this->manage_end_at ?? null,
+            "manage_end_doctor_code" => $this->manage_end_doctor_code ?? '',
+            "manage_end_doctor_name" => $this->manage_end_doctor_name ?? '',
+            "manage_end_team_code"   => $this->manage_end_team_code ?? '',
+            "manage_end_team_name"   => $this->manage_end_team_name ?? '',
+            "manage_end_org_code"    => $this->manage_end_org_code ?? '',
+            "manage_end_org_name"    => $this->manage_end_org_name ?? '',
         ];
     }
 }
