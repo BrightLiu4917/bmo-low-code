@@ -3,6 +3,7 @@
 declare(strict_types = 1);
 
 namespace BrightLiu\LowCode\Services;
+use BrightLiu\LowCode\Traits\InstanceMake;
 use BrightLiu\LowCode\Core\Abstracts\QueryEngineAbstract;
 
 
@@ -14,4 +15,5 @@ use BrightLiu\LowCode\Core\Abstracts\QueryEngineAbstract;
  */
 class QueryEngineService extends QueryEngineAbstract
 {
+    use InstanceMake;
 }

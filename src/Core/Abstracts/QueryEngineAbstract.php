@@ -5,7 +5,6 @@ namespace BrightLiu\LowCode\Core\Abstracts;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Connection;
 use BrightLiu\LowCode\Enums\HeaderEnum;
-use BrightLiu\LowCode\Traits\InstanceMake;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
@@ -31,7 +30,6 @@ abstract class QueryEngineAbstract implements QueryEngineContract
     use
         DynamicWhereTrait,
         WithDiseaseContext,
-        InstanceMake,
         DynamicMultiOrderTrait;
 
     // 查询构建器
