@@ -17,13 +17,14 @@ return [
 
     //业务中台相关
     'bmo-baseline' => [
-            // 人群类型表 一般都是 feature_user_detail
-            'crowd-type-table'=> env('BMO_BUSINESS_CENTER_CROWD_TYPE_TABLE','feature_user_detail'),
-
             // 基线数据库
             'database'=>[
+                // 人群类型表 一般都是 feature_user_detail
+                'crowd-type-table'=> env('BMO_BUSINESS_CENTER_CROWD_TYPE_TABLE','feature_user_detail'),
+
                 //人员宽表 主表
-                'crowd_psn_wdth_table'=>env('DB_MEDICAL_CROWD_PSN_WDTH','crowd_psn_wdth'),
+                'crowd-psn-wdth-table'=>env('DB_MEDICAL_CROWD_PSN_WDTH','crowd_psn_wdth'),
+
                 'default' => [
                     'driver' => 'mysql',
                     'host' => env('DB_MEDICAL_PLATFORM_HOST', '127.0.0.1'),

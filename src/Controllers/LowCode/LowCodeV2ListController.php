@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace BrightLiu\LowCode\Controllers\LowCode;
 
+use BrightLiu\LowCode\Enums\Foundation\Logger;
 use App\Http\Resources\LowCode\BasicInfoResource;
 use BrightLiu\LowCode\Enums\Model\AdminPreference\SceneEnum;
 use BrightLiu\LowCode\Services\QueryEngineService;
@@ -183,6 +184,13 @@ final class LowCodeV2ListController extends BaseController
                 }
             });
         } catch (\Throwable $exception) {
+            Logger::LOW_CODE_LIST->error('list-query-控制器 查询异常', [
+                'inputs'     => $inputArgs ?? [],
+                'error'      => $exception->getMessage(),
+                'trace'      => $exception->getTraceAsString(),
+                'line'       => $exception->getLine(),
+                'file'       => $exception->getFile(),
+            ]);
         }
         return $this->responseData($data, QuerySource::class);
     }
@@ -293,12 +301,6 @@ final class LowCodeV2ListController extends BaseController
         return $this->responseSuccess();
     }
 
-    public function basicInfo(Request $request)
-    {
-        $userId = $request->input('user_id', '');
-        $data   = LowCodeResidentService::instance()->basicInfo($userId);
-        return $this->responseData($data, BasicInfoResource::class);
-    }
 
     /**
      * 转换人群患者编码
