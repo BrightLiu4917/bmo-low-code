@@ -83,5 +83,5 @@ ResidentService::instance()->updateInfo($userId,['age'=>18])
 ResidentService::instance()->manageResident($userId,["相关参数"])  
 
 出组患者 相关参数
-ResidentService::instance()->manageResident($userId,boolean(是否清理纳管信息默认为true))  
+ResidentService::instance()->removeManageResident($userId,boolean(是否清理纳管信息默认为true))  
 ```
