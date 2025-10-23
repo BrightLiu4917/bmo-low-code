@@ -20,10 +20,10 @@ return [
             // 基线数据库
             'database'=>[
                 // 人群类型表 一般都是 feature_user_detail
-                'crowd-type-table'=> env('BMO_BUSINESS_CENTER_CROWD_TYPE_TABLE','feature_user_detail'),
+                'crowd-type-table'=> env('DB_BUSINESS_CENTER_CROWD_TYPE_TABLE','feature_user_detail'),
 
                 //人员宽表 主表
-                'crowd-psn-wdth-table'=>env('DB_MEDICAL_CROWD_PSN_WDTH','crowd_psn_wdth'),
+                'crowd-psn-wdth-table'=>env('DB_MEDICAL_CROWD_PSN_WDTH_TABLE','crowd_psn_wdth'),
 
                 'default' => [
                     'driver' => 'mysql',
