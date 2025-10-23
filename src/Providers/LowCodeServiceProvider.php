@@ -3,6 +3,10 @@
 namespace BrightLiu\LowCode\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use BrightLiu\LowCode\Context\OrgContext;
+use BrightLiu\LowCode\Context\AuthContext;
+use BrightLiu\LowCode\Context\AdminContext;
+use BrightLiu\LowCode\Context\DiseaseContext;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -14,6 +18,14 @@ class LowCodeServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->singleton('context:org', OrgContext::class);
+
+        $this->app->singleton('context:auth', AuthContext::class);
+
+        $this->app->singleton('context:disease', DiseaseContext::class);
+
+        $this->app->singleton('context:admin', AdminContext::class);
+
         // 合并配置文件
         $this->mergeConfigFrom(
             __DIR__.'/../../config/low-code.php',
