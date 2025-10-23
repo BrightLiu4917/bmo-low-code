@@ -1,8 +1,10 @@
 # 低代码包 bmo-low-code
 ### 安装 Composer 包
+-----
 ```text
 composer require bright-liu4917/bmo-low-code
 ```
+-----
 ### 在 config/app.php配置文件中注册服务提供者：
 ```text
 'providers' => [
@@ -10,13 +12,15 @@ composer require bright-liu4917/bmo-low-code
     BrightLiu\LowCode\Providers\LowCodeServiceProvider::class,
 ],
 ```
+-----
 ### 发布配置文件
 ```text
 php artisan vendor:publish --provider="BrightLiu\LowCode\Providers\LowCodeServiceProvider"
 ```
+-----
 ### env配置文件
 ```text
-BMO_ORG_ID=用户中心ID
+BMO_ORG_ID=用户中心ID 用户中心 org_id
 BMP_CHEETAH_MEDICAL_PLATFORM_URI=业务中台接口地址 宝庆老师
 BMP_CHEETAH_MEDICAL_CROWD_KIT_URI=人群基线接口地址 童java
 
@@ -31,6 +35,7 @@ DB_MEDICAL_CROWD_PSN_WDTH_TABLE=人员宽表
 DB_BUSINESS_CENTER_CROWD_TYPE_TABLE=患者标签关系表一般是 "feature_user_detail"
 
 ```
+-----
 ### 执行迁移文件和配置中间件
 ```text
 php artisan migrate
@@ -38,14 +43,8 @@ php artisan migrate
 app/Http/Kernel.php.$routeMiddleware 追加如下
 'auth.disease' => DiseaseAuthenticate::class,
 ```
+-----
 
-### 注意事项
-```text
-通知前端必须header入参
-X-Gp-Org-Id 机构ID 前端自己申请写死
-X-Gp-System-Code 系统编码 研发PM定义
-X-Gp-Disease-Code 疾病编码（场景编码）后端开发定义
-```
 ### 内置方法
 ```text
 低代码查询数据
@@ -89,8 +88,23 @@ ResidentService::instance()->manageResident($userId,["相关参数"])
 出组患者 相关参数
 ResidentService::instance()->removeManageResident($userId,boolean(是否清理纳管信息默认为true))  
 ```
-
+-----
 ### 注意事项
 ```text
-1 /api/v2/low-code/list/query 需要业务自己继承后，重新实现
+1.
+api/v2/low-code/list/query 需要业务自己继承后，重新实现
+
+2.
+通知前端必须header入参
+X-Gp-Org-Id 机构ID 前端自己申请写死
+X-Gp-System-Code 系统编码 研发PM定义
+X-Gp-Disease-Code 疾病编码（场景编码）后端开发定义
 ```
+-----
+### 小工具
+```text
+1 低代码查询方式 入参print_sql=1 打印原生sql 如下图 截图1
+```
+##### 截图1
+![img.png](img.png)
+-----
