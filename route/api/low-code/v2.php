@@ -12,8 +12,6 @@ Route::group([
 
         Route::get('resident-crowd/optional', [ResidentCrowdController::class, 'optional']);
 
-        //患者相关
-        Route::any('resident-archive/basic-info', [LowCodeListV2Controller::class, 'basicInfo']);
     });
 
     // 个性化模板

@@ -3,6 +3,7 @@ return [
     'auth'=>[
         //用户中心OrgID
         'org_id' => env("BMO_ORG_ID",''),
+        'uri' => env('BMO_AUTH_URI'),
     ],
 
     //童java 基线人群服务

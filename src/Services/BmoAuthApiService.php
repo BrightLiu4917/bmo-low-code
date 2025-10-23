@@ -28,7 +28,7 @@ class BmoAuthApiService extends LowCodeBaseService
      */
     public function __construct()
     {
-        $this->baseUri = config('business.bmo-service.auth.base_uri');
+        $this->baseUri = config('business.bmo-service.auth.uri');
     }
 
     /**

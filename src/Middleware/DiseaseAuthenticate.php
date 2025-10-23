@@ -13,8 +13,7 @@ use BrightLiu\LowCode\Services\BmoAuthApiService;
 use BrightLiu\LowCode\Context\AuthContext;
 use BrightLiu\LowCode\Context\DiseaseContext;
 use Gupo\BetterLaravel\Http\Traits\HttpResponse;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+
 
 /**
  * 病种操作认证
