@@ -85,3 +85,8 @@ ResidentService::instance()->manageResident($userId,["相关参数"])
 出组患者 相关参数
 ResidentService::instance()->removeManageResident($userId,boolean(是否清理纳管信息默认为true))  
 ```
+
+### 注意事项
+```text
+1 /api/v2/low-code/list/query 需要业务自己继承后，重新实现
+```
