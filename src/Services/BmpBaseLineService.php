@@ -299,7 +299,7 @@ class BmpBaseLineService extends LowCodeBaseService
     {
         return QueryEngineService::instance()
                                  ->autoClient()
-                                 ->useTable(config('low-code.bmo-baseline.crowd-type-table'))
+                                 ->useTable(config('low-code.bmo-baseline.database.crowd-type-table'))
                                  ->setCache(50)
                                  ->whereBatchUserIds($userIds)
                                  ->select(['user_id', 'group_id', 'group_name'])
