@@ -231,12 +231,13 @@ class LowCodeListService extends LowCodeBaseService
             $list = $this->getLowCodeListByCodes(collect($inputArgs)->pluck('code')->toArray());
 
             $queryEngine = QueryEngineService::instance()->autoClient();
+            $bizSceneTable = $queryEngine->table ?? '';
             foreach ($inputArgs as $value) {
                 $listCode = $value['code'] ?? '';
                 $config = $list[$listCode] ?? [];
 
                 //3. 构建查询条件组
-                $builtQuery = $this->buildQueryConditions($queryEngine, $value, $config);
+                $builtQuery = $this->buildQueryConditions($queryEngine, $value, $config,$bizSceneTable);
                 return $builtQuery->setCache(60)->getPaginateResult();
             }
         } catch (QueryEngineException $e) {

@@ -31,10 +31,14 @@ DB_MEDICAL_CROWD_PSN_WDTH_TABLE=人员宽表
 DB_BUSINESS_CENTER_CROWD_TYPE_TABLE=患者标签关系表一般是 "feature_user_detail"
 
 ```
-### 执行迁移文件
+### 执行迁移文件和配置中间件
 ```text
 php artisan migrate
+
+app/Http/Kernel.php.$routeMiddleware 追加如下
+'auth.disease' => DiseaseAuthenticate::class,
 ```
+
 ### 注意事项
 ```text
 通知前端必须header入参
