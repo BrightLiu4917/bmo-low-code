@@ -18,10 +18,6 @@ final class HeaderEnum extends BaseEnum
     #[Message('病种CODE')]
     public const DISEASE_CODE = 'X-Gp-Disease-Code';
 
-
-    #[Message('场景CODE')]
-    public const SCENE_CODE = 'X-Gp-Scene-Code';
-
     #[Message('机构ID')]
     public const ORG_ID = 'X-Gp-Org-Id';
 

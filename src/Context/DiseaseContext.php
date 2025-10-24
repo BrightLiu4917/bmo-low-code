@@ -5,8 +5,6 @@ declare(strict_types = 1);
 namespace BrightLiu\LowCode\Context;
 
 
-use BrightLiu\LowCode\Models\LowCodeDisease;
-
 /**
  * 病种上下文
  */
@@ -18,14 +16,9 @@ final class DiseaseContext
     protected string $diseaseCode = '';
 
     /**
-     * @var string
+     * @var null|Disease
      */
-    protected string $sceneCode = '';
-
-    /**
-     * @var null|\BrightLiu\LowCode\Models\LowCodeDisease
-     */
-    protected ?LowCodeDisease $disease = null;
+    protected ?Disease $disease = null;
 
     /**
      * @return static
@@ -40,13 +33,12 @@ final class DiseaseContext
      *
      * @return static
      */
-    public static function init(string $diseaseCode,string $sceneCode): static
+    public static function init(string $diseaseCode): static
     {
         return tap(
             static::instance(),
-            function (DiseaseContext $context) use ($diseaseCode,$sceneCode) {
+            function (DiseaseContext $context) use ($diseaseCode) {
                 $context->setDiseaseCode($diseaseCode);
-                $context->setSceneCode($sceneCode);
             }
         );
     }
@@ -57,11 +49,6 @@ final class DiseaseContext
     public function getDiseaseCode(): string
     {
         return $this->diseaseCode;
-    }
-
-    public function getSceneCode(): string
-    {
-        return $this->sceneCode;
     }
 
     /**
@@ -75,14 +62,14 @@ final class DiseaseContext
     /**
      * @return null|Disease
      */
-    public function getDisease(): ?LowCodeDisease
+    public function getDisease(): ?Disease
     {
         if (empty($this->diseaseCode)) {
             return null;
         }
 
         return $this->disease = match (true) {
-            empty($this->disease) => LowCodeDisease::query()
+            empty($this->disease) => Disease::query()
                 ->where('code', $this->diseaseCode)
                 ->first(['id', 'code', 'name', 'weight']),
             default => $this->disease
@@ -105,21 +92,12 @@ final class DiseaseContext
         $this->disease = null;
     }
 
-    public function setSceneCode(string $value): void
-    {
-        if ($value === $this->sceneCode) {
-            return;
-        }
-
-        $this->sceneCode = $value;
-    }
-
     /**
-     * @param null|LowCodeDisease $value
+     * @param null|Disease $value
      *
      * @return void
      */
-    public function setDisease(?LowCodeDisease $value): void
+    public function setDisease(?Disease $value): void
     {
         $this->disease = $value;
 

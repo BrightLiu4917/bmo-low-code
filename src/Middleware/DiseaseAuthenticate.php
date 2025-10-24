@@ -59,8 +59,6 @@ final class DiseaseAuthenticate
         $request = request();
         DiseaseContext::init(
             diseaseCode: (string) $request->header(HeaderEnum::DISEASE_CODE, ''),
-            sceneCode:(string) $request->header(HeaderEnum::SCENE_CODE, ''),
-
         );
 
         OrgContext::init(
