@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace BrightLiu\LowCode\Context;
 
+use BrightLiu\LowCode\Models\LowCodeDisease;
+
 
 /**
  * 病种上下文
@@ -16,9 +18,9 @@ final class DiseaseContext
     protected string $diseaseCode = '';
 
     /**
-     * @var null|Disease
+     * @var null|LowCodeDisease
      */
-    protected ?Disease $disease = null;
+    protected ?LowCodeDisease $disease = null;
 
     /**
      * @return static
@@ -60,16 +62,16 @@ final class DiseaseContext
     }
 
     /**
-     * @return null|Disease
+     * @return null|LowCodeDisease
      */
-    public function getDisease(): ?Disease
+    public function getDisease(): ?LowCodeDisease
     {
         if (empty($this->diseaseCode)) {
             return null;
         }
 
         return $this->disease = match (true) {
-            empty($this->disease) => Disease::query()
+            empty($this->disease) => LowCodeDisease::query()
                 ->where('code', $this->diseaseCode)
                 ->first(['id', 'code', 'name', 'weight']),
             default => $this->disease
@@ -93,11 +95,11 @@ final class DiseaseContext
     }
 
     /**
-     * @param null|Disease $value
+     * @param null|LowCodeDisease $value
      *
      * @return void
      */
-    public function setDisease(?Disease $value): void
+    public function setDisease(?LowCodeDisease $value): void
     {
         $this->disease = $value;
 
