@@ -16,6 +16,8 @@ BMO_ORG_ID=用户中心ID 用户中心 org_id 可以不写，预留的
 BMP_CHEETAH_MEDICAL_PLATFORM_URI=业务中台接口地址 宝庆老师
 BMP_CHEETAH_MEDICAL_CROWD_KIT_URI=人群基线接口地址 童java
 
+LOW_CODE_SET_USE_TABLE_FIELD= 如果前端入参有"X-Gp-Scene-Code" scene_code 否则 disease_code
+
 
 基线表 等配置
 DB_MEDICAL_PLATFORM_HOST
@@ -104,5 +106,5 @@ header 必须入参
     X-Gp-Disease-Code 疾病编码 后端开发定义 比如 (sanya)
     X-Gp-Scene-Code   场景编码 后端开发定义 比如配药（CHRONIC_DISEASE）
 json 入参
-table_name:场景表名
+table_name:场景表名 java要表明
 ```

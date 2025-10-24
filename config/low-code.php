@@ -74,6 +74,8 @@ return [
 
     'dependencies' => [
         // query 方法里面的resource 映射到 业务
-        // QuerySource::class=>''
-    ]
+         QuerySource::class=>'你的Source'
+    ],
+
+    'low-code-set-use-table-field' => env('LOW_CODE_SET_USE_TABLE_FIELD','scene_code')
 ];

@@ -74,8 +74,14 @@ abstract class QueryEngineAbstract implements QueryEngineContract
                 return $this;
             }
 
-            $contextCode = $this->getDiseaseCode() ?:
-                request()?->header(HeaderEnum::DISEASE_CODE);
+            $configField = config('low-code.low-code-set-use-table-field', 'disease_code');
+            dd($configField);
+            $isSceneCode = $configField === 'scene_code';
+
+            $contextCode = $isSceneCode
+                ? ($this->getSceneCode() ?: request()?->header(HeaderEnum::SCENE_CODE))
+                : ($this->getDiseaseCode() ?: request()?->header(HeaderEnum::DISEASE_CODE));
+
             // 模式2：自动上下文（常规请求）
             if (!empty($contextCode)) {
                 // 尝试从上下文获取疾病编码
