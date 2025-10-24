@@ -41,8 +41,9 @@ DB_BUSINESS_CENTER_CROWD_TYPE_TABLE=患者标签关系表一般是 "feature_user
 php artisan migrate
 
 app/Http/Kernel.php.$routeMiddleware 追加如下
-'auth.disease' => DiseaseAuthenticate::class,
-'bmp.disease.auth.inner' => BmpDiseaseAuthenticateInner::class
+ 'auth.disease' => DiseaseAuthenticate::class,
+ 'bmp.disease.auth.inner' => BmpDiseaseAuthenticateInner::class,
+ 'bmp.disease.auth.inner' => BmpDiseaseAuthenticateInner::class
 
 ```
 -----
