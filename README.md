@@ -98,7 +98,7 @@ api/v2/low-code/list/query 需要业务自己继承后，重新实现
 
 2.
 通知前端必须header入参
-X-Gp-Org-Id 机构ID 前端自己申请写死
+X-Gp-Org-Id 机构ID 前端自己申请写死 预留可以不写
 X-Gp-System-Code 系统编码 研发PM定义 
 X-Gp-Disease-Code 疾病编码 后端开发定义 比如 (sanya)
 X-Gp-Scene-Code   场景编码 后端开发定义 比如配药（CHRONIC_DISEASE）
