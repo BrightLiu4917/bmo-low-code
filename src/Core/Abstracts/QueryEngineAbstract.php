@@ -75,7 +75,6 @@ abstract class QueryEngineAbstract implements QueryEngineContract
             }
 
             $configField = config('low-code.low-code-set-use-table-field', 'disease_code');
-            dd($configField);
             $isSceneCode = $configField === 'scene_code';
 
             $contextCode = $isSceneCode
