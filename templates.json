@@ -1,0 +1,2001 @@
+{
+  "normal": [
+    {
+      "list": [
+        {
+          "admin_name": "全部",
+          "route_group": [
+            "/Patient/ManagedPatient"
+          ],
+          "preset_condition_json": [
+            [
+              "is_deleted",
+              "=",
+              0
+            ]
+          ],
+          "default_order_by_json": [
+            [
+              "gmt_created",
+              "desc"
+            ],
+            [
+              "user_id",
+              "desc"
+            ]
+          ],
+          "list_type": 0,
+          "templates": {
+            "filter": {
+              "name": "通用列表-筛选字段",
+              "description": "通用列表-筛选字段",
+              "template_type": 1,
+              "content_type": 2,
+              "parts": [
+                {
+                  "name": "患者:姓名(筛选)",
+                  "description": "患者:姓名(筛选)",
+                  "content": {
+                    "key": "rsdnt_nm",
+                    "type": "input",
+                    "field": "rsdnt_nm",
+                    "label": "患者姓名",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者姓名"
+                  }
+                },
+                {
+                  "name": "患者:身份证(筛选)",
+                  "description": "患者:身份证(筛选)",
+                  "content": {
+                    "key": "id_crd_no",
+                    "type": "input",
+                    "field": "id_crd_no",
+                    "label": "患者身份证",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者身份证"
+                  }
+                },
+                {
+                  "name": "患者:电话号码(筛选)",
+                  "description": "患者:电话号码(筛选)",
+                  "content": {
+                    "key": "slf_tel_no",
+                    "type": "input",
+                    "field": "slf_tel_no",
+                    "label": "患者电话号码",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者电话号码"
+                  }
+                },
+                {
+                  "name": "患者:邀请状态(筛选)",
+                  "description": "患者:邀请状态(筛选)",
+                  "content": {
+                    "type": "select",
+                    "field": "invitaiton_status",
+                    "label": "邀请状态",
+                    "props": {
+                      "options": [
+                        {
+                          "label": "已邀请",
+                          "value": "1",
+                          "complex_condition": [
+                            [
+                              "invitaiton_status",
+                              "=",
+                              "1"
+                            ]
+                          ]
+                        },
+                        {
+                          "label": "未邀请",
+                          "value": "0",
+                          "complex_condition": [
+                            [
+                              "invitaiton_status",
+                              "=",
+                              "0"
+                            ]
+                          ]
+                        }
+                      ],
+                      "labelField": null,
+                      "valueField": null
+                    },
+                    "search": "=",
+                    "showLabel": 0,
+                    "placeholder": "邀请状态"
+                  }
+                },
+                {
+                  "name": "患者:人群分类(筛选)",
+                  "description": "患者:人群分类(筛选)",
+                  "content": {
+                    "key": "_crowds",
+                    "type": "select",
+                    "field": "crowd_id",
+                    "label": "人群分类",
+                    "props": {},
+                    "apiUrl": "/api/v2/resident/resident-crowd/optional",
+                    "search": "=",
+                    "showLabel": null,
+                    "placeholder": "请选择人群分类"
+                  }
+                },
+                {
+                  "name": "患者:居住地(筛选)",
+                  "description": "患者:居住地(筛选)",
+                  "content": {
+                    "key": "_crowds",
+                    "type": "cascader",
+                    "field": "curr_addr_vlg_cd",
+                    "label": "居住地",
+                    "props": {},
+                    "apiUrl": "/api/allAddressListLowCode",
+                    "search": "=",
+                    "showLabel": null,
+                    "placeholder": "请选择居住地"
+                  }
+                }
+              ]
+            },
+            "button": {
+              "name": "通用列表-操作栏按钮",
+              "description": "通用列表-操作栏按钮",
+              "template_type": 1,
+              "content_type": 3,
+              "parts": [
+                {
+                  "name": "患者:加入服务(按钮)",
+                  "description": "患者:加入服务(按钮)",
+                  "content": {
+                    "key": "resident_manage",
+                    "label": "加入服务",
+                    "title": "加入服务",
+                    "action": "MANAGE",
+                    "visible": "Number(data.manage_status) == 0"
+                  }
+                },
+                {
+                  "name": "患者:发送邀请(按钮)",
+                  "description": "患者:发送邀请(按钮)",
+                  "content": {
+                    "key": "send_invitation",
+                    "label": "发送邀请",
+                    "title": "发送邀请",
+                    "action": "SEND_INVITATION",
+                    "visible": "Number(data.invitaiton_status) == 0"
+                  }
+                },
+                {
+                  "name": "患者:人员流转(按钮)",
+                  "description": "患者:人员流转(按钮)",
+                  "content": {
+                    "key": "resident_flowing",
+                    "label": "人员流转",
+                    "title": "人员流转",
+                    "action": "FLOWING",
+                    "visible": "Number(data.circulation_status) == 0 || Number(data.circulation_status) == 3 || Number(data.circulation_status) == 4"
+                  }
+                },
+                {
+                  "name": "患者:专病档案(按钮)",
+                  "description": "患者:专病档案(按钮)",
+                  "content": {
+                    "key": "resident_archives",
+                    "label": "专病档案",
+                    "title": "专病档案",
+                    "action": "ARCHIVES",
+                    "visible": "true"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "admin_name": "待服务",
+          "route_group": [
+            "/Patient/ManagedPatient"
+          ],
+          "preset_condition_json": [
+            [
+              "is_deleted",
+              "=",
+              0
+            ],
+            [
+              "raw",
+              "(manage_status is null or manage_status = 0)"
+            ]
+          ],
+          "default_order_by_json": [
+            [
+              "gmt_created",
+              "desc"
+            ],
+            [
+              "user_id",
+              "desc"
+            ]
+          ],
+          "list_type": 0,
+          "templates": {
+            "filter": {
+              "name": "通用列表-筛选字段",
+              "description": "通用列表-筛选字段",
+              "template_type": 1,
+              "content_type": 2,
+              "parts": [
+                {
+                  "name": "患者:姓名(筛选)",
+                  "description": "患者:姓名(筛选)",
+                  "content": {
+                    "key": "rsdnt_nm",
+                    "type": "input",
+                    "field": "rsdnt_nm",
+                    "label": "患者姓名",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者姓名"
+                  }
+                },
+                {
+                  "name": "患者:身份证(筛选)",
+                  "description": "患者:身份证(筛选)",
+                  "content": {
+                    "key": "id_crd_no",
+                    "type": "input",
+                    "field": "id_crd_no",
+                    "label": "患者身份证",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者身份证"
+                  }
+                },
+                {
+                  "name": "患者:电话号码(筛选)",
+                  "description": "患者:电话号码(筛选)",
+                  "content": {
+                    "key": "slf_tel_no",
+                    "type": "input",
+                    "field": "slf_tel_no",
+                    "label": "患者电话号码",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者电话号码"
+                  }
+                },
+                {
+                  "name": "患者:邀请状态(筛选)",
+                  "description": "患者:邀请状态(筛选)",
+                  "content": {
+                    "type": "select",
+                    "field": "invitaiton_status",
+                    "label": "邀请状态",
+                    "props": {
+                      "options": [
+                        {
+                          "label": "已邀请",
+                          "value": "1",
+                          "complex_condition": [
+                            [
+                              "invitaiton_status",
+                              "=",
+                              "1"
+                            ]
+                          ]
+                        },
+                        {
+                          "label": "未邀请",
+                          "value": "0",
+                          "complex_condition": [
+                            [
+                              "invitaiton_status",
+                              "=",
+                              "0"
+                            ]
+                          ]
+                        }
+                      ],
+                      "labelField": null,
+                      "valueField": null
+                    },
+                    "search": "=",
+                    "showLabel": 0,
+                    "placeholder": "邀请状态"
+                  }
+                },
+                {
+                  "name": "患者:居住地(筛选)",
+                  "description": "患者:居住地(筛选)",
+                  "content": {
+                    "key": "_crowds",
+                    "type": "cascader",
+                    "field": "curr_addr_vlg_cd",
+                    "label": "居住地",
+                    "props": {},
+                    "apiUrl": "/api/allAddressListLowCode",
+                    "search": "=",
+                    "showLabel": null,
+                    "placeholder": "请选择居住地"
+                  }
+                },
+                {
+                  "name": "患者:人群分类(筛选)",
+                  "description": "患者:人群分类(筛选)",
+                  "content": {
+                    "key": "_crowds",
+                    "type": "select",
+                    "field": "crowd_id",
+                    "label": "人群分类",
+                    "props": {},
+                    "apiUrl": "/api/v2/resident/resident-crowd/optional",
+                    "search": "=",
+                    "showLabel": null,
+                    "placeholder": "请选择人群分类"
+                  }
+                }
+              ]
+            },
+            "button": {
+              "name": "通用列表-操作栏按钮",
+              "description": "通用列表-操作栏按钮",
+              "template_type": 1,
+              "content_type": 3,
+              "parts": [
+                {
+                  "name": "患者:加入服务(按钮)",
+                  "description": "患者:加入服务(按钮)",
+                  "content": {
+                    "key": "resident_manage",
+                    "label": "加入服务",
+                    "title": "加入服务",
+                    "action": "MANAGE",
+                    "visible": "Number(data.manage_status) == 0"
+                  }
+                },
+                {
+                  "name": "患者:发送邀请(按钮)",
+                  "description": "患者:发送邀请(按钮)",
+                  "content": {
+                    "key": "send_invitation",
+                    "label": "发送邀请",
+                    "title": "发送邀请",
+                    "action": "SEND_INVITATION",
+                    "visible": "Number(data.invitaiton_status) == 0"
+                  }
+                },
+                {
+                  "name": "患者:人员流转(按钮)",
+                  "description": "患者:人员流转(按钮)",
+                  "content": {
+                    "key": "resident_flowing",
+                    "label": "人员流转",
+                    "title": "人员流转",
+                    "action": "FLOWING",
+                    "visible": "Number(data.circulation_status) == 0 || Number(data.circulation_status) == 3 || Number(data.circulation_status) == 4"
+                  }
+                },
+                {
+                  "name": "患者:专病档案(按钮)",
+                  "description": "患者:专病档案(按钮)",
+                  "content": {
+                    "key": "resident_archives",
+                    "label": "专病档案",
+                    "title": "专病档案",
+                    "action": "ARCHIVES",
+                    "visible": "true"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "admin_name": "在服务",
+          "route_group": [
+            "/Patient/ManagedPatient"
+          ],
+          "preset_condition_json": [
+            [
+              "is_deleted",
+              "=",
+              0
+            ],
+            [
+              "raw",
+              "(manage_status =1)"
+            ]
+          ],
+          "default_order_by_json": [
+            [
+              "gmt_created",
+              "desc"
+            ],
+            [
+              "user_id",
+              "desc"
+            ]
+          ],
+          "list_type": 0,
+          "templates": {
+            "filter": {
+              "name": "通用列表-筛选字段",
+              "description": "通用列表-筛选字段",
+              "template_type": 1,
+              "content_type": 2,
+              "parts": [
+                {
+                  "name": "患者:姓名(筛选)",
+                  "description": "患者:姓名(筛选)",
+                  "content": {
+                    "key": "rsdnt_nm",
+                    "type": "input",
+                    "field": "rsdnt_nm",
+                    "label": "患者姓名",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者姓名"
+                  }
+                },
+                {
+                  "name": "患者:身份证(筛选)",
+                  "description": "患者:身份证(筛选)",
+                  "content": {
+                    "key": "id_crd_no",
+                    "type": "input",
+                    "field": "id_crd_no",
+                    "label": "患者身份证",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者身份证"
+                  }
+                },
+                {
+                  "name": "患者:电话号码(筛选)",
+                  "description": "患者:电话号码(筛选)",
+                  "content": {
+                    "key": "slf_tel_no",
+                    "type": "input",
+                    "field": "slf_tel_no",
+                    "label": "患者电话号码",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者电话号码"
+                  }
+                },
+                {
+                  "name": "患者:邀请状态(筛选)",
+                  "description": "患者:邀请状态(筛选)",
+                  "content": {
+                    "type": "select",
+                    "field": "invitaiton_status",
+                    "label": "邀请状态",
+                    "props": {
+                      "options": [
+                        {
+                          "label": "已邀请",
+                          "value": "1",
+                          "complex_condition": [
+                            [
+                              "invitaiton_status",
+                              "=",
+                              "1"
+                            ]
+                          ]
+                        },
+                        {
+                          "label": "未邀请",
+                          "value": "0",
+                          "complex_condition": [
+                            [
+                              "invitaiton_status",
+                              "=",
+                              "0"
+                            ]
+                          ]
+                        }
+                      ],
+                      "labelField": null,
+                      "valueField": null
+                    },
+                    "search": "=",
+                    "showLabel": 0,
+                    "placeholder": "邀请状态"
+                  }
+                },
+                {
+                  "name": "患者:居住地(筛选)",
+                  "description": "患者:居住地(筛选)",
+                  "content": {
+                    "key": "_crowds",
+                    "type": "cascader",
+                    "field": "curr_addr_vlg_cd",
+                    "label": "居住地",
+                    "props": {},
+                    "apiUrl": "/api/allAddressListLowCode",
+                    "search": "=",
+                    "showLabel": null,
+                    "placeholder": "请选择居住地"
+                  }
+                },
+                {
+                  "name": "患者:人群分类(筛选)",
+                  "description": "患者:人群分类(筛选)",
+                  "content": {
+                    "key": "_crowds",
+                    "type": "select",
+                    "field": "crowd_id",
+                    "label": "人群分类",
+                    "props": {},
+                    "apiUrl": "/api/v2/resident/resident-crowd/optional",
+                    "search": "=",
+                    "showLabel": null,
+                    "placeholder": "请选择人群分类"
+                  }
+                }
+              ]
+            },
+            "button": {
+              "name": "通用列表-操作栏按钮",
+              "description": "通用列表-操作栏按钮",
+              "template_type": 1,
+              "content_type": 3,
+              "parts": [
+                {
+                  "name": "患者:退出服务(按钮)",
+                  "description": "患者:退出服务(按钮)",
+                  "content": {
+                    "key": "resident_exit_manage",
+                    "label": "退出服务",
+                    "title": "退出服务",
+                    "action": "EXIT_MANAGE",
+                    "visible": "Number(data.manage_status) == 1"
+                  }
+                },
+                {
+                  "name": "患者:专病档案(按钮)",
+                  "description": "患者:专病档案(按钮)",
+                  "content": {
+                    "key": "resident_archives",
+                    "label": "专病档案",
+                    "title": "专病档案",
+                    "action": "ARCHIVES",
+                    "visible": "true"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "admin_name": "已拒绝",
+          "route_group": [
+            "/Patient/ManagedPatient"
+          ],
+          "preset_condition_json": [
+            [
+              "is_deleted",
+              "=",
+              0
+            ],
+            [
+              "circulation_status",
+              "=",
+              3
+            ]
+          ],
+          "default_order_by_json": [
+            [
+              "gmt_created",
+              "desc"
+            ],
+            [
+              "user_id",
+              "desc"
+            ]
+          ],
+          "list_type": 0,
+          "templates": {
+            "filter": {
+              "name": "通用列表-筛选字段",
+              "description": "通用列表-筛选字段",
+              "template_type": 1,
+              "content_type": 2,
+              "parts": [
+                {
+                  "name": "患者:姓名(筛选)",
+                  "description": "患者:姓名(筛选)",
+                  "content": {
+                    "key": "rsdnt_nm",
+                    "type": "input",
+                    "field": "rsdnt_nm",
+                    "label": "患者姓名",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者姓名"
+                  }
+                },
+                {
+                  "name": "患者:身份证(筛选)",
+                  "description": "患者:身份证(筛选)",
+                  "content": {
+                    "key": "id_crd_no",
+                    "type": "input",
+                    "field": "id_crd_no",
+                    "label": "患者身份证",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者身份证"
+                  }
+                },
+                {
+                  "name": "患者:电话号码(筛选)",
+                  "description": "患者:电话号码(筛选)",
+                  "content": {
+                    "key": "slf_tel_no",
+                    "type": "input",
+                    "field": "slf_tel_no",
+                    "label": "患者电话号码",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者电话号码"
+                  }
+                },
+                {
+                  "name": "患者:邀请状态(筛选)",
+                  "description": "患者:邀请状态(筛选)",
+                  "content": {
+                    "type": "select",
+                    "field": "invitaiton_status",
+                    "label": "邀请状态",
+                    "props": {
+                      "options": [
+                        {
+                          "label": "已邀请",
+                          "value": "1",
+                          "complex_condition": [
+                            [
+                              "invitaiton_status",
+                              "=",
+                              "1"
+                            ]
+                          ]
+                        },
+                        {
+                          "label": "未邀请",
+                          "value": "0",
+                          "complex_condition": [
+                            [
+                              "invitaiton_status",
+                              "=",
+                              "0"
+                            ]
+                          ]
+                        }
+                      ],
+                      "labelField": null,
+                      "valueField": null
+                    },
+                    "search": "=",
+                    "showLabel": 0,
+                    "placeholder": "邀请状态"
+                  }
+                },
+                {
+                  "name": "患者:居住地(筛选)",
+                  "description": "患者:居住地(筛选)",
+                  "content": {
+                    "key": "_crowds",
+                    "type": "cascader",
+                    "field": "curr_addr_vlg_cd",
+                    "label": "居住地",
+                    "props": {},
+                    "apiUrl": "/api/allAddressListLowCode",
+                    "search": "=",
+                    "showLabel": null,
+                    "placeholder": "请选择居住地"
+                  }
+                }
+              ]
+            },
+            "button": {
+              "name": "通用列表-操作栏按钮",
+              "description": "通用列表-操作栏按钮",
+              "template_type": 1,
+              "content_type": 3,
+              "parts": [
+                {
+                  "name": "患者:恢复服务(按钮)",
+                  "description": "患者:恢复服务(按钮)",
+                  "content": {
+                    "key": "resident_recovery_manage",
+                    "label": "恢复服务",
+                    "title": "恢复服务",
+                    "action": "RECOVERY_MANAGE",
+                    "visible": "true"
+                  }
+                },
+                {
+                  "name": "患者:用药记录(按钮)",
+                  "description": "患者:用药记录(按钮)",
+                  "content": {
+                    "key": "resident_medication_record",
+                    "label": "用药记录",
+                    "title": "用药记录",
+                    "action": "MEDICATION_RECORD",
+                    "visible": "true"
+                  }
+                },
+                {
+                  "name": "患者:专病档案(按钮)",
+                  "description": "患者:专病档案(按钮)",
+                  "content": {
+                    "key": "resident_archives",
+                    "label": "专病档案",
+                    "title": "专病档案",
+                    "action": "ARCHIVES",
+                    "visible": "true"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "admin_name": "已退出",
+          "route_group": [
+            "/Patient/ManagedPatient"
+          ],
+          "preset_condition_json": [
+            [
+              "is_deleted",
+              "=",
+              0
+            ],
+            [
+              "manage_status",
+              "=",
+              3
+            ]
+          ],
+          "default_order_by_json": [
+            [
+              "gmt_created",
+              "desc"
+            ],
+            [
+              "user_id",
+              "desc"
+            ]
+          ],
+          "list_type": 0,
+          "templates": {
+            "filter": {
+              "name": "通用列表-筛选字段",
+              "description": "通用列表-筛选字段",
+              "template_type": 1,
+              "content_type": 2,
+              "parts": [
+                {
+                  "name": "患者:姓名(筛选)",
+                  "description": "患者:姓名(筛选)",
+                  "content": {
+                    "key": "rsdnt_nm",
+                    "type": "input",
+                    "field": "rsdnt_nm",
+                    "label": "患者姓名",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者姓名"
+                  }
+                },
+                {
+                  "name": "患者:身份证(筛选)",
+                  "description": "患者:身份证(筛选)",
+                  "content": {
+                    "key": "id_crd_no",
+                    "type": "input",
+                    "field": "id_crd_no",
+                    "label": "患者身份证",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者身份证"
+                  }
+                },
+                {
+                  "name": "患者:电话号码(筛选)",
+                  "description": "患者:电话号码(筛选)",
+                  "content": {
+                    "key": "slf_tel_no",
+                    "type": "input",
+                    "field": "slf_tel_no",
+                    "label": "患者电话号码",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者电话号码"
+                  }
+                },
+                {
+                  "name": "患者:邀请状态(筛选)",
+                  "description": "患者:邀请状态(筛选)",
+                  "content": {
+                    "type": "select",
+                    "field": "invitaiton_status",
+                    "label": "邀请状态",
+                    "props": {
+                      "options": [
+                        {
+                          "label": "已邀请",
+                          "value": "1",
+                          "complex_condition": [
+                            [
+                              "invitaiton_status",
+                              "=",
+                              "1"
+                            ]
+                          ]
+                        },
+                        {
+                          "label": "未邀请",
+                          "value": "0",
+                          "complex_condition": [
+                            [
+                              "invitaiton_status",
+                              "=",
+                              "0"
+                            ]
+                          ]
+                        }
+                      ],
+                      "labelField": null,
+                      "valueField": null
+                    },
+                    "search": "=",
+                    "showLabel": 0,
+                    "placeholder": "邀请状态"
+                  }
+                },
+                {
+                  "name": "患者:居住地(筛选)",
+                  "description": "患者:居住地(筛选)",
+                  "content": {
+                    "key": "_crowds",
+                    "type": "cascader",
+                    "field": "curr_addr_vlg_cd",
+                    "label": "居住地",
+                    "props": {},
+                    "apiUrl": "/api/allAddressListLowCode",
+                    "search": "=",
+                    "showLabel": null,
+                    "placeholder": "请选择居住地"
+                  }
+                },
+                {
+                  "name": "患者:人群分类(筛选)",
+                  "description": "患者:人群分类(筛选)",
+                  "content": {
+                    "key": "_crowds",
+                    "type": "select",
+                    "field": "crowd_id",
+                    "label": "人群分类",
+                    "props": {},
+                    "apiUrl": "/api/v2/resident/resident-crowd/optional",
+                    "search": "=",
+                    "showLabel": null,
+                    "placeholder": "请选择人群分类"
+                  }
+                }
+              ]
+            },
+            "button": {
+              "name": "通用列表-操作栏按钮",
+              "description": "通用列表-操作栏按钮",
+              "template_type": 1,
+              "content_type": 3,
+              "parts": [
+                {
+                  "name": "患者:恢复服务(按钮)",
+                  "description": "患者:恢复服务(按钮)",
+                  "content": {
+                    "key": "resident_recovery_manage",
+                    "label": "恢复服务",
+                    "title": "恢复服务",
+                    "action": "RECOVERY_MANAGE",
+                    "visible": "true"
+                  }
+                },
+                {
+                  "name": "患者:用药记录(按钮)",
+                  "description": "患者:用药记录(按钮)",
+                  "content": {
+                    "key": "resident_medication_record",
+                    "label": "用药记录",
+                    "title": "用药记录",
+                    "action": "MEDICATION_RECORD",
+                    "visible": "true"
+                  }
+                },
+                {
+                  "name": "患者:专病档案(按钮)",
+                  "description": "患者:专病档案(按钮)",
+                  "content": {
+                    "key": "resident_archives",
+                    "label": "专病档案",
+                    "title": "专病档案",
+                    "action": "ARCHIVES",
+                    "visible": "true"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "admin_name": "已流转",
+          "route_group": [
+            "/Patient/ManagedPatient"
+          ],
+          "preset_condition_json": [
+            [
+              "is_deleted",
+              "=",
+              0
+            ],
+            [
+              "circulation_status",
+              "=",
+              1
+            ]
+          ],
+          "default_order_by_json": [
+            [
+              "gmt_created",
+              "desc"
+            ],
+            [
+              "user_id",
+              "desc"
+            ]
+          ],
+          "list_type": 0,
+          "templates": {
+            "filter": {
+              "name": "通用列表-筛选字段",
+              "description": "通用列表-筛选字段",
+              "template_type": 1,
+              "content_type": 2,
+              "parts": [
+                {
+                  "name": "患者:姓名(筛选)",
+                  "description": "患者:姓名(筛选)",
+                  "content": {
+                    "key": "rsdnt_nm",
+                    "type": "input",
+                    "field": "rsdnt_nm",
+                    "label": "患者姓名",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者姓名"
+                  }
+                },
+                {
+                  "name": "患者:身份证(筛选)",
+                  "description": "患者:身份证(筛选)",
+                  "content": {
+                    "key": "id_crd_no",
+                    "type": "input",
+                    "field": "id_crd_no",
+                    "label": "患者身份证",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者身份证"
+                  }
+                },
+                {
+                  "name": "患者:电话号码(筛选)",
+                  "description": "患者:电话号码(筛选)",
+                  "content": {
+                    "key": "slf_tel_no",
+                    "type": "input",
+                    "field": "slf_tel_no",
+                    "label": "患者电话号码",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者电话号码"
+                  }
+                },
+                {
+                  "name": "患者:邀请状态(筛选)",
+                  "description": "患者:邀请状态(筛选)",
+                  "content": {
+                    "type": "select",
+                    "field": "invitaiton_status",
+                    "label": "邀请状态",
+                    "props": {
+                      "options": [
+                        {
+                          "label": "已邀请",
+                          "value": "1",
+                          "complex_condition": [
+                            [
+                              "invitaiton_status",
+                              "=",
+                              "1"
+                            ]
+                          ]
+                        },
+                        {
+                          "label": "未邀请",
+                          "value": "0",
+                          "complex_condition": [
+                            [
+                              "invitaiton_status",
+                              "=",
+                              "0"
+                            ]
+                          ]
+                        }
+                      ],
+                      "labelField": null,
+                      "valueField": null
+                    },
+                    "search": "=",
+                    "showLabel": 0,
+                    "placeholder": "邀请状态"
+                  }
+                },
+                {
+                  "name": "患者:居住地(筛选)",
+                  "description": "患者:居住地(筛选)",
+                  "content": {
+                    "key": "_crowds",
+                    "type": "cascader",
+                    "field": "curr_addr_vlg_cd",
+                    "label": "居住地",
+                    "props": {},
+                    "apiUrl": "/api/allAddressListLowCode",
+                    "search": "=",
+                    "showLabel": null,
+                    "placeholder": "请选择居住地"
+                  }
+                }
+              ]
+            },
+            "button": {
+              "name": "通用列表-操作栏按钮",
+              "description": "通用列表-操作栏按钮",
+              "template_type": 1,
+              "content_type": 3,
+              "parts": [
+                {
+                  "name": "患者:取消流转(按钮)",
+                  "description": "患者:取消流转(按钮)",
+                  "content": {
+                    "key": "resident_cancel_flowing",
+                    "label": "取消流转",
+                    "title": "取消流转",
+                    "action": "CANCEL_FLOWING",
+                    "visible": "Number(data.circulation_status) == 1"
+                  }
+                },
+                {
+                  "name": "患者:专病档案(按钮)",
+                  "description": "患者:专病档案(按钮)",
+                  "content": {
+                    "key": "resident_archives",
+                    "label": "专病档案",
+                    "title": "专病档案",
+                    "action": "ARCHIVES",
+                    "visible": "true"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "admin_name": "待接收",
+          "route_group": [
+            "/Patient/ManagedPatient"
+          ],
+          "preset_condition_json": [
+            [
+              "is_deleted",
+              "=",
+              0
+            ],
+            [
+              "circulation_status",
+              "in",
+              [
+                1,
+                2,
+                3,
+                4
+              ]
+            ]
+          ],
+          "default_order_by_json": [
+            [
+              "gmt_created",
+              "desc"
+            ],
+            [
+              "user_id",
+              "desc"
+            ]
+          ],
+          "list_type": 0,
+          "templates": {
+            "filter": {
+              "name": "通用列表-筛选字段",
+              "description": "通用列表-筛选字段",
+              "template_type": 1,
+              "content_type": 2,
+              "parts": [
+                {
+                  "name": "患者:姓名(筛选)",
+                  "description": "患者:姓名(筛选)",
+                  "content": {
+                    "key": "rsdnt_nm",
+                    "type": "input",
+                    "field": "rsdnt_nm",
+                    "label": "患者姓名",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者姓名"
+                  }
+                },
+                {
+                  "name": "患者:身份证(筛选)",
+                  "description": "患者:身份证(筛选)",
+                  "content": {
+                    "key": "id_crd_no",
+                    "type": "input",
+                    "field": "id_crd_no",
+                    "label": "患者身份证",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者身份证"
+                  }
+                },
+                {
+                  "name": "患者:电话号码(筛选)",
+                  "description": "患者:电话号码(筛选)",
+                  "content": {
+                    "key": "slf_tel_no",
+                    "type": "input",
+                    "field": "slf_tel_no",
+                    "label": "患者电话号码",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者电话号码"
+                  }
+                },
+                {
+                  "name": "患者:邀请状态(筛选)",
+                  "description": "患者:邀请状态(筛选)",
+                  "content": {
+                    "type": "select",
+                    "field": "invitaiton_status",
+                    "label": "邀请状态",
+                    "props": {
+                      "options": [
+                        {
+                          "label": "已邀请",
+                          "value": "1",
+                          "complex_condition": [
+                            [
+                              "invitaiton_status",
+                              "=",
+                              "1"
+                            ]
+                          ]
+                        },
+                        {
+                          "label": "未邀请",
+                          "value": "0",
+                          "complex_condition": [
+                            [
+                              "invitaiton_status",
+                              "=",
+                              "0"
+                            ]
+                          ]
+                        }
+                      ],
+                      "labelField": null,
+                      "valueField": null
+                    },
+                    "search": "=",
+                    "showLabel": 0,
+                    "placeholder": "邀请状态"
+                  }
+                },
+                {
+                  "name": "患者:居住地(筛选)",
+                  "description": "患者:居住地(筛选)",
+                  "content": {
+                    "key": "_crowds",
+                    "type": "cascader",
+                    "field": "curr_addr_vlg_cd",
+                    "label": "居住地",
+                    "props": {},
+                    "apiUrl": "/api/allAddressListLowCode",
+                    "search": "=",
+                    "showLabel": null,
+                    "placeholder": "请选择居住地"
+                  }
+                },
+                {
+                  "name": "患者:人群分类(筛选)",
+                  "description": "患者:人群分类(筛选)",
+                  "content": {
+                    "key": "_crowds",
+                    "type": "select",
+                    "field": "crowd_id",
+                    "label": "人群分类",
+                    "props": {},
+                    "apiUrl": "/api/v2/resident/resident-crowd/optional",
+                    "search": "=",
+                    "showLabel": null,
+                    "placeholder": "请选择人群分类"
+                  }
+                }
+              ]
+            },
+            "button": {
+              "name": "通用列表-操作栏按钮",
+              "description": "通用列表-操作栏按钮",
+              "template_type": 1,
+              "content_type": 3,
+              "parts": [
+                {
+                  "name": "患者:发送邀请(按钮)",
+                  "description": "患者:发送邀请(按钮)",
+                  "content": {
+                    "key": "send_invitation",
+                    "label": "发送邀请",
+                    "title": "发送邀请",
+                    "action": "SEND_INVITATION",
+                    "visible": "Number(data.invitaiton_status) == 0"
+                  }
+                },
+                {
+                  "name": "患者:同意服务(按钮)",
+                  "description": "患者:同意服务(按钮)",
+                  "content": {
+                    "key": "resident_agree_manage",
+                    "label": "同意服务",
+                    "title": "同意服务",
+                    "action": "AGREE_MANAGE",
+                    "visible": "true"
+                  }
+                },
+                {
+                  "name": "患者:拒绝服务(按钮)",
+                  "description": "患者:拒绝服务(按钮)",
+                  "content": {
+                    "key": "resident_refusal_manage",
+                    "label": "拒绝服务",
+                    "title": "拒绝服务",
+                    "action": "REFUSAL_MANAGE",
+                    "visible": "Number(data.manage_status) == 0"
+                  }
+                },
+                {
+                  "name": "患者:专病档案(按钮)",
+                  "description": "患者:专病档案(按钮)",
+                  "content": {
+                    "key": "resident_archives",
+                    "label": "专病档案",
+                    "title": "专病档案",
+                    "action": "ARCHIVES",
+                    "visible": "true"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "admin_name": "人群患者列表",
+          "route_group": [
+            "/Crowd/Patients"
+          ],
+          "preset_condition_json": [
+            [
+              "is_deleted",
+              "=",
+              0
+            ]
+          ],
+          "default_order_by_json": [
+            [
+              "gmt_created",
+              "desc"
+            ],
+            [
+              "user_id",
+              "desc"
+            ]
+          ],
+          "list_type": 0,
+          "templates": {
+            "filter": {
+              "name": "通用列表-筛选字段",
+              "description": "通用列表-筛选字段",
+              "template_type": 1,
+              "content_type": 2,
+              "parts": [
+                {
+                  "name": "患者:姓名(筛选)",
+                  "description": "患者:姓名(筛选)",
+                  "content": {
+                    "key": "rsdnt_nm",
+                    "type": "input",
+                    "field": "rsdnt_nm",
+                    "label": "患者姓名",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者姓名"
+                  }
+                },
+                {
+                  "name": "患者:身份证(筛选)",
+                  "description": "患者:身份证(筛选)",
+                  "content": {
+                    "key": "id_crd_no",
+                    "type": "input",
+                    "field": "id_crd_no",
+                    "label": "患者身份证",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者身份证"
+                  }
+                },
+                {
+                  "name": "患者:电话号码(筛选)",
+                  "description": "患者:电话号码(筛选)",
+                  "content": {
+                    "key": "slf_tel_no",
+                    "type": "input",
+                    "field": "slf_tel_no",
+                    "label": "患者电话号码",
+                    "props": {
+                      "options": [],
+                      "labelField": null,
+                      "valueField": null,
+                      "childrenField": null
+                    },
+                    "apiUrl": null,
+                    "search": "like",
+                    "showLabel": null,
+                    "placeholder": "请输入患者电话号码"
+                  }
+                },
+                {
+                  "name": "患者:人群分类(筛选)",
+                  "description": "患者:人群分类(筛选)",
+                  "content": {
+                    "key": "_crowds",
+                    "type": "select",
+                    "field": "crowd_id",
+                    "label": "人群分类",
+                    "props": {},
+                    "apiUrl": "/api/v2/resident/resident-crowd/optional",
+                    "search": "=",
+                    "showLabel": null,
+                    "placeholder": "请选择人群分类"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "templates": {
+        "column": {
+          "name": "通用列表-展示字段",
+          "description": "通用列表-展示字段",
+          "template_type": 1,
+          "content_type": 1,
+          "parts": [
+            {
+              "name": "患者:姓名",
+              "description": "患者姓名",
+              "content": {
+                "key": "rsdnt_nm",
+                "fixed": true,
+                "title": "姓名"
+              }
+            },
+            {
+              "name": "患者:身份证",
+              "description": "患者身份证",
+              "content": {
+                "key": "id_crd_no",
+                "title": "身份证"
+              }
+            },
+            {
+              "name": "患者:年龄",
+              "description": "患者年龄",
+              "content": {
+                "key": "age",
+                "title": "年龄"
+              }
+            },
+            {
+              "name": "患者:现在居住地",
+              "description": "患者现在居住地",
+              "content": {
+                "key": "now_address",
+                "title": "现在居住地"
+              }
+            },
+            {
+              "name": "患者:原来居住地",
+              "description": "患者原来居住地",
+              "content": {
+                "key": "raw_address",
+                "title": "原来居住地"
+              }
+            },
+            {
+              "name": "患者:上次配药医院",
+              "description": "上次配药医院",
+              "content": {
+                "key": "rct_disp_hosp_nm",
+                "title": "上次配药医院"
+              }
+            },
+            {
+              "name": "患者:上次配药时间",
+              "description": "上次配药时间",
+              "content": {
+                "key": "rct_disp_drug_tm",
+                "title": "上次配药时间"
+              }
+            },
+            {
+              "name": "患者:签约家医",
+              "description": "签约家医",
+              "content": {
+                "key": "sgn_ctrct_dct_nm",
+                "title": "签约家医"
+              }
+            },
+            {
+              "name": "患者:邀请状态",
+              "description": "邀请状态",
+              "content": {
+                "key": "invitaiton_status",
+                "title": "邀请状态"
+              }
+            },
+            {
+              "name": "患者:性别",
+              "description": "患者性别",
+              "content": {
+                "key": "gdr_cd",
+                "title": "性别"
+              }
+            },
+            {
+              "name": "患者:所属站点",
+              "description": "患者所属站点",
+              "content": {
+                "key": "site_name",
+                "title": "所属站点"
+              }
+            },
+            {
+              "name": "患者:加入服务时间（纳入管时间）",
+              "description": "患者加入服务时间",
+              "content": {
+                "key": "dscg_mng_tm",
+                "title": "加入服务时间"
+              }
+            },
+            {
+              "name": "患者:流转原因",
+              "description": "患者流转原因",
+              "content": {
+                "key": "wander_about_cause",
+                "title": "流转原因"
+              }
+            },
+            {
+              "name": "患者:流转申请时间",
+              "description": "患者流转申请时间",
+              "content": {
+                "key": "circulation_time",
+                "title": "流转申请时间"
+              }
+            },
+            {
+              "name": "患者:流转申请人",
+              "description": "患者流转申请人",
+              "content": {
+                "key": "circulation_name",
+                "title": "流转申请人"
+              }
+            },
+            {
+              "name": "患者:流转状态",
+              "description": "患者流转状态",
+              "content": {
+                "key": "circulation_status",
+                "title": "流转状态"
+              }
+            },
+            {
+              "name": "患者:电话号码",
+              "description": "患者电话号码",
+              "content": {
+                "key": "slf_tel_no",
+                "title": "电话号码"
+              }
+            },
+            {
+              "name": "患者:拒绝(退出)服务时间",
+              "description": "患者拒绝(退出)服务时间",
+              "content": {
+                "key": "refuse_time",
+                "title": "拒绝(退出)服务时间"
+              }
+            },
+            {
+              "name": "患者:拒绝(退出)服务原因",
+              "description": "患者拒绝(退出)服务原因",
+              "content": {
+                "key": "out_title",
+                "title": "拒绝(退出)服务原因"
+              }
+            },
+            {
+              "name": "患者:拒绝(退出)服务描述",
+              "description": "患者拒绝(退出)服务描述",
+              "content": {
+                "key": "out_remark",
+                "title": "拒绝(退出)服务描述"
+              }
+            },
+            {
+              "name": "患者:人群分类",
+              "description": "患者人群分类",
+              "content": {
+                "key": "_crowds",
+                "title": "人群分类"
+              }
+            }
+          ]
+        },
+        "filter": {
+          "name": "通用列表-筛选字段",
+          "description": "通用列表-筛选字段",
+          "template_type": 1,
+          "content_type": 2,
+          "parts": [
+            {
+              "name": "患者:姓名(筛选)",
+              "description": "患者:姓名(筛选)",
+              "content": {
+                "key": "rsdnt_nm",
+                "type": "input",
+                "field": "rsdnt_nm",
+                "label": "患者姓名",
+                "props": {
+                  "options": [],
+                  "labelField": null,
+                  "valueField": null,
+                  "childrenField": null
+                },
+                "apiUrl": null,
+                "search": "like",
+                "showLabel": null,
+                "placeholder": "请输入患者姓名"
+              }
+            },
+            {
+              "name": "患者:身份证(筛选)",
+              "description": "患者:身份证(筛选)",
+              "content": {
+                "key": "id_crd_no",
+                "type": "input",
+                "field": "id_crd_no",
+                "label": "患者身份证",
+                "props": {
+                  "options": [],
+                  "labelField": null,
+                  "valueField": null,
+                  "childrenField": null
+                },
+                "apiUrl": null,
+                "search": "like",
+                "showLabel": null,
+                "placeholder": "请输入患者身份证"
+              }
+            },
+            {
+              "name": "患者:电话号码(筛选)",
+              "description": "患者:电话号码(筛选)",
+              "content": {
+                "key": "slf_tel_no",
+                "type": "input",
+                "field": "slf_tel_no",
+                "label": "患者电话号码",
+                "props": {
+                  "options": [],
+                  "labelField": null,
+                  "valueField": null,
+                  "childrenField": null
+                },
+                "apiUrl": null,
+                "search": "like",
+                "showLabel": null,
+                "placeholder": "请输入患者电话号码"
+              }
+            },
+            {
+              "name": "患者:邀请状态(筛选)",
+              "description": "患者:邀请状态(筛选)",
+              "content": {
+                "type": "select",
+                "field": "invitaiton_status",
+                "label": "邀请状态",
+                "props": {
+                  "options": [
+                    {
+                      "label": "已邀请",
+                      "value": "1",
+                      "complex_condition": [
+                        [
+                          "invitaiton_status",
+                          "=",
+                          "1"
+                        ]
+                      ]
+                    },
+                    {
+                      "label": "未邀请",
+                      "value": "0",
+                      "complex_condition": [
+                        [
+                          "invitaiton_status",
+                          "=",
+                          "0"
+                        ]
+                      ]
+                    }
+                  ],
+                  "labelField": null,
+                  "valueField": null
+                },
+                "search": "=",
+                "showLabel": 0,
+                "placeholder": "邀请状态"
+              }
+            },
+            {
+              "name": "患者:居住地(筛选)",
+              "description": "患者:居住地(筛选)",
+              "content": {
+                "key": "_crowds",
+                "type": "cascader",
+                "field": "curr_addr_vlg_cd",
+                "label": "居住地",
+                "props": {},
+                "apiUrl": "/api/allAddressListLowCode",
+                "search": "=",
+                "showLabel": null,
+                "placeholder": "请选择居住地"
+              }
+            },
+            {
+              "name": "患者:人群分类(筛选)",
+              "description": "患者:人群分类(筛选)",
+              "content": {
+                "key": "_crowds",
+                "type": "select",
+                "field": "crowd_id",
+                "label": "人群分类",
+                "props": {},
+                "apiUrl": "/api/v2/resident/resident-crowd/optional",
+                "search": "=",
+                "showLabel": null,
+                "placeholder": "请选择人群分类"
+              }
+            }
+          ]
+        },
+        "button": {
+          "name": "通用列表-操作栏按钮",
+          "description": "通用列表-操作栏按钮",
+          "template_type": 1,
+          "content_type": 3,
+          "parts": [
+            {
+              "name": "患者:加入服务(按钮)",
+              "description": "患者:加入服务(按钮)",
+              "content": {
+                "key": "resident_manage",
+                "label": "加入服务",
+                "title": "加入服务",
+                "action": "MANAGE",
+                "visible": "Number(data.manage_status) == 0"
+              }
+            },
+            {
+              "name": "患者:发送邀请(按钮)",
+              "description": "患者:发送邀请(按钮)",
+              "content": {
+                "key": "send_invitation",
+                "label": "发送邀请",
+                "title": "发送邀请",
+                "action": "SEND_INVITATION",
+                "visible": "Number(data.invitaiton_status) == 0"
+              }
+            },
+            {
+              "name": "患者:同意服务(按钮)",
+              "description": "患者:同意服务(按钮)",
+              "content": {
+                "key": "resident_agree_manage",
+                "label": "同意服务",
+                "title": "同意服务",
+                "action": "AGREE_MANAGE",
+                "visible": "Number(data.manage_status) == 1"
+              }
+            },
+            {
+              "name": "患者:拒绝服务(按钮)",
+              "description": "患者:拒绝服务(按钮)",
+              "content": {
+                "key": "resident_refusal_manage",
+                "label": "拒绝服务",
+                "title": "拒绝服务",
+                "action": "REFUSAL_MANAGE",
+                "visible": "Number(data.manage_status) == 0"
+              }
+            },
+            {
+              "name": "患者:人员流转(按钮)",
+              "description": "患者:人员流转(按钮)",
+              "content": {
+                "key": "resident_flowing",
+                "label": "人员流转",
+                "title": "人员流转",
+                "action": "FLOWING",
+                "visible": "Number(data.circulation_status) == 0 || Number(data.circulation_status) == 3 || Number(data.circulation_status) == 4"
+              }
+            },
+            {
+              "name": "患者:取消流转(按钮)",
+              "description": "患者:取消流转(按钮)",
+              "content": {
+                "key": "resident_cancel_flowing",
+                "label": "取消流转",
+                "title": "取消流转",
+                "action": "CANCEL_FLOWING",
+                "visible": "Number(data.circulation_status) == 1"
+              }
+            },
+            {
+              "name": "患者:退出服务(按钮)",
+              "description": "患者:退出服务(按钮)",
+              "content": {
+                "key": "resident_exit_manage",
+                "label": "退出服务",
+                "title": "退出服务",
+                "action": "EXIT_MANAGE",
+                "visible": "Number(data.manage_status) == 1"
+              }
+            },
+            {
+              "name": "患者:恢复服务(按钮)",
+              "description": "患者:恢复服务(按钮)",
+              "content": {
+                "key": "resident_recovery_manage",
+                "label": "恢复服务",
+                "title": "恢复服务",
+                "action": "RECOVERY_MANAGE",
+                "visible": "true"
+              }
+            },
+            {
+              "name": "患者:用药记录(按钮)",
+              "description": "患者:用药记录(按钮)",
+              "content": {
+                "key": "resident_medication_record",
+                "label": "用药记录",
+                "title": "用药记录",
+                "action": "MEDICATION_RECORD",
+                "visible": "true"
+              }
+            },
+            {
+              "name": "患者:专病档案(按钮)",
+              "description": "患者:专病档案(按钮)",
+              "content": {
+                "key": "resident_archives",
+                "label": "专病档案",
+                "title": "专病档案",
+                "action": "ARCHIVES",
+                "visible": "true"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
