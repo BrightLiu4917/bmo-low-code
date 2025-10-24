@@ -112,4 +112,4 @@ X-Gp-Scene-Code   场景编码 后端开发定义 比如配药（CHRONIC_DISEASE
 ![img.png](img.png)
 -----
 
-### strore/templates.json 模板文件以下内容，案例文件在README.md，同级目录下 ⚠️json 内容根据需求自定义
+### store/templates.json 模板文件以下内容，案例文件在README.md，同级目录下 ⚠️json 内容根据需求自定义
