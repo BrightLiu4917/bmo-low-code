@@ -86,13 +86,13 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
     }
 
     /**
-     * @param string $userId
+     * @param string $empi
      * @param array  $attributes
      *
      * @return void
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function updatePatientInfo(string $userId, array $attributes): void
+    public function updatePatientInfo(string $empi, array $attributes): void
     {
         if (empty($attributes)) {
             return;
@@ -102,7 +102,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
             ->retry(3)
             ->timeout(15)
             ->post($this->baseUriVia().'innerapi/personal-archive/create',[
-                'user_id' => $userId,
+                'empi' => $empi,
                 'col_values' => array_values(Arr::map(
                     $attributes,
                     fn ($value, $key) => ['col_name' => $key, 'col_value' => $value]

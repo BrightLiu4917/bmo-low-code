@@ -22,9 +22,9 @@ class ResidentService extends BaseService
     /**
      * 判断居民是否存在
      */
-    public function exists(string $userId): bool
+    public function exists(string $empi): bool
     {
-        return !empty(CrowdConnection::query()->where('user_id', $userId)->exists());
+        return !empty(CrowdConnection::query()->where('empi', $empi)->exists());
     }
 
     /**
@@ -32,13 +32,13 @@ class ResidentService extends BaseService
      *
      * @throws ServiceException
      */
-    public function getBasicInfo(string $userId): ResidentBasicInfoEntity
+    public function getBasicInfo(string $empi): ResidentBasicInfoEntity
     {
-        if (empty($userId)) {
+        if (empty($empi)) {
             throw new ServiceException('参数错误');
         }
 
-        return ResidentBasicInfoEntity::make((array) $this->getInfo($userId));
+        return ResidentBasicInfoEntity::make((array) $this->getInfo($empi));
     }
 
     /**
@@ -46,9 +46,9 @@ class ResidentService extends BaseService
      *
      * @throws ServiceException
      */
-    public function getInfo(string $userId, array $columns = ['*']): array
+    public function getInfo(string $empi, array $columns = ['*']): array
     {
-        $info = CrowdConnection::query()->where('user_id', $userId)->first($columns);
+        $info = CrowdConnection::query()->where('empi', $empi)->first($columns);
 
         if (empty($info)) {
             throw new ServiceException('居民不存在');
@@ -62,9 +62,9 @@ class ResidentService extends BaseService
      *
      * @throws ServiceException
      */
-    public function updateBasicInfo(string $userId, ResidentBasicInfoEntity $basicInfo): void
+    public function updateBasicInfo(string $empi, ResidentBasicInfoEntity $basicInfo): void
     {
-        $this->updateInfo($userId, $basicInfo->only([
+        $this->updateInfo($empi, $basicInfo->only([
             'rsdnt_nm', 'slf_tel_no', 'gdr_cd', 'bth_dt',
         ]));
     }
@@ -74,30 +74,30 @@ class ResidentService extends BaseService
      *
      * @throws ServiceException
      */
-    public function updateInfo(string $userId, array $attributes): void
+    public function updateInfo(string $empi, array $attributes): void
     {
-        if (empty($userId) || empty($attributes)) {
+        if (empty($empi) || empty($attributes)) {
             return;
         }
 
-        if (!$this->exists($userId)) {
+        if (!$this->exists($empi)) {
             throw new ServiceException('居民不存在');
         }
 
         BmpCheetahMedicalCrowdkitApiService::make()->updatePatientInfo(
-            $userId,
+            $empi,
             $attributes
         );
     }
 
 
-    public function manageResident(string $userId, array $attributes): void
+    public function manageResident(string $empi, array $attributes): void
     {
-        if (empty($userId) || empty($attributes)) {
+        if (empty($empi) || empty($attributes)) {
             return;
         }
 
-        if (!$this->exists($userId)) {
+        if (!$this->exists($empi)) {
             throw new ServiceException('居民不存在');
         }
 
@@ -122,13 +122,13 @@ class ResidentService extends BaseService
         $latestData['manage_doctor_name'] = auth()->user()->name ?? '';
 
         BmpCheetahMedicalCrowdkitApiService::make()->updatePatientInfo(
-            $userId,
+            $empi,
             array_merge($attributes, $latestData)
         );
     }
 
     /**
-     * @param string $userId
+     * @param string $empi
      * @param array  $attributes
      * @param bool   $isClearManageData
      *
@@ -136,12 +136,12 @@ class ResidentService extends BaseService
      * @throws \Gupo\BetterLaravel\Exceptions\ServiceException
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function removeManageResident(string $userId, array $attributes,bool $isClearManageData =  true): void
+    public function removeManageResident(string $empi, array $attributes,bool $isClearManageData =  true): void
     {
-        if (empty($userId) || empty($attributes)) {
+        if (empty($empi) || empty($attributes)) {
             return;
         }
-        if (!$this->exists($userId)) {
+        if (!$this->exists($empi)) {
             throw new ServiceException('居民不存在');
         }
         $latestData['manage_status'] = 3;
@@ -159,7 +159,7 @@ class ResidentService extends BaseService
         }
 
         BmpCheetahMedicalCrowdkitApiService::make()->updatePatientInfo(
-            $userId,
+            $empi,
             array_merge($attributes, $latestData)
         );
     }
