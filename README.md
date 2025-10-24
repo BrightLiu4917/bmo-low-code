@@ -20,7 +20,7 @@ php artisan vendor:publish --provider="BrightLiu\LowCode\Providers\LowCodeServic
 -----
 ### env配置文件
 ```text
-BMO_ORG_ID=用户中心ID 用户中心 org_id
+BMO_ORG_ID=用户中心ID 用户中心 org_id 可以不写，预留的
 BMP_CHEETAH_MEDICAL_PLATFORM_URI=业务中台接口地址 宝庆老师
 BMP_CHEETAH_MEDICAL_CROWD_KIT_URI=人群基线接口地址 童java
 
@@ -98,7 +98,7 @@ api/v2/low-code/list/query 需要业务自己继承后，重新实现
 
 2.
 通知前端必须header入参
-X-Gp-Org-Id 机构ID 前端自己申请写死 预留可以不写
+X-Gp-Org-Id 机构ID 前端自己申请写死
 X-Gp-System-Code 系统编码 研发PM定义 
 X-Gp-Disease-Code 疾病编码 后端开发定义 比如 (sanya)
 X-Gp-Scene-Code   场景编码 后端开发定义 比如配药（CHRONIC_DISEASE）
