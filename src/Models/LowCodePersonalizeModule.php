@@ -23,7 +23,7 @@ use BrightLiu\LowCode\Models\Traits\Cacheable\NewEloquentBuilder;
 final class LowCodePersonalizeModule extends LowCodeBaseModel
 {
     use DiseaseRelation;
-    protected $table  = 'personalize_modules';
+
 
     public const UPDATED_AT = null;
 
