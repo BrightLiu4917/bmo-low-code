@@ -94,7 +94,7 @@ ResidentService::instance()->removeManageResident($empi,boolean(是否清理纳�
 ### 注意事项
 ```text
 1.
-api/v2/low-code/list/query 需要业务自己继承后，重新实现
+⚠️⚠️⚠️ api/v2/low-code/list/query 需要业务自己继承后，重新实现 主要是resource 返回数据结构 ⚠️⚠️⚠️
 
 2.
 通知前端必须header入参
