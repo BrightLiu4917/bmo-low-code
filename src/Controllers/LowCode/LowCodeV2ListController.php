@@ -190,7 +190,7 @@ final class LowCodeV2ListController extends BaseController
                 'file'       => $exception->getFile(),
             ]);
         }
-        return $this->responseData($data, QuerySource::class);
+        return $this->responseData($data, class_map(QuerySource::class));
     }
 
     /**

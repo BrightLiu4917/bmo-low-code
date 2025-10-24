@@ -1,5 +1,7 @@
 <?php
 
+use BrightLiu\LowCode\Resources\LowCode\LowCodeList\QuerySource;
+
 return [
     "cache-model" => [
         // 是否开启 id/code 缓存
@@ -69,5 +71,8 @@ return [
         ],
     ],
 
-    'dependencies' => []
+    'dependencies' => [
+        // query 方法里面的resource 映射到 业务
+        // QuerySource::class=>''
+    ]
 ];

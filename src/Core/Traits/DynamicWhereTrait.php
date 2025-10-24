@@ -14,6 +14,12 @@ trait DynamicWhereTrait
     public function whereMixed(array $conditions,
         string $defaultBoolean = 'and',
     ): self {
+        
+        //映射错误 or 对应的表没创建
+        if (is_null($this->queryBuilder)){
+            throw new ServiceException('queryBuilder实例为null 请检查“场景编码”映射database_sources表中数据是否存在正确');
+        }
+        
         foreach ($conditions as $key => $condition) {
             // 处理 ['or', Closure] 或 ['and', Closure]
             if (is_array($condition) && count($condition) === 2 &&
