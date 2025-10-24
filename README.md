@@ -5,14 +5,6 @@
 composer require bright-liu4917/bmo-low-code
 ```
 -----
-### 在 config/app.php配置文件中注册服务提供者：
-```text
-'providers' => [
-    // 其他服务提供者...
-    BrightLiu\LowCode\Providers\LowCodeServiceProvider::class,
-],
-```
------
 ### 发布配置文件
 ```text
 php artisan vendor:publish --provider="BrightLiu\LowCode\Providers\LowCodeServiceProvider"
@@ -33,17 +25,6 @@ DB_MEDICAL_PLATFORM_USERNAME
 DB_MEDICAL_PLATFORM_PASSWORD
 DB_MEDICAL_CROWD_PSN_WDTH_TABLE=人员宽表一般是"crowd_psn_wdth"
 DB_BUSINESS_CENTER_CROWD_TYPE_TABLE=患者标签关系表一般是 "feature_user_detail"
-
-```
------
-### 执行迁移文件和配置中间件
-```text
-php artisan migrate
-
-app/Http/Kernel.php.$routeMiddleware 追加如下
- 'auth.disease' => DiseaseAuthenticate::class,
- 'bmp.disease.auth.inner' => BmpDiseaseAuthenticateInner::class
-
 ```
 -----
 

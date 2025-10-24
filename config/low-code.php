@@ -1,5 +1,6 @@
 <?php
 
+use BrightLiu\LowCode\Enums\Foundation\Middleware;
 use BrightLiu\LowCode\Resources\LowCode\LowCodeList\QuerySource;
 
 return [
@@ -56,15 +57,15 @@ return [
         'modules' => [
             'api' => [
                 'prefix' => 'api',
-                'middleware' => ['api', 'auth.disease'],
+                'middleware' => ['api', Middleware::AUTH_DISEASE],
             ],
             'low-code' => [
                 'prefix' => 'api',
-                'middleware' => ['api', 'auth.disease'],
+                'middleware' => ['api', Middleware::AUTH_DISEASE],
             ],
             'innerapi' => [
                 'prefix' => 'innerapi',
-//                'middleware' => ['auth.disease'],
+//                'middleware' => [Middleware::AUTH_DISEASE],
             ]
 
 

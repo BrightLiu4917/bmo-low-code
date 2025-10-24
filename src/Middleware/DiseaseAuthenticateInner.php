@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Middleware;
 
-use BrightLiu\LowCode\Enums\HeaderEnum;
 use BrightLiu\LowCode\Context\AuthContext;
 use BrightLiu\LowCode\Context\DiseaseContext;
+use BrightLiu\LowCode\Context\OrgContext;
+use BrightLiu\LowCode\Enums\HeaderEnum;
 use Gupo\BetterLaravel\Http\Traits\HttpResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use BrightLiu\LowCode\Context\OrgContext;
 
 /**
- * 业务中台:病种操作认证(Inner)
+ * 病种操作认证:Inner
  */
-final class BmpDiseaseAuthenticateInner
+class DiseaseAuthenticateInner
 {
     use HttpResponse;
 

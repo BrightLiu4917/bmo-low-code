@@ -18,7 +18,7 @@ use Gupo\BetterLaravel\Http\Traits\HttpResponse;
 /**
  * 病种操作认证
  */
-final class DiseaseAuthenticate
+class DiseaseAuthenticate
 {
     use HttpResponse;
 
@@ -58,15 +58,17 @@ final class DiseaseAuthenticate
     {
         $request = request();
         DiseaseContext::init(
-            diseaseCode: (string) $request->header(HeaderEnum::DISEASE_CODE, ''),
+            diseaseCode: (string) $request->header(HeaderEnum::DISEASE_CODE, $request->input('disease_code', '')),
+            sceneCode: (string) $request->header(HeaderEnum::SCENE_CODE, $request->input('scene_code', ''))
         );
 
         OrgContext::init(
-            orgCode: (string) $request->header(HeaderEnum::ORG_ID, ''),
+            orgCode: (string) $request->header(HeaderEnum::ORG_ID, $request->input('org_code', '')),
         );
+
         AuthContext::init(
-            systemCode: (string) $request->header(HeaderEnum::SYSTEM_CODE, ''),
-            orgId: (int) $request->header(HeaderEnum::ORG_ID, ''),
+            systemCode: (string) $request->header(HeaderEnum::SYSTEM_CODE, $request->input('sys_code', '')),
+            orgId: (int) $request->header(HeaderEnum::ORG_ID, $request->input('org_code', 0)),
             token: (string) $request->header(HeaderEnum::AUTHORIZATION, ''),
             requestSource: (string) $request->header(HeaderEnum::REQUEST_SOURCE, '')
         );
