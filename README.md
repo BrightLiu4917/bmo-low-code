@@ -42,7 +42,6 @@ php artisan migrate
 
 app/Http/Kernel.php.$routeMiddleware 追加如下
  'auth.disease' => DiseaseAuthenticate::class,
- 'bmp.disease.auth.inner' => BmpDiseaseAuthenticateInner::class,
  'bmp.disease.auth.inner' => BmpDiseaseAuthenticateInner::class
 
 ```
@@ -77,19 +76,19 @@ QueryEngineService::instance()
         
 
 获取患者基础信息
-ResidentService::instance()->getBasicInfo($userId)
+ResidentService::instance()->getBasicInfo($empi)
 
 获取患者完整信息
-ResidentService::instance()->getInfo($userId)
+ResidentService::instance()->getInfo($empi)
 
 更新患者信息
-ResidentService::instance()->updateInfo($userId,['age'=>18])
+ResidentService::instance()->updateInfo($empi,['age'=>18])
 
 纳管患者 相关参数 manage_org_code,manage_org_name,manage_doctor_code,manage_doctor_name 如不入参 会通过上下文获取
-ResidentService::instance()->manageResident($userId,["相关参数"])  
+ResidentService::instance()->manageResident($empi,["相关参数"])  
 
 出组患者 相关参数
-ResidentService::instance()->removeManageResident($userId,boolean(是否清理纳管信息默认为true))  
+ResidentService::instance()->removeManageResident($empi,boolean(是否清理纳管信息默认为true))  
 ```
 -----
 ### 注意事项
@@ -101,6 +100,7 @@ api/v2/low-code/list/query 需要业务自己继承后，重新实现
 通知前端必须header入参
 X-Gp-Org-Id 机构ID 前端自己申请写死
 X-Gp-System-Code 系统编码 研发PM定义
+X-Gp-Disease-Code 疾病编码（场景编码）后端开发定义
 X-Gp-Disease-Code 疾病编码（场景编码）后端开发定义
 ```
 -----
