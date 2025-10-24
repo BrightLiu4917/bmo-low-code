@@ -21,19 +21,19 @@ class ResidentMetricService extends BaseService
     /**
      * 保存监测指标
      *
-     * @param string $userId 居民主索引
+     * @param string $empi 居民主索引
      * @param array $metricIds 指标ID
      */
-    public function saveMonitor(string $userId, array $metricIds = []): bool
+    public function saveMonitor(string $empi, array $metricIds = []): bool
     {
         $optionalMetrics = BmpCheetahMedicalCrowdkitApiService::make()->getMetricOptional();
         $optionalMetricMap = array_column($optionalMetrics, 'field_name', 'field');
 
         // TODO: 写法待完善
-        DB::transaction(function () use ($userId, $metricIds, $optionalMetricMap) {
+        DB::transaction(function () use ($empi, $metricIds, $optionalMetricMap) {
             ResidentMonitorMetric::query()
                 ->where('disease_code', $this->getDiseaseCode())
-                ->where('resident_user_id', $userId)
+                ->where('resident_empi', $empi)
                 ->delete();
 
             if (!empty($metricIds)) {
@@ -42,7 +42,7 @@ class ResidentMetricService extends BaseService
                         array_map(
                             fn ($metricId) => [
                                 'disease_code' => $this->getDiseaseCode(),
-                                'resident_user_id' => $userId,
+                                'resident_empi' => $empi,
                                 'metric_title' => $optionalMetricMap[$metricId] ?? null,
                                 'metric_id' => $metricId,
                                 'created_at' => Clock::now(),

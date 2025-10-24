@@ -21,17 +21,17 @@ class ResidentArchiveService extends BaseService
      *
      * @throws ServiceException
      */
-    public function getBasicInfo(string $userId): array
+    public function getBasicInfo(string $empi): array
     {
         // 基本信息
-        $info = ResidentService::make()->getInfo($userId);
+        $info = ResidentService::make()->getInfo($empi);
 
         // 关注状态
-        $following = FollowResidentService::make()->getFollowing($userId);
+        $following = FollowResidentService::make()->getFollowing($empi);
 
         // 人群分类
         $crowdInfo = (array) CrowdConnection::table('feature_user_detail')
-            ->where('user_id', $info['user_id'])
+            ->where('empi', $info['empi'])
             ->get(['group_id', 'group_name'])
             ->toArray();
 
@@ -47,9 +47,9 @@ class ResidentArchiveService extends BaseService
      *
      * @throws ServiceException
      */
-    public function getInfo(string $userId): array
+    public function getInfo(string $empi): array
     {
-        $info = ResidentService::make()->getInfo($userId);
+        $info = ResidentService::make()->getInfo($empi);
 
         return (array) $info;
     }
@@ -59,13 +59,13 @@ class ResidentArchiveService extends BaseService
      *
      * @throws ServiceException
      */
-    public function updateInfo(string $userId, array $attributes): void
+    public function updateInfo(string $empi, array $attributes): void
     {
         // TODO: 待完善
-        $guarded = ['id_crd_no', 'user_id', 'is_deleted', 'gmt_created', 'gmt_modified'];
+        $guarded = ['id_crd_no', 'empi', 'is_deleted', 'gmt_created', 'gmt_modified'];
 
         $attributes = array_diff_key($attributes, array_flip($guarded));
 
-        ResidentService::make()->updateInfo($userId, $attributes);
+        ResidentService::make()->updateInfo($empi, $attributes);
     }
 }

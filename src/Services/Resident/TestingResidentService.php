@@ -18,17 +18,17 @@ class TestingResidentService extends BaseService
     /**
      * 标记为测试
      */
-    public function maskTesting(string $userId): bool
+    public function maskTesting(string $empi): bool
     {
-        if (empty($userId)) {
+        if (empty($empi)) {
             return false;
         }
 
-        if (!ResidentService::make()->exists($userId)) {
+        if (!ResidentService::make()->exists($empi)) {
             throw new ServiceException('居民不存在');
         }
 
-        ResidentService::make()->updateInfo($userId, ['is_testing' => 1]);
+        ResidentService::make()->updateInfo($empi, ['is_testing' => 1]);
 
         return true;
     }
@@ -36,13 +36,13 @@ class TestingResidentService extends BaseService
     /**
      * 取消标记为测试
      */
-    public function unmaskTesting(string $userId): bool
+    public function unmaskTesting(string $empi): bool
     {
-        if (!ResidentService::make()->exists($userId)) {
+        if (!ResidentService::make()->exists($empi)) {
             throw new ServiceException('居民不存在');
         }
 
-        ResidentService::make()->updateInfo($userId, ['is_testing' => 0]);
+        ResidentService::make()->updateInfo($empi, ['is_testing' => 0]);
 
         return true;
     }

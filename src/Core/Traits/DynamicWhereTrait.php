@@ -275,6 +275,19 @@ trait DynamicWhereTrait
     }
 
     /**
+     * 添加批量用户主索引条件
+     *
+     * @param array $value 用户主索引数组
+     *
+     * @return self
+     */
+    public function whereBatchEmpis(array $value = []): self
+    {
+        $this->queryBuilder = $this->queryBuilder->whereIn('empi', $value);
+        return $this;
+    }
+
+    /**
      * 添加字段条件
      *
      * @param string $value 字段值

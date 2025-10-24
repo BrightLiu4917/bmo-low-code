@@ -19,12 +19,12 @@ class FollowResidentService extends BaseService
     /**
      * 获取关注中的信息
      */
-    public function getFollowing(string $userId): ?FollowResident
+    public function getFollowing(string $empi): ?FollowResident
     {
         return FollowResident::query()
             ->where('disease_code', $this->getDiseaseCode())
             ->where('admin_id', $this->getAdminId())
-            ->where('resident_user_id', $userId)
+            ->where('resident_empi', $empi)
             ->first();
     }
 
@@ -33,13 +33,13 @@ class FollowResidentService extends BaseService
      *
      * @throws ServiceException
      */
-    public function follow(string $userId): bool
+    public function follow(string $empi): bool
     {
-        if (empty($userId)) {
+        if (empty($empi)) {
             return false;
         }
 
-        if (!ResidentService::make()->exists($userId)) {
+        if (!ResidentService::make()->exists($empi)) {
             throw new ServiceException('居民不存在');
         }
 
@@ -47,7 +47,7 @@ class FollowResidentService extends BaseService
             [
                 'disease_code' => $this->getDiseaseCode(),
                 'admin_id' => $this->getAdminId(),
-                'resident_user_id' => $userId,
+                'resident_empi' => $empi,
             ]
         );
 
@@ -59,16 +59,16 @@ class FollowResidentService extends BaseService
      *
      * @throws ServiceException
      */
-    public function unfollow(string $userId): bool
+    public function unfollow(string $empi): bool
     {
-        if (!ResidentService::make()->exists($userId)) {
+        if (!ResidentService::make()->exists($empi)) {
             throw new ServiceException('居民不存在');
         }
 
         return (bool) FollowResident::query()
             ->where('disease_code', $this->getDiseaseCode())
             ->where('admin_id', $this->getAdminId())
-            ->where('resident_user_id', $userId)
+            ->where('resident_empi', $empi)
             ->delete();
     }
 }

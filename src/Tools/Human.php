@@ -12,6 +12,7 @@ final class Human
      * @param string $idCardNo 身份证号码
      *
      * @return string
+     * @deprecated 现在user_id已不再使用，请使用empi替代
      */
     public static function generateUserId(string $idCardNo): string
     {

@@ -11,7 +11,7 @@ class MonitorTrendItemsRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['bail', 'required', 'string'],
+            'empi' => ['bail', 'required', 'string'],
             'date_range' => ['bail', 'nullable', 'array'],
             'date_range.0' => ['bail', 'nullable', 'date_format:Y-m-d'],
             'date_range.1' => ['bail', 'nullable', 'date_format:Y-m-d'],
@@ -21,7 +21,7 @@ class MonitorTrendItemsRequest extends BaseRequest
     public function attributes(): array
     {
         return [
-            'user_id' => '居民主索引',
+            'empi' => '居民主索引',
             'metric_id' => '指标ID',
             'date_range' => '时间范围',
         ];

@@ -157,17 +157,17 @@ final class LowCodeV2ListController extends BaseController
         $data      = LowCodeListService::instance()->query($inputArgs);
         try {
             // 追加人群分类信息
-            $userIds = $data->pluck('user_id')->toArray();
+            $empis = $data->pluck('empi')->toArray();
 
             //查询人群分类表里人群
-            $crowds = BmpBaseLineService::instance()->getPatientCrowds($userIds);
+            $crowds = BmpBaseLineService::instance()->getPatientCrowds($empis);
             $grouped = [];
             foreach ($crowds as $item) {
-                $userId = $item->user_id;
-                if (!isset($grouped[$userId])) {
-                    $grouped[$userId] = [];
+                $empi = $item->empi;
+                if (!isset($grouped[$empi])) {
+                    $grouped[$empi] = [];
                 }
-                $grouped[$userId][] = [
+                $grouped[$empi][] = [
                     'group_id'   => $item->group_id,
                     'group_name' => $item->group_name,
                 ];
@@ -175,8 +175,8 @@ final class LowCodeV2ListController extends BaseController
 
             //$grouped 将患者的人群分类收集到一起
             $data = $data->each(function($item) use ($grouped) {
-                if (isset($grouped[$item->user_id])){
-                    $res = (array)$grouped[($item->user_id ?? '')];
+                if (isset($grouped[$item->empi])){
+                    $res = (array)$grouped[($item->empi ?? '')];
                     return $item->_crowds = implode(',',
                         array_column($res ?? [], 'group_name'));
                 }

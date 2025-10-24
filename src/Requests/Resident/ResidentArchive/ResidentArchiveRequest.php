@@ -14,7 +14,7 @@ class ResidentArchiveRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['bail', 'nullable', 'required'],
+            'empi' => ['bail', 'nullable', 'required'],
             'attributes' => ['bail', 'required', 'array'],
         ];
     }
@@ -22,7 +22,7 @@ class ResidentArchiveRequest extends BaseRequest
     public function attributes(): array
     {
         return [
-            'user_id' => '居民主索引',
+            'empi' => '居民主索引',
             'attributes' => '属性',
         ];
     }
@@ -30,13 +30,13 @@ class ResidentArchiveRequest extends BaseRequest
     public function scenes(): array
     {
         return [
-            'basicInfo' => ['user_id'],
-            'follow' => ['user_id'],
-            'unfollow' => ['user_id'],
-            'maskTesting' => ['user_id'],
-            'unmaskTesting' => ['user_id'],
-            'info' => ['user_id'],
-            'updateInfo' => ['user_id', 'attributes'],
+            'basicInfo' => ['empi'],
+            'follow' => ['empi'],
+            'unfollow' => ['empi'],
+            'maskTesting' => ['empi'],
+            'unmaskTesting' => ['empi'],
+            'info' => ['empi'],
+            'updateInfo' => ['empi', 'attributes'],
         ];
     }
 }

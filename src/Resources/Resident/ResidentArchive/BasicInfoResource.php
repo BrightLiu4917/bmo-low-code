@@ -24,7 +24,7 @@ class BasicInfoResource extends JsonResource
             // 基本信息
             'id_crd_no' => Mask::idcard($info['id_crd_no'] ?? ''),
             'rsdnt_nm' => $info['rsdnt_nm'] ?? '',
-            'user_id' => $info['user_id'] ?? '',
+            'empi' => $info['empi'] ?? '',
             'gdr_cd' => $info['gdr_cd'] ?? 0,
             'gdr_cd_nm' => match (intval($info['gdr_cd'] ?? 0)) {
                 1 => '男',

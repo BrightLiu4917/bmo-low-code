@@ -49,11 +49,11 @@ class ResidentMetricController extends BaseController
      */
     public function monitorList(MonitorListRequest $request): JsonResponse
     {
-        $userId = (string) $request->input('user_id', '');
+        $empi = (string) $request->input('empi', '');
 
         $data = ResidentMonitorMetric::query()
             ->byContextDisease()
-            ->where('resident_user_id', $userId)
+            ->where('resident_empi', $empi)
             ->orderBy('id')
             ->get();
 
@@ -68,7 +68,7 @@ class ResidentMetricController extends BaseController
     public function monitorTrendItems(MonitorTrendItemsRequest $request): JsonResponse
     {
         // 居民主索引
-        $userId = (string) $request->input('user_id', '');
+        $empi = (string) $request->input('empi', '');
 
         // 指标ID
         $metricId = (string) $request->input('metric_id', '');
@@ -86,7 +86,7 @@ class ResidentMetricController extends BaseController
             ->where('disease_code', $this->getDiseaseCode())
             ->where('sys_code', $this->getSystemCode())
             ->where('org_code', $this->getOrgCode())
-            ->where('user_id', $userId)
+            ->where('empi', $empi)
             ->whereBetweenDate('fill_date', $dateRangeMin, $dateRangeMax, forceFullDay: true)
             ->get(['col_value', 'fill_date', 'data_source'])
             ->sortBy('fill_date')
@@ -102,13 +102,13 @@ class ResidentMetricController extends BaseController
      */
     public function saveMonitor(SaveMonitorRequest $request, ResidentMetricService $srv): JsonResponse
     {
-        $userId = (string) $request->input('user_id', '');
+        $empi = (string) $request->input('empi', '');
 
         $metricIds = (array) $request->input('metric_ids', []);
 
         // TODO: 判断居民、指标是否存在
 
-        $srv->saveMonitor($userId, $metricIds);
+        $srv->saveMonitor($empi, $metricIds);
 
         return $this->responseSuccess();
     }

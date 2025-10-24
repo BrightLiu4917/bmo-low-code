@@ -50,7 +50,7 @@ final class CrowdKitService extends LowCodeBaseService
 
         $fixedColumns = ['rsdnt_nm', 'id_crd_no'];
 
-        $hiddenColumns = ['user_id', 'is_deleted', 'gmt_created', 'gmt_modified'];
+        $hiddenColumns = ['empi', 'is_deleted', 'gmt_created', 'gmt_modified'];
 
         return collect($columnGroup)
             ->map(

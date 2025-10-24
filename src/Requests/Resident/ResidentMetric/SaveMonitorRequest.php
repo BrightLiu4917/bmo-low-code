@@ -11,7 +11,7 @@ class SaveMonitorRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['bail', 'required', 'string'],
+            'empi' => ['bail', 'required', 'string'],
             'metric_ids' => ['bail', 'nullable', 'array'],
         ];
     }
@@ -19,7 +19,7 @@ class SaveMonitorRequest extends BaseRequest
     public function attributes(): array
     {
         return [
-            'user_id' => '居民主索引',
+            'empi' => '居民主索引',
             'metric_ids' => '指标ID',
         ];
     }

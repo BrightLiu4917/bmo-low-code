@@ -24,11 +24,11 @@ class ResidentArchiveController extends BaseController
      */
     public function info(ResidentArchiveRequest $request, ResidentArchiveService $srv, CrowdKitService $kitSrv): JsonResponse
     {
-        $userId = (string) $request->input('user_id');
+        $empi = (string) $request->input('empi');
 
         $columnGroup = $kitSrv->getOptionalColumns();
 
-        $attributes = $srv->getInfo($userId);
+        $attributes = $srv->getInfo($empi);
 
         $data = $kitSrv->combineColumnGroup($columnGroup, $attributes);
 
@@ -40,11 +40,11 @@ class ResidentArchiveController extends BaseController
      */
     public function updateInfo(ResidentArchiveRequest $request, ResidentArchiveService $srv): JsonResponse
     {
-        $userId = (string) $request->input('user_id');
+        $empi = (string) $request->input('empi');
 
         $attributes = (array) $request->input('attributes', []);
 
-        $srv->updateInfo($userId, $attributes);
+        $srv->updateInfo($empi, $attributes);
 
         return $this->responseSuccess();
     }
@@ -54,9 +54,9 @@ class ResidentArchiveController extends BaseController
      */
     public function basicInfo(ResidentArchiveRequest $request, ResidentArchiveService $srv): JsonResponse
     {
-        $userId = (string) $request->input('user_id');
+        $empi = (string) $request->input('empi');
 
-        $data = $srv->getBasicInfo($userId);
+        $data = $srv->getBasicInfo($empi);
 
         return $this->responseData($data, BasicInfoResource::class);
     }
@@ -66,9 +66,9 @@ class ResidentArchiveController extends BaseController
      */
     public function follow(ResidentArchiveRequest $request, FollowResidentService $srv): JsonResponse
     {
-        $userId = (string) $request->input('user_id');
+        $empi = (string) $request->input('empi');
 
-        $srv->follow($userId);
+        $srv->follow($empi);
 
         return $this->responseSuccess();
     }
@@ -78,9 +78,9 @@ class ResidentArchiveController extends BaseController
      */
     public function unfollow(ResidentArchiveRequest $request, FollowResidentService $srv): JsonResponse
     {
-        $userId = (string) $request->input('user_id');
+        $empi = (string) $request->input('empi');
 
-        $srv->unfollow($userId);
+        $srv->unfollow($empi);
 
         return $this->responseSuccess();
     }
@@ -90,9 +90,9 @@ class ResidentArchiveController extends BaseController
      */
     public function maskTesting(ResidentArchiveRequest $request, TestingResidentService $srv): JsonResponse
     {
-        $userId = (string) $request->input('user_id');
+        $empi = (string) $request->input('empi');
 
-        $srv->maskTesting($userId);
+        $srv->maskTesting($empi);
 
         return $this->responseSuccess();
     }
@@ -102,9 +102,9 @@ class ResidentArchiveController extends BaseController
      */
     public function unmaskTesting(ResidentArchiveRequest $request, TestingResidentService $srv): JsonResponse
     {
-        $userId = (string) $request->input('user_id');
+        $empi = (string) $request->input('empi');
 
-        $srv->unmaskTesting($userId);
+        $srv->unmaskTesting($empi);
 
         return $this->responseSuccess();
     }

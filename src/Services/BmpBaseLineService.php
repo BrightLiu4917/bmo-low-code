@@ -291,18 +291,18 @@ class BmpBaseLineService extends LowCodeBaseService
 
     /**
      * 获取患者人群分类
-     * @param array $userIds
+     * @param array $empis
      *
      * @return mixed
      */
-    public function getPatientCrowds(array $userIds = [])
+    public function getPatientCrowds(array $empis = [])
     {
         return QueryEngineService::instance()
                                  ->autoClient()
                                  ->useTable(config('low-code.bmo-baseline.database.crowd-type-table'))
                                  ->setCache(50)
-                                 ->whereBatchUserIds($userIds)
-                                 ->select(['user_id', 'group_id', 'group_name'])
+                                 ->whereBatchEmpis($empis)
+                                 ->select(['empi', 'group_id', 'group_name'])
                                  ->getAllResult();
     }
 }

@@ -11,14 +11,14 @@ class MonitorListRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['bail', 'required', 'string'],
+            'empi' => ['bail', 'required', 'string'],
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'user_id' => '居民主索引',
+            'empi' => '居民主索引',
         ];
     }
 }
