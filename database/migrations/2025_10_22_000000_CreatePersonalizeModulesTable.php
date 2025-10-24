@@ -9,8 +9,8 @@ class CreatePersonalizeModulesTable extends Migration
 {
     public function up()
     {
-        if (!Schema::hasTable('low_code_personalize_modules')) {
-            Schema::create('low_code_personalize_modules', function (Blueprint $table) {
+        if (!Schema::hasTable('personalize_modules')) {
+            Schema::create('personalize_modules', function (Blueprint $table) {
                 // 主键
                 $table->bigIncrements('id')->comment('主键');
 
@@ -34,8 +34,8 @@ class CreatePersonalizeModulesTable extends Migration
 
     public function down()
     {
-        if (Schema::hasTable('low_code_personalize_modules')) {
-            Schema::dropIfExists('low_code_personalize_modules');
+        if (Schema::hasTable('personalize_modules')) {
+            Schema::dropIfExists('personalize_modules');
         }
     }
 }
