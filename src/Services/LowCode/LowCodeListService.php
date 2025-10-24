@@ -217,15 +217,15 @@ class LowCodeListService extends LowCodeBaseService
             ]);
         }
     }
+
     /**
-     *
      * @param array $inputArgs
-     * @param array $params
+     * @param int   $setCacheTtl 设置缓存时间
      *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|void
-     * @throws ServiceException
+     * @return void
+     * @throws \Gupo\BetterLaravel\Exceptions\ServiceException
      */
-    public function query(array $inputArgs = [])
+    public function query(array $inputArgs = [],int $setCacheTtl = 10)
     {
         try {
             // 1.获取列表
@@ -239,7 +239,7 @@ class LowCodeListService extends LowCodeBaseService
 
                 //3. 构建查询条件组
                 $builtQuery = $this->buildQueryConditions($queryEngine, $value, $config,$bizSceneTable);
-                return $builtQuery->setCache(60)->getPaginateResult();
+                return $builtQuery->setCache($setCacheTtl)->getPaginateResult();
             }
         } catch (QueryEngineException $e) {
             Logger::LOW_CODE_LIST->error('低代码列表查询异常', [
