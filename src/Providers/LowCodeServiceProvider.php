@@ -61,16 +61,17 @@ class LowCodeServiceProvider extends ServiceProvider
 
         // 配置文件发布
         $this->publishes([
-            __DIR__.'/../../config/business/bmo-service.php' => config_path('business/bmo-service.php'),
+            __DIR__.
+            '/../../config/business/bmo-service.php' => config_path('business/bmo-service.php'),
         ], 'bmo-service-config');
 
-//        $this->publishes([
-//            __DIR__.'/../../resource/ListSource.php' => app_path('Http/Resources/LowCode'),
-//        ], 'low-code-list-resource');
-//
-//        $this->publishes([
-//            __DIR__.'/../../resource/BasicInfoSource.php' => app_path('Http/Resources/LowCode'),
-//        ], 'low-code-basic-info-resource');
+        //        $this->publishes([
+        //            __DIR__.'/../../resource/ListSource.php' => app_path('Http/Resources/LowCode'),
+        //        ], 'low-code-list-resource');
+        //
+        //        $this->publishes([
+        //            __DIR__.'/../../resource/BasicInfoSource.php' => app_path('Http/Resources/LowCode'),
+        //        ], 'low-code-basic-info-resource');
 
         // 迁移文件发布
         $this->publishes([
@@ -79,10 +80,12 @@ class LowCodeServiceProvider extends ServiceProvider
 
         // 可选：同时发布配置和迁移的统一标签
         $this->publishes([
-            __DIR__.'/../../config/low-code.php' => config_path('low-code.php'),
-            __DIR__.'/../../config/business/bmo-service.php' => config_path('business/bmo-service.php'),
-            __DIR__.'/../../database/migrations' => database_path('migrations'),
-//            __DIR__.'/../../resource' => app_path('Http/Resources/LowCode'),
+            __DIR__.'/../../config/low-code.php'             => config_path('low-code.php'),
+            __DIR__.
+            '/../../config/business/bmo-service.php'         => config_path('business/bmo-service.php'),
+            __DIR__.
+            '/../../database/migrations'                     => database_path('migrations'),
+            //            __DIR__.'/../../resource' => app_path('Http/Resources/LowCode'),
         ], 'low-code-package');
     }
 
@@ -91,15 +94,16 @@ class LowCodeServiceProvider extends ServiceProvider
      */
     protected function registerModuleRoutes(): void
     {
-        if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
+        if ($this->app instanceof CachesRoutes &&
+            $this->app->routesAreCached()) {
             return;
         }
 
-        $rootPath = __DIR__ . '/../../route';
+        $rootPath = __DIR__.'/../../route';
 
         transform(
             config('low-code.http.modules', []),
-            function ($modules) use ($rootPath) {
+            function($modules) use ($rootPath) {
                 foreach ($modules as $moduleName => $options) {
                     Route::group(
                         $options,
@@ -115,7 +119,7 @@ class LowCodeServiceProvider extends ServiceProvider
 
     protected function loadDependencies(): void
     {
-        $dependencies = (array) config('low-code.dependencies', []);
+        $dependencies = (array)config('low-code.dependencies', []);
 
         foreach ($dependencies as $source => $dependency) {
             if ($source === $dependency) {

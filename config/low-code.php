@@ -59,7 +59,13 @@ return [
             'low-code' => [
                 'prefix' => 'api',
                 'middleware' => ['api', 'auth.disease'],
+            ],
+            'innerapi' => [
+                'prefix' => 'innerapi',
+//                'middleware' => ['auth.disease'],
             ]
+
+
         ],
     ],
 

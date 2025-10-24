@@ -42,6 +42,8 @@ php artisan migrate
 
 app/Http/Kernel.php.$routeMiddleware 追加如下
 'auth.disease' => DiseaseAuthenticate::class,
+'bmp.disease.auth.inner' => BmpDiseaseAuthenticateInner::class
+
 ```
 -----
 
