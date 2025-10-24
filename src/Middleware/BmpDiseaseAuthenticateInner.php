@@ -53,6 +53,7 @@ final class BmpDiseaseAuthenticateInner
 
         DiseaseContext::init(
             diseaseCode: (string) $request->header(HeaderEnum::DISEASE_CODE, (string) $request->input('disease_code', '')),
+            sceneCode: (string) $request->header(HeaderEnum::SCENE_CODE, $request->input('scene_code', ''))
         );
 
         OrgContext::init(

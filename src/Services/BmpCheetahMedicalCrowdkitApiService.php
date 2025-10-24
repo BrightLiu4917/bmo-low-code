@@ -39,6 +39,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                 'org_code' => $this->getOrgCode(),
                 'sys_code' => $this->getSystemCode(),
                 'disease_code' => $this->getDiseaseCode(),
+                'scene_code' => $this->getSceneCode()
             ])
             ->throw()
             ->json();
@@ -57,6 +58,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                          'org_code' => $this->getOrgCode(),
                          'sys_code' => $this->getSystemCode(),
                          'disease_code' => $this->getDiseaseCode(),
+                         'scene_code' => $this->getSceneCode()
                      ])
                      ->throw()
                      ->json();
@@ -80,6 +82,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                 'org_code' => $this->getOrgCode(),
                 'sys_code' => $this->getSystemCode(),
                 'disease_code' => $this->getDiseaseCode(),
+                'scene_code' => $this->getSceneCode()
             ])
             ->throw()
             ->json();
@@ -111,6 +114,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                 'org_code' => $this->getOrgCode(),
                 'sys_code' => $this->getSystemCode(),
                 'disease_code' => $this->getDiseaseCode(),
+                'scene_code' => $this->getSceneCode()
             ])
             ->throw()
             ->json();
@@ -128,6 +132,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                        'org_code' => $this->getOrgCode(),
                        'sys_code' => $this->getSystemCode(),
                        'disease_code' => $this->getDiseaseCode(),
+                       'scene_code' => $this->getSceneCode()
                    ])
                    ->throw()
                    ->json();

@@ -32,6 +32,7 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
             'org_code' => $this->getOrgCode(),
             'sys_code' => $this->getSystemCode(),
             'disease_code' => $this->getDiseaseCode(),
+            'scene_code' => $this->getSceneCode(),
             'tenant_id' => $this->getTenantId(),
         ])->throw()->json();
         return $data['data']['results'] ??[];
@@ -49,6 +50,7 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
             'org_code' => $this->getOrgCode(),
             'sys_code' => $this->getSystemCode(),
             'disease_code' => $this->getDiseaseCode(),
+            'scene_code' => $this->getSceneCode(),
             'tenant_id' => $this->getTenantId(),
         ])->throw()->json();
         return $data['data'] ??[];
@@ -64,6 +66,7 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
             'org_code' => $this->getOrgCode(),
             'sys_code' => $this->getSystemCode(),
             'disease_code' => $this->getDiseaseCode(),
+            'scene_code' => $this->getSceneCode(),
             'tenant_id' => $this->getTenantId(),
         ])->throw()->json();
         return $data['data'] ?? 0;

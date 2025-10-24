@@ -18,6 +18,11 @@ final class DiseaseContext
     protected string $diseaseCode = '';
 
     /**
+     * @var string
+     */
+    protected string $sceneCode = '';
+
+    /**
      * @var null|LowCodeDisease
      */
     protected ?LowCodeDisease $disease = null;
@@ -32,15 +37,18 @@ final class DiseaseContext
 
     /**
      * @param string $diseaseCode
+     * @param string $sceneCode
      *
      * @return static
      */
-    public static function init(string $diseaseCode): static
+    public static function init(string $diseaseCode, string $sceneCode = ''): static
     {
         return tap(
             static::instance(),
-            function (DiseaseContext $context) use ($diseaseCode) {
+            function (DiseaseContext $context) use ($diseaseCode, $sceneCode) {
                 $context->setDiseaseCode($diseaseCode);
+
+                $context->setSceneCode($sceneCode);
             }
         );
     }
@@ -78,6 +86,11 @@ final class DiseaseContext
         };
     }
 
+    public function getSceneCode(): string
+    {
+        return $this->sceneCode;
+    }
+
     /**
      * @param string $value
      *
@@ -106,24 +119,36 @@ final class DiseaseContext
         $this->diseaseCode = $value?->code ?? '';
     }
 
+    public function setSceneCode(string $value): void
+    {
+        $this->sceneCode = $value;
+    }
+
     /**
      * @param string $diseaseCode
+     * @param string $sceneCode
      * @param callable $callback
      *
      * @return mixed
      */
-    public static function with(string $diseaseCode, callable $callback)
+    public static function with(string $diseaseCode, string $sceneCode, callable $callback)
     {
         $context = static::instance();
 
         $latestDiseaseCode = $context->getDiseaseCode();
 
+        $latestSceneCode = $context->getSceneCode();
+
         $context->setDiseaseCode($diseaseCode);
+
+        $context->setSceneCode($sceneCode);
 
         try {
             return $callback();
         } finally {
             $context->setDiseaseCode($latestDiseaseCode);
+
+            $context->setSceneCode($latestSceneCode);
         }
     }
 }
