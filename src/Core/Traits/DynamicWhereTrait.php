@@ -16,7 +16,7 @@ trait DynamicWhereTrait
     ): self {
         
         //映射错误 or 对应的表没创建
-        if (is_null($this->queryBuilder)){
+        if (!empty($conditions) && is_null($this->queryBuilder)){
             throw new ServiceException('queryBuilder实例为null 请检查“场景编码”映射database_sources表中数据是否存在正确');
         }
         
