@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace BrightLiu\LowCode\Controllers\LowCode;
 
 use BrightLiu\LowCode\Enums\Foundation\Logger;
-use App\Http\Resources\LowCode\BasicInfoResource;
 use BrightLiu\LowCode\Enums\Model\AdminPreference\SceneEnum;
 use BrightLiu\LowCode\Services\QueryEngineService;
 use BrightLiu\LowCode\Services\BmpBaseLineService;
@@ -111,7 +110,7 @@ final class LowCodeV2ListController extends BaseController
     {
         $code = (string)$request->input('code', null);
 
-        $data = $srv->pre($this->covertCrowdPatientCode($code));
+        $data = $srv->pre(LowCodeListService::instance()->covertCrowdPatientCode($code));
 
         try {
             $preference = AdminPreference::query()
@@ -141,7 +140,7 @@ final class LowCodeV2ListController extends BaseController
     public function query(Request $request): JsonResponse
     {
         $inputArgs = $request->input('input_args');
-        $codes     = $this->covertCrowdPatientCode(array_column($inputArgs,
+        $codes     = LowCodeListService::instance()->covertCrowdPatientCode(array_column($inputArgs,
             'code'));
         $inputArgs = array_map(
             function($item) use ($codes) {
@@ -155,7 +154,7 @@ final class LowCodeV2ListController extends BaseController
             },
             $inputArgs
         );
-        $data      = $this->service->query($inputArgs);
+        $data      = LowCodeListService::instance()->query($inputArgs);
         try {
             // 追加人群分类信息
             $userIds = $data->pluck('user_id')->toArray();
@@ -175,7 +174,6 @@ final class LowCodeV2ListController extends BaseController
             }
 
             //$grouped 将患者的人群分类收集到一起
-
             $data = $data->each(function($item) use ($grouped) {
                 if (isset($grouped[$item->user_id])){
                     $res = (array)$grouped[($item->user_id ?? '')];
@@ -240,7 +238,7 @@ final class LowCodeV2ListController extends BaseController
 
         // 缺省时，从low_code_part中解析获取
         if (empty($columns)) {
-            $listCode = $this->covertCrowdPatientCode($listCode);
+            $listCode = LowCodeListService::instance()->covertCrowdPatientCode($listCode);
 
             $lowCodeList = LowCodeList::query()->where('code', $listCode)
                                       ->first(['template_code_column']);

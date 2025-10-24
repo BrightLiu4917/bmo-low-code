@@ -6,6 +6,7 @@ namespace BrightLiu\LowCode\Services\LowCode;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use BrightLiu\LowCode\Models\LowCodeList;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Traits\CastDefaultFixHelper;
@@ -249,5 +250,36 @@ class LowCodeListService extends LowCodeBaseService
                 'input_args' => $inputArgs ?? null,
             ]);
         }
+    }
+
+    /**
+     * @param string|array $codes
+     *
+     * @return string|array
+     */
+    public function covertCrowdPatientCode(string|array $codes): string|array
+    {
+        return Cache::remember('crowd_patient_code:'.md5(json_encode($codes)),
+            60 * 5, function() use ($codes) {
+                $isOnce = !is_array($codes);
+
+                $codes = (array)$codes;
+
+                $existsCodes = LowCodeList::query()->whereIn('code', $codes)
+                                          ->pluck('code')->toArray();
+
+                // TODO: 写法待完善
+                $crowdPatientCode = LowCodeList::query()->byContextDisease()
+                                               ->where('admin_name',
+                                                   '人群患者列表')
+                                               ->value('code');
+
+                return transform(
+                    array_combine($codes,
+                        array_map(fn ($code) => in_array($code, $existsCodes) ?
+                            $code : $crowdPatientCode, $codes)),
+                    fn ($value) => $isOnce ? end($value) ?? '' : $value
+                );
+            });
     }
 }
