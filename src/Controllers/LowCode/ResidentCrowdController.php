@@ -10,6 +10,7 @@ use BrightLiu\LowCode\Services\BmpCheetahMedicalPlatformApiService;
 use Gupo\BetterLaravel\Http\BaseController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use BrightLiu\LowCode\Services\BmpCheetahMedicalCrowdkitApiService;
 
 final class ResidentCrowdController extends BaseController
 {
@@ -19,7 +20,7 @@ final class ResidentCrowdController extends BaseController
     public function optional(Request $request): JsonResponse
     {
         try {
-            $data = BmpCheetahMedicalPlatformApiService::make()->getCrowds();
+            $data = BmpCheetahMedicalCrowdkitApiService::make()->getCrowds();
         } catch (\Throwable $e) {
             Logger::LARAVEL->error($e);
             $data = [];

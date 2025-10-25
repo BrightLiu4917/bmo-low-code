@@ -28,6 +28,7 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
      */
     public function getCrowds(): array
     {
+
         $data = Http::asJson()->post($this->baseUriVia() . 'innerapi/userGroup/page', [
             'org_code' => $this->getOrgCode(),
             'sys_code' => $this->getSystemCode(),

@@ -41,9 +41,25 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                 'disease_code' => $this->getDiseaseCode(),
                 'scene_code' => $this->getSceneCode()
             ])
-            ->throw()
+            
             ->json();
         return $data['data'] ?? [];
+    }
+
+
+    /**
+     * 获取人群分类
+     */
+    public function getCrowds(): array
+    {
+        $data = Http::asJson()->post($this->baseUriVia() . 'innerapi/userGroup/page', [
+            'org_code' => $this->getOrgCode(),
+            'sys_code' => $this->getSystemCode(),
+            'disease_code' => $this->getDiseaseCode(),
+            'scene_code' => $this->getSceneCode(),
+            'tenant_id' => $this->getTenantId(),
+        ])->json();
+        return $data['data']['results'] ??[];
     }
 
     /**
@@ -60,7 +76,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                          'disease_code' => $this->getDiseaseCode(),
                          'scene_code' => $this->getSceneCode()
                      ])
-                     ->throw()
+                     
                      ->json();
         return $data['data'] ?? [];
     }
@@ -84,7 +100,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                 'disease_code' => $this->getDiseaseCode(),
                 'scene_code' => $this->getSceneCode()
             ])
-            ->throw()
+            
             ->json();
     }
 
@@ -116,7 +132,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                 'disease_code' => $this->getDiseaseCode(),
                 'scene_code' => $this->getSceneCode()
             ])
-            ->throw()
+            
             ->json();
     }
 
@@ -134,7 +150,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                        'disease_code' => $this->getDiseaseCode(),
                        'scene_code' => $this->getSceneCode()
                    ])
-                   ->throw()
+                   
                    ->json();
         return $data['data'] ?? [];
     }

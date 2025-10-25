@@ -161,9 +161,9 @@ class LowCodeListService extends LowCodeBaseService
                 // 从$queryItem中移除crowd_id相关条件
                 unset($filters[$crowdIdIndex]);
             } else  {
-                $t1 = $queryEngine->table;
-                $t1Empi = $queryEngine->table.'.empi';
-                $queryEngine = $queryEngine->rightJoin("$widhtTable as t2", $t1Empi, '=', 't2.empi');
+                $t1Empi = 't1.empi';
+                $queryEngine = $queryEngine->useTable($bizSceneTable.' as t1')->rightJoin("$widhtTable as t2", $t1Empi, '=', 't2.empi');
+
 
                 //todo 缺陷 join 后不支持子查询
                 //                    ->rawTable(
