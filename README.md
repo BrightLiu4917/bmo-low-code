@@ -108,5 +108,5 @@ header 必须入参
     X-Gp-Disease-Code 疾病编码 业务中台后端开发定义 比如 (sanya)
     X-Gp-Scene-Code   场景编码 后端开发定义 比如配药（CHRONIC_DISEASE）
 json 入参
-table_name:场景表名 java要表明
+table_name:场景表名 向业务总台后端要表名
 ```
