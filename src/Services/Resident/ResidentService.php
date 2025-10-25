@@ -12,6 +12,9 @@ use BrightLiu\LowCode\Services\BmpCheetahMedicalCrowdkitApiService;
 use BrightLiu\LowCode\Support\CrowdConnection;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
 use Gupo\BetterLaravel\Service\BaseService;
+use Illuminate\Support\Facades\DB;
+use BrightLiu\LowCode\Tools\BetterArr;
+use Closure;
 
 /**
  * 居民相关
@@ -48,13 +51,49 @@ class ResidentService extends BaseService
      */
     public function getInfo(string $empi, array $columns = ['*']): array
     {
-        $info = CrowdConnection::query()->where('empi', $empi)->first($columns);
+        $info = $this->query(fn ($query) => $query->where('t1.empi', $empi), $columns);
 
         if (empty($info)) {
             throw new ServiceException('居民不存在');
         }
 
         return (array) $info;
+    }
+
+    /**
+     * 根据身份评点与获取居民信息
+     *
+     * @throws ServiceException
+     */
+    public function getInfoByCardNo(string $idCardNo, array $columns = ['*']): array
+    {
+        $info = $this->query(fn ($query) => $query->where('t1.id_crd_no', $idCardNo), $columns);
+
+        if (empty($info)) {
+            throw new ServiceException('居民不存在');
+        }
+
+        return (array) $info;
+    }
+
+    /**
+     * 基本信息查询
+     */
+    public function query(\Closure $query, array $columns = ['*']): array
+    {
+        $psnTable = config('low-code.bmo-baseline.database.crowd-psn-wdth-table');
+
+        $connection = CrowdConnection::connection();
+
+        $sceneTable = $connection->getConfig('table');
+
+        return BetterArr::toArray(
+            $connection
+                ->table($psnTable, 't1')
+                ->leftJoin("{$sceneTable} as t2", 't1.empi', '=', 't2.empi')
+                ->where($query)
+                ->first($columns)
+        );
     }
 
     /**
