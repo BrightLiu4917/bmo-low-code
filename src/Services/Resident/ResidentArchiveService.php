@@ -26,6 +26,10 @@ class ResidentArchiveService extends BaseService
         // 基本信息
         $info = ResidentService::make()->getInfo($empi);
 
+        if (empty($info)) {
+            throw new ServiceException('居民不存在');
+        }
+
         // 关注状态
         $following = FollowResidentService::make()->getFollowing($empi);
 
@@ -50,6 +54,10 @@ class ResidentArchiveService extends BaseService
     public function getInfo(string $empi): array
     {
         $info = ResidentService::make()->getInfo($empi);
+
+        if (empty($info)) {
+            throw new ServiceException('居民不存在');
+        }
 
         return (array) $info;
     }

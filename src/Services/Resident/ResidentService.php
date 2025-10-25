@@ -35,10 +35,10 @@ class ResidentService extends BaseService
      *
      * @throws ServiceException
      */
-    public function getBasicInfo(string $empi): ResidentBasicInfoEntity
+    public function getBasicInfo(string $empi): ?ResidentBasicInfoEntity
     {
         if (empty($empi)) {
-            throw new ServiceException('参数错误');
+            return null;
         }
 
         return ResidentBasicInfoEntity::make((array) $this->getInfo($empi));
@@ -49,15 +49,13 @@ class ResidentService extends BaseService
      *
      * @throws ServiceException
      */
-    public function getInfo(string $empi, array $columns = ['*']): array
+    public function getInfo(string $empi, array $columns = ['*']): ?array
     {
-        $info = $this->query(fn ($query) => $query->where('t1.empi', $empi), $columns);
-
-        if (empty($info)) {
-            throw new ServiceException('居民不存在');
+        if (empty($empi)) {
+            return null;
         }
 
-        return (array) $info;
+        return $this->first(fn ($query) => $query->where('t1.empi', $empi), $columns);
     }
 
     /**
@@ -65,35 +63,38 @@ class ResidentService extends BaseService
      *
      * @throws ServiceException
      */
-    public function getInfoByCardNo(string $idCardNo, array $columns = ['*']): array
+    public function getInfoByCardNo(string $idCardNo, array $columns = ['*']): ?array
     {
-        $info = $this->query(fn ($query) => $query->where('t1.id_crd_no', $idCardNo), $columns);
-
-        if (empty($info)) {
-            throw new ServiceException('居民不存在');
+        if (empty($idCardNo)) {
+            return null;
         }
 
-        return (array) $info;
+        return $this->first(fn ($query) => $query->where('t1.id_crd_no', $idCardNo), $columns);
     }
 
     /**
      * 基本信息查询
      */
-    public function query(\Closure $query, array $columns = ['*']): array
+    public function first(\Closure $query, array $columns = ['*']): ?array
     {
         $psnTable = config('low-code.bmo-baseline.database.crowd-psn-wdth-table');
+
+        // TODO: log
+        if (empty($psnTable)) {
+            return null;
+        }
 
         $connection = CrowdConnection::connection();
 
         $sceneTable = $connection->getConfig('table');
 
-        return BetterArr::toArray(
-            $connection
-                ->table($psnTable, 't1')
-                ->leftJoin("{$sceneTable} as t2", 't1.empi', '=', 't2.empi')
-                ->where($query)
-                ->first($columns)
-        );
+        $result = $connection
+            ->table($psnTable, 't1')
+            ->leftJoin("{$sceneTable} as t2", 't1.empi', '=', 't2.empi')
+            ->where($query)
+            ->first($columns);
+
+        return !empty($result) ? BetterArr::toArray($result) : null;
     }
 
     /**
