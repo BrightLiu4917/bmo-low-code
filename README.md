@@ -36,6 +36,8 @@ DB_BUSINESS_CENTER_CROWD_TYPE_TABLE=患者标签关系表一般是 "feature_user
 QueryEngineService::instance()
         ->autoClient()//自动获取客户端入参数信息
         
+        //->innerJoin()
+        
         // 设置查询条件 内置多种查询方法 whereUserId、 whereManageOrgCode、 whereIdCrdNo
         ->whereMixed(
                         [
