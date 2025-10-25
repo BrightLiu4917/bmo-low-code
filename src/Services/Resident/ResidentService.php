@@ -49,7 +49,7 @@ class ResidentService extends BaseService
      *
      * @throws ServiceException
      */
-    public function getInfo(string $empi, array $columns = ['*']): ?array
+    public function getInfo(string $empi, array $columns = ['t2.*', 't1.*']): ?array
     {
         if (empty($empi)) {
             return null;
@@ -63,7 +63,7 @@ class ResidentService extends BaseService
      *
      * @throws ServiceException
      */
-    public function getInfoByCardNo(string $idCardNo, array $columns = ['*']): ?array
+    public function getInfoByCardNo(string $idCardNo, array $columns = ['t2.*', 't1.*']): ?array
     {
         if (empty($idCardNo)) {
             return null;
@@ -75,13 +75,17 @@ class ResidentService extends BaseService
     /**
      * 基本信息查询
      */
-    public function first(\Closure $query, array $columns = ['*']): ?array
+    public function first(\Closure $query, array $columns = ['t2.*', 't1.*']): ?array
     {
         $psnTable = config('low-code.bmo-baseline.database.crowd-psn-wdth-table');
 
         // TODO: log
         if (empty($psnTable)) {
             return null;
+        }
+
+        if (in_array('empi', $columns)) {
+            $columns = array_map(fn ($c) => $c === 'empi' ? 't1.empi' : $c, $columns);
         }
 
         $connection = CrowdConnection::connection();
