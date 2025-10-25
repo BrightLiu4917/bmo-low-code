@@ -35,6 +35,19 @@ class DiseaseAuthenticate
             if (empty($token = $request->header(HeaderEnum::AUTHORIZATION, ''))) {
                 throw new AuthenticateException('Token invalid.');
             }
+
+            if (empty($request->header(HeaderEnum::SCENE_CODE, ''))) {
+                throw new AuthenticateException('x-gp-scene_code invalid.');
+            }
+
+            if (empty($request->header(HeaderEnum::SYSTEM_CODE, ''))) {
+                throw new AuthenticateException('x-gp-system_code invalid.');
+            }
+
+            if (empty($request->header(HeaderEnum::DISEASE_CODE, ''))) {
+                throw new AuthenticateException('x-gp-disease_code invalid.');
+            }
+
             //获取用户中心账号信息
             $bmoAccount = BmoAuthApiService::instance()->getUserInfoByToken($token);
             if (empty($bmoAccount)){
