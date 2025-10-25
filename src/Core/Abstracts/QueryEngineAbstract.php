@@ -161,6 +161,7 @@ abstract class QueryEngineAbstract implements QueryEngineContract
             $this->queryBuilder  = $this->connection->table(
                 $this->databaseTable
             );
+            $this->reapplyJoins();
         }
     }
 
@@ -178,6 +179,7 @@ abstract class QueryEngineAbstract implements QueryEngineContract
         $this->database      = $database ?: $this->database;
         $this->databaseTable = $this->database.'.'.$this->table;
         $this->queryBuilder  = $this->connection->table($this->databaseTable);
+        $this->reapplyJoins();
         return $this;
     }
 
@@ -671,7 +673,13 @@ abstract class QueryEngineAbstract implements QueryEngineContract
 
         // 如果查询构建器已初始化，立即应用 JOIN
         if ($this->queryBuilder) {
-            $method = $type . 'Join';
+
+            if ($type == 'inner'){
+                $method = 'Join';
+            }else{
+                $method = $type . 'Join';
+            }
+
 
             if (method_exists($this->queryBuilder, $method)) {
                 $this->queryBuilder->{$method}($table, $first, $operator, $second);
@@ -955,6 +963,16 @@ abstract class QueryEngineAbstract implements QueryEngineContract
         return $this;
     }
 
+    public function debugJoins(): array
+    {
+        return [
+            'joins' => $this->joins,
+            'query_builder_initialized' => !is_null($this->queryBuilder),
+            'current_table' => $this->table,
+            'current_database' => $this->database
+        ];
+    }
+
     protected function applyJoins(): void
     {
         foreach ($this->joins as $join) {
@@ -970,4 +988,72 @@ abstract class QueryEngineAbstract implements QueryEngineContract
             }
         }
     }
+
+    /**
+     * 重新应用所有 JOIN 关系
+     */
+    protected function reapplyJoins(): void
+    {
+        if (!$this->queryBuilder || empty($this->joins)) {
+            return;
+        }
+
+        foreach ($this->joins as $join) {
+            $this->applyJoinToBuilder($this->queryBuilder, $join);
+        }
+    }
+
+    /**
+     * 将 JOIN 应用到查询构建器
+     */
+    protected function applyJoinToBuilder(Builder $builder, array $join): void
+    {
+        $method = $join['type'] . 'Join';
+
+        if (!method_exists($builder, $method)) {
+            Log::warning("JOIN 方法不存在: {$method}");
+            return;
+        }
+
+        try {
+            // 处理不同类型的 JOIN
+            if (isset($join['closure'])) {
+                // 闭包类型的 JOIN
+                $builder->{$method}($join['table'], $join['closure']);
+            } elseif (isset($join['raw'])) {
+                // 原始表达式类型的 JOIN
+                $builder->{$method}($join['table'], function($joinBuilder) use ($join) {
+                    $joinBuilder->whereRaw($join['raw'], $join['bindings'] ?? []);
+                });
+            } elseif (isset($join['subquery'])) {
+                // 子查询类型的 JOIN
+                $builder->{$method}($join['subquery'], $join['as'], $join['first'], $join['operator'], $join['second']);
+            } else {
+                // 标准 JOIN
+                $builder->{$method}(
+                    $join['table'],
+                    $join['first'],
+                    $join['operator'],
+                    $join['second']
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error("应用 JOIN 失败: " . $e->getMessage(), [
+                'join' => $join,
+                'exception' => $e
+            ]);
+        }
+    }
+    /**
+     * 添加 INNER JOIN 关系
+     */
+    public function innerJoin(
+        string $table,
+        string $first,
+        string $operator = '=',
+        string $second = null
+    ): self {
+        return $this->join($table, $first, $operator, $second, self::JOIN_INNER);
+    }
+
 }
