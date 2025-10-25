@@ -73,8 +73,8 @@ return [
     ],
 
     'dependencies' => [
-        // query 方法里面的resource 映射到 业务
-         QuerySource::class=>'你的Source'
+        //患者列表的出参
+         QuerySource::class=>'你的resource文件路径'
     ],
 
     'low-code-set-use-table-field' => env('LOW_CODE_SET_USE_TABLE_FIELD','scene_code')
