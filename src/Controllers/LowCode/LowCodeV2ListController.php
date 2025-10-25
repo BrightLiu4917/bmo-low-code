@@ -92,12 +92,15 @@ final class LowCodeV2ListController extends BaseController
         $codes = $request->input('codes', null);
         // TODO: 按人群患者查询时，需要携带条件
         foreach ($codes as $key => $code) {
+            $quyeryInstance = QueryEngineService::instance()->autoClient();
+            $mainTable = $quyeryInstance->table .' as t1';
+
             $data[$key]['crowd_type_total_count']
-                = QueryEngineService::instance()
-                                    ->autoClient()
-                                    ->whereListPresetCondition($code)
-                                    ->setCache(10)
-                                    ->getCountResult();
+                = $quyeryInstance
+                ->useTable($mainTable)
+                ->whereListPresetCondition($code)
+                ->setCache(10)
+                ->getCountResult();
             $data[$key]['crowd_type_code'] = $code;
         }
         return $this->responseData($data);
