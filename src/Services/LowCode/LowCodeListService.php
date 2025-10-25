@@ -162,8 +162,7 @@ class LowCodeListService extends LowCodeBaseService
                 unset($filters[$crowdIdIndex]);
             } else  {
                 $t1Empi = 't1.empi';
-                $queryEngine = $queryEngine->useTable($bizSceneTable.' as t1')->rightJoin("$widhtTable as t2", $t1Empi, '=', 't2.empi');
-
+                $queryEngine = $queryEngine->useTable($bizSceneTable.' as t2')->innerJoin("$widhtTable as t1", $t1Empi, '=', 't2.empi');
 
                 //todo 缺陷 join 后不支持子查询
                 //                    ->rawTable(
@@ -238,11 +237,45 @@ class LowCodeListService extends LowCodeBaseService
                 $config = $list[$listCode] ?? [];
 
                 //3. 构建查询条件组
-                $builtQuery = $this->buildQueryConditions($queryEngine, $value, $config,$bizSceneTable);
+                $builtQuery = $this->buildQueryConditions(clone $queryEngine, $value, $config,$bizSceneTable);
                 return $builtQuery->setCache($setCacheTtl)->getPaginateResult();
             }
         } catch (QueryEngineException $e) {
             Logger::LOW_CODE_LIST->error('低代码列表查询异常', [
+                'error'      => $e->getMessage(),
+                'trace'      => $e->getTraceAsString(),
+                'line'       => $e->getLine(),
+                'file'       => $e->getFile(),
+                'input_args' => $inputArgs ?? null,
+            ]);
+        }
+    }
+
+    /**
+     * @param array $inputArgs
+     * @param int   $setCacheTtl 设置缓存时间
+     *
+     * @return void
+     * @throws \Gupo\BetterLaravel\Exceptions\ServiceException
+     */
+    public function queryCount(array $inputArgs = [],int $setCacheTtl = 10)
+    {
+        try {
+            // 1.获取列表
+            $list = $this->getLowCodeListByCodes(collect($inputArgs)->pluck('code')->toArray());
+
+            $queryEngine = QueryEngineService::instance()->autoClient();
+            $bizSceneTable = $queryEngine->table ?? '';
+            foreach ($inputArgs as $value) {
+                $listCode = $value['code'] ?? '';
+                $config = $list[$listCode] ?? [];
+
+                //3. 构建查询条件组
+                $builtQuery = $this->buildQueryConditions(clone $queryEngine, $value, $config,$bizSceneTable);
+                return $builtQuery->setCache($setCacheTtl)->getCountResult();
+            }
+        } catch (QueryEngineException $e) {
+            Logger::LOW_CODE_LIST->error('低代码列表数量查询异常', [
                 'error'      => $e->getMessage(),
                 'trace'      => $e->getTraceAsString(),
                 'line'       => $e->getLine(),
