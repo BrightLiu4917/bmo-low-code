@@ -57,7 +57,8 @@ class DiseaseAuthenticateInner
         );
 
         OrgContext::init(
-            (string) $request->header(HeaderEnum::ORG_ID, $request->input('org_code', ''))
+            (string) $request->header(HeaderEnum::ORG_ID, $request->input('org_code', '')),
+            (string) $request->header(HeaderEnum::ARC_CODE, $request->input('arc_code', ''))
         );
 
         AuthContext::init(
