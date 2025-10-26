@@ -173,19 +173,17 @@ class ResidentService extends BaseService
     }
 
     /**
-     * 业务中台纳管一个患者
      * @param  string  $empi
      * @param  string  $patientName
      * @param  int  $projectId
      * @param  string  $baseDate
      * @param  string  $arcCode
      * @param  string  $areaCode
-     * @param  string  $orgCode
      * @param  int  $splitFlag
      *
-     * @return void
+     * @return int
      */
-    public function createManagePlan(
+    public function createUserManagePlanTask(
         string $empi = '',
         string $patientName = '',
         int $projectId = 0,
@@ -195,7 +193,7 @@ class ResidentService extends BaseService
         int $splitFlag = 0
     ):int
     {
-       return BmpCheetahMedicalPlatformApiService::instance()->createManagePlan(
+       return BmpCheetahMedicalPlatformApiService::instance()->createUserManagePlanTask(
            empi: $empi,
            patientName: $patientName,
            projectId: $projectId,
@@ -203,6 +201,27 @@ class ResidentService extends BaseService
            arcCode: $arcCode,
            areaCode: $areaCode,
            splitFlag: $splitFlag
+        );
+    }
+
+    public function stopUserManagePlanTask(
+        string $empi = '',
+        string $patientName = '',
+        int $projectId = 0,
+        string $baseDate = '',
+        string $arcCode = '',
+        string $areaCode = '',
+        int $splitFlag = 0
+    ):bool
+    {
+        return BmpCheetahMedicalPlatformApiService::instance()->stopUserManagePlanTask(
+            empi: $empi,
+            patientName: $patientName,
+            projectId: $projectId,
+            baseDate: $baseDate,
+            arcCode: $arcCode,
+            areaCode: $areaCode,
+            splitFlag: $splitFlag
         );
     }
 

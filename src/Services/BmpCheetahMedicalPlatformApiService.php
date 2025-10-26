@@ -42,7 +42,8 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
     /**
      * 获取患者统计数据
      *
-     * @param array<int> $statisticsTypes 统计项目类型 0-患者任务状态统计，1-服务方任务状态统计，2-近N天新增患者统计，3-今日打卡人数统计
+     * @param array<int> $statisticsTypes 统计项目类型
+     *     0-患者任务状态统计，1-服务方任务状态统计，2-近N天新增患者统计，3-今日打卡人数统计
      */
     public function getPatientStatisticsData(array $statisticsTypes = [0, 3]): array
     {
@@ -74,6 +75,26 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
     }
 
     /**
+     * @param  string  $empi
+     * @param  string  $sceneCode
+     *
+     * @return mixed
+     */
+    public function stopUserManagePlanTask(
+        string $empi = '',
+        string $sceneCode = '',
+    ): bool {
+        $data = Http::asJson()->timeout(3)->post(
+            $this->baseUriVia().'/innerapi/task/completedAll',
+            [
+                "patient_id" => $empi,
+                "scene_code" => $sceneCode ?: $this->getSceneCode(),
+            ]
+        )->json();
+        return $data['data'];
+    }
+
+    /**
      * 创建管理方案
      * @param  string  $empi
      * @param  string  $patientName
@@ -86,7 +107,7 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
      *
      * @return int
      */
-    public function createManagePlan(
+    public function createUserManagePlan(
         string $empi = '',
         string $patientName = '',
         int $projectId = 0,
@@ -94,7 +115,7 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
         string $arcCode = '',
         string $areaCode = '',
         string $orgCode = '',
-        int $splitFlag = 0
+        int $splitFlag = 0,
     ):int
     {
         $data = Http::asJson()->timeout(3)->post($this->baseUriVia() . '/innerapi/patient/manager',
