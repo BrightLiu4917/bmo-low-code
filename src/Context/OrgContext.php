@@ -15,6 +15,9 @@ final class OrgContext
      */
     protected string $orgCode = '';
 
+    protected string $arcCode = '';
+
+
     /**
      * @return static
      */
@@ -25,15 +28,17 @@ final class OrgContext
 
     /**
      * @param string $orgCode
+     * @param  string  $arcCode
      *
      * @return static
      */
-    public static function init(string $orgCode): static
+    public static function init(string $orgCode,string $arcCode): static
     {
         return tap(
             static::instance(),
-            function (OrgContext $context) use ($orgCode) {
+            function (OrgContext $context) use ($orgCode,$arcCode) {
                 $context->setOrgCode($orgCode);
+                $context->setArcCode($arcCode);
             }
         );
     }
@@ -53,12 +58,26 @@ final class OrgContext
         $this->orgCode = $value;
     }
 
+    public function setArcCode(string $value): void
+    {
+        if ($value === $this->arcCode) {
+            return;
+        }
+
+        $this->arcCode = $value;
+    }
+
     /**
      * @return string
      */
     public function getOrgCode(): string
     {
         return $this->orgCode;
+    }
+
+    public function getArcCode(): string
+    {
+        return $this->arcCode;
     }
 
     /**

@@ -72,4 +72,47 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
         ])->json();
         return $data['data'] ?? 0;
     }
+
+    /**
+     * 创建管理方案
+     * @param  string  $empi
+     * @param  string  $patientName
+     * @param  int  $projectId
+     * @param  string  $baseDate
+     * @param  string  $arcCode
+     * @param  string  $areaCode
+     * @param  string  $orgCode
+     * @param  int  $splitFlag
+     *
+     * @return int
+     */
+    public function createManagePlan(
+        string $empi = '',
+        string $patientName = '',
+        int $projectId = 0,
+        string $baseDate = '',
+        string $arcCode = '',
+        string $areaCode = '',
+        string $orgCode = '',
+        int $splitFlag = 0
+    ):int
+    {
+        $data = Http::asJson()->timeout(3)->post($this->baseUriVia() . '/innerapi/patient/manager',
+            [
+                "arc_code"     => $arcCode ?: $this->getArcCode(),
+                "area_code"    => $areaCode,
+                "base_date"    => $baseDate,
+                "disease_code" => $this->getDiseaseCode(),
+                "org_code"     => $orgCode ?: $this->getOrgCode(),
+                "patient_id"   => $empi,
+                "patient_name" => $patientName,
+                "project_id"   => $projectId,
+                "scene_code"   => $this->getSceneCode(),
+                "split_flag"   => $splitFlag,
+                "sys_code"     => $this->getSystemCode(),
+                "tenant_id"    => $this->getTenantId(),
+        ]
+        )->json();
+        return $data['data']['user_project_id'] ?? 0;
+    }
 }

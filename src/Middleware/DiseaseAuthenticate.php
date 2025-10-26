@@ -36,6 +36,10 @@ class DiseaseAuthenticate
                 throw new AuthenticateException('Token invalid.');
             }
 
+            if (empty($request->header(HeaderEnum::ARC_CODE, ''))) {
+                throw new AuthenticateException('x-gp-arc-code invalid.');
+            }
+
             if (empty($request->header(HeaderEnum::SCENE_CODE, ''))) {
                 throw new AuthenticateException('x-gp-scene_code invalid.');
             }
@@ -76,14 +80,22 @@ class DiseaseAuthenticate
         );
 
         OrgContext::init(
-            orgCode: (string) $request->header(HeaderEnum::ORG_ID, $request->input('org_code', '')),
+            orgCode: (string)$request->header(
+                HeaderEnum::ORG_ID,
+                $request->input('org_code', '')
+            ),
+            arcCode: (string)$request->header(
+                HeaderEnum::ARC_CODE,
+                $request->input('arc_code', '')
+            ),
         );
 
         AuthContext::init(
             systemCode: (string) $request->header(HeaderEnum::SYSTEM_CODE, $request->input('sys_code', '')),
             orgId: (int) $request->header(HeaderEnum::ORG_ID, $request->input('org_code', 0)),
             token: (string) $request->header(HeaderEnum::AUTHORIZATION, ''),
-            requestSource: (string) $request->header(HeaderEnum::REQUEST_SOURCE, '')
+            requestSource: (string) $request->header(HeaderEnum::REQUEST_SOURCE, ''),
+            arcCode: (string) $request->header(HeaderEnum::ARC_CODE, ''),
         );
         AdminContext::init($admin);
     }

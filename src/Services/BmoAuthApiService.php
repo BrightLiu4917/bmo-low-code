@@ -32,6 +32,39 @@ class BmoAuthApiService extends LowCodeBaseService
     }
 
     /**
+     * @param  string  $token
+     * @param  string  $arcCode
+     *
+     * @return array
+     */
+    public function getUserByToken(string $token = '', string $arcCode = ''):array
+    {
+        $appId     = config('business.bmo-service.auth.app_id');
+        $appSecret = config('business.bmo-service.auth.app_secret');
+        if (!$appId || !$appSecret) {
+            throw new \RuntimeException('BMO服务配置错误');
+        }
+
+        $response = Http::timeout(10)
+            ->asJson()
+                        ->retry(2, 500) // 重试2次，间隔500毫秒
+
+                        ->withHeaders(
+                            [
+                                'AppId'         => $appId,
+                                'AppSecret'     => $appSecret,
+                                'Authorization' => $token,
+                            ]
+                        )
+                        ->get(
+                            $this->baseUri.'/innerapi/get-user-by-token',
+                            ['arc_code' => $arcCode]
+                        )
+                        ->json();
+        return $response['data'] ?? [];
+    }
+
+    /**
      * @param string $token
      * @param int    $orgId
      *
@@ -75,7 +108,7 @@ class BmoAuthApiService extends LowCodeBaseService
             Logger::API_SERVICE->error('获取用户信息失败', [
                 'token_prefix' => substr($token, 0, 8) . '...',
                 'org_id' => $orgId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
             throw new \RuntimeException('获取用户信息失败: ' . $e->getMessage());
         }

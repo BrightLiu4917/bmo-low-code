@@ -7,6 +7,7 @@ namespace BrightLiu\LowCode\Services\Resident;
 use BrightLiu\LowCode\Traits\Context\WithContext;
 use BrightLiu\LowCode\Traits\Context\WithOrgContext;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
+use BrightLiu\LowCode\Services\BmpCheetahMedicalPlatformApiService;
 use BrightLiu\LowCode\Entities\Business\Resident\ResidentBasicInfoEntity;
 use BrightLiu\LowCode\Services\BmpCheetahMedicalCrowdkitApiService;
 use BrightLiu\LowCode\Support\CrowdConnection;
@@ -168,6 +169,40 @@ class ResidentService extends BaseService
         BmpCheetahMedicalCrowdkitApiService::make()->updatePatientInfo(
             $empi,
             array_merge($attributes, $latestData)
+        );
+    }
+
+    /**
+     * 业务中台纳管一个患者
+     * @param  string  $empi
+     * @param  string  $patientName
+     * @param  int  $projectId
+     * @param  string  $baseDate
+     * @param  string  $arcCode
+     * @param  string  $areaCode
+     * @param  string  $orgCode
+     * @param  int  $splitFlag
+     *
+     * @return void
+     */
+    public function createManagePlan(
+        string $empi = '',
+        string $patientName = '',
+        int $projectId = 0,
+        string $baseDate = '',
+        string $arcCode = '',
+        string $areaCode = '',
+        int $splitFlag = 0
+    ):int
+    {
+       return BmpCheetahMedicalPlatformApiService::instance()->createManagePlan(
+           empi: $empi,
+           patientName: $patientName,
+           projectId: $projectId,
+           baseDate: $baseDate,
+           arcCode: $arcCode,
+           areaCode: $areaCode,
+           splitFlag: $splitFlag
         );
     }
 

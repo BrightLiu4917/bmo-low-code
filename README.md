@@ -12,14 +12,23 @@ php artisan vendor:publish --provider="BrightLiu\LowCode\Providers\LowCodeServic
 -----
 ### env配置文件
 ```text
+
+#### 用户中心 #####
 BMO_ORG_ID=用户中心ID 用户中心 org_id 可以不写，预留的
+BMO_APP_ID=用户中心 app_id
+BMO_APP_SECRET=用户中心 app_secret
+#### 用户中心 #####
+
+#### 业务中台 #####
 BMP_CHEETAH_MEDICAL_PLATFORM_URI=业务中台接口地址 宝庆老师
 BMP_CHEETAH_MEDICAL_CROWD_KIT_URI=人群基线接口地址 童java
+#### 业务中台 #####
 
+#### 低代码配置 #####
 LOW_CODE_SET_USE_TABLE_FIELD= 如果前端入参有"X-Gp-Scene-Code" scene_code 否则 disease_code
+#### 低代码配置 #####
 
-
-基线表 等配置
+#### 基线表 等配置 #####
 DB_MEDICAL_PLATFORM_HOST
 DB_MEDICAL_PLATFORM_PORT
 DB_MEDICAL_PLATFORM_DATABASE
@@ -27,6 +36,7 @@ DB_MEDICAL_PLATFORM_USERNAME
 DB_MEDICAL_PLATFORM_PASSWORD
 DB_MEDICAL_CROWD_PSN_WDTH_TABLE=人员宽表一般是"crowd_psn_wdth"
 DB_BUSINESS_CENTER_CROWD_TYPE_TABLE=患者标签关系表一般是 "feature_user_detail"
+#### 基线表 等配置 #####
 ```
 -----
 
@@ -87,6 +97,7 @@ X-Gp-Org-Id 机构ID 前端自己申请写死
 X-Gp-System-Code 系统编码 研发PM定义 
 X-Gp-Disease-Code 疾病编码 后端开发定义 比如 (sanya)
 X-Gp-Scene-Code   场景编码 后端开发定义 比如配药（CHRONIC_DISEASE）
+X-Gp-Arc-Code     Arc_code 前端自己获取
 ```
 -----
 ### 小工具
@@ -107,6 +118,7 @@ header 必须入参
     X-Gp-System-Code  系统编码 研发PM定义 
     X-Gp-Disease-Code 疾病编码 业务中台后端开发定义 比如 (SANYA)
     X-Gp-Scene-Code   场景编码 后端开发定义 比如 “慢病配药”（CHRONIC_DISEASE）
+    X-Gp-Arc-Code     Arc_code 前端自己获取
 json 入参
 table_name:场景表名 向业务总台后端要表名
 ```

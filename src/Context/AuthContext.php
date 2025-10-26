@@ -27,6 +27,8 @@ final class AuthContext
      */
     protected string $requestSource = '';
 
+    protected string $arcCode = '';
+
     /**
      * @var null|Collection
      */
@@ -58,17 +60,23 @@ final class AuthContext
      *
      * @return static
      */
-    public static function init(string $systemCode, int $orgId, string $token, string $requestSource): static
+    public static function init(string $systemCode, int $orgId, string $token, string $requestSource,string $arcCode = ''): static
     {
         return tap(
             static::instance(),
-            function (AuthContext $context) use ($systemCode, $orgId, $token, $requestSource) {
+            function (AuthContext $context) use ($systemCode, $orgId, $token, $requestSource,$arcCode) {
                 $context->setSystemCode($systemCode);
                 $context->setOrgId($orgId);
                 $context->setToken($token);
                 $context->setRequestSource($requestSource);
+                $context->setArcCode($arcCode);
             }
         );
+    }
+
+    public function getArcCode(): string
+    {
+        return $this->arcCode;
     }
 
     /**
@@ -110,6 +118,11 @@ final class AuthContext
     public function setSystemCode(string $value): void
     {
         $this->systemCode = $value;
+    }
+
+    public function setArcCode(string $value): void
+    {
+        $this->arcCode = $value;
     }
 
     /**

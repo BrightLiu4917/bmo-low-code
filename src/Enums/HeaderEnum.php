@@ -27,6 +27,10 @@ final class HeaderEnum extends BaseEnum
     #[Message('系统CODE')]
     public const SYSTEM_CODE = 'X-Gp-System-Code';
 
+
+    #[Message('ARC_CODE')]
+    public const ARC_CODE = 'X-Gp-Arc-Code';
+
     #[Message('请求来源')]
     public const REQUEST_SOURCE = 'X-Gp-Request-Source';
 }
