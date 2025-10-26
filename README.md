@@ -84,6 +84,9 @@ ResidentService::instance()->manageResident($empi,["相关参数"])
 
 出组患者 相关参数
 ResidentService::instance()->removeManageResident($empi,boolean(是否清理纳管信息默认为true))  
+
+创建管理方案
+ResidentService::instance()->createManagePlan(....)  
 ```
 -----
 ### 注意事项
