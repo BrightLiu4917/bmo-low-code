@@ -206,22 +206,14 @@ class ResidentService extends BaseService
 
     public function stopUserManagePlanTask(
         string $empi = '',
-        string $patientName = '',
-        int $projectId = 0,
-        string $baseDate = '',
-        string $arcCode = '',
-        string $areaCode = '',
-        int $splitFlag = 0
+        string $sceneCode = '',
+
     ):bool
     {
         return BmpCheetahMedicalPlatformApiService::instance()->stopUserManagePlanTask(
             empi: $empi,
-            patientName: $patientName,
-            projectId: $projectId,
-            baseDate: $baseDate,
-            arcCode: $arcCode,
-            areaCode: $areaCode,
-            splitFlag: $splitFlag
+            sceneCode: $sceneCode,
+
         );
     }
 
