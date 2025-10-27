@@ -107,7 +107,7 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
      *
      * @return int
      */
-    public function createUserManagePlan(
+    public function createUserManagePlanTask(
         string $empi = '',
         string $patientName = '',
         int $projectId = 0,
