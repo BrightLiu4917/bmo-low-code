@@ -190,7 +190,7 @@ class ResidentService extends BaseService
         string $baseDate = '',
         string $arcCode = '',
         string $areaCode = '',
-        int $splitFlag = 0
+        int $splitFlag = 0,
     ):int
     {
        return BmpCheetahMedicalPlatformApiService::instance()->createUserManagePlanTask(
@@ -252,5 +252,16 @@ class ResidentService extends BaseService
             $empi,
             array_merge($attributes, $latestData)
         );
+    }
+
+    /**
+     * 创建患者
+     * @param  array  $args
+     *
+     * @return array
+     */
+    public function createPatient (string $idCardNo = '' ,array $args = []):array
+    {
+       return BmpCheetahMedicalPlatformApiService::instance()->createPatient(idCardNo:$idCardNo,args: $args);
     }
 }

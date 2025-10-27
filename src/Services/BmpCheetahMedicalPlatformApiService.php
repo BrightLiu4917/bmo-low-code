@@ -140,14 +140,13 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
 
 
 
-    public function createPatient(array $args):array
+    public function createPatient(string $idCardNo = '',array $args):array
     {
         try {
             //验证患者是否存在
             if (empty($args)) {
                 return [null,null,'参数错误'];
             }
-            $idCardNo = $args['id_crd_no'] ?? '';
             if (!empty(ResidentService::instance()->getInfoByCardNo(idCardNo:$idCardNo,columns: ['empi']))){
                 return [null,null,'患者存在: '.$idCardNo];
             }
