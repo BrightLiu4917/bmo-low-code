@@ -15,6 +15,11 @@ final class CrowdKitService extends LowCodeBaseService
     use WithAuthContext;
 
     /**
+     * 人群分类缓存
+     */
+    protected static ?array $groupNameMapping = null;
+
+    /**
      * 获取人群可选列
      */
     public function getOptionalColumns(): Collection
@@ -97,5 +102,29 @@ final class CrowdKitService extends LowCodeBaseService
 
             return $item;
         });
+    }
+
+    /**
+     * 解析人群分类名称
+     * PS: 人群分类名称不在feature_use_detail表中，需要做额外的查询
+     *
+     * @param int $groupId 人群分类ID
+     */
+    public function resolveGroupName(int $groupId, mixed $default = null): mixed
+    {
+        if (empty($groupId)) {
+            return $default;
+        }
+
+        $groupNameMapping = self::$groupNameMapping ??= rescue(
+            fn () => array_column(
+                BmpCheetahMedicalCrowdkitApiService::instance()->getCrowds(),
+                'group_name',
+                'id'
+            ),
+            []
+        );
+
+        return $groupNameMapping[$groupId] ?? $default;
     }
 }

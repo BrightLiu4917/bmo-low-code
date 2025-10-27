@@ -8,6 +8,7 @@ use BrightLiu\LowCode\Support\CrowdConnection;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
 use Gupo\BetterLaravel\Service\BaseService;
 use Illuminate\Support\Collection;
+use BrightLiu\LowCode\Services\CrowdKitService;
 
 /**
  * 居民档案相关
@@ -36,7 +37,10 @@ class ResidentArchiveService extends BaseService
         // 人群分类
         $crowdInfo = (array) CrowdConnection::table('feature_user_detail')
             ->where('empi', $info['empi'])
-            ->get(['group_id', 'group_name'])
+            ->get(['group_id'])
+            ->each(function ($item) {
+                $item->offsetSet('group_name', (string) CrowdKitService::instance()->resolveGroupName(intval($item->group_id ?? '')));
+            })
             ->toArray();
 
         return [
