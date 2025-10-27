@@ -67,7 +67,7 @@ trait WithOrgContext
     public function getArcType(): string
     {
         if (empty($this->contextArcType)) {
-            $this->contextArcName = OrgContext::instance()->getArcType();
+            $this->contextArcType = OrgContext::instance()->getArcType();
         }
 
         return $this->contextArcType;
