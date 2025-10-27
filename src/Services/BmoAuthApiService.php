@@ -69,8 +69,8 @@ class BmoAuthApiService extends LowCodeBaseService
 
     public function getArcDetail(string $arcCode = ''):array
     {
-        $appId     = config('business.bmo-service.auth.app_id');
-        $appSecret = config('business.bmo-service.auth.app_secret');
+        $appId     = config('business.bmo-service.app_id');
+        $appSecret = config('business.bmo-service.app_secret');
         if (!$appId || !$appSecret) {
             throw new \RuntimeException('BMO服务配置错误');
         }
