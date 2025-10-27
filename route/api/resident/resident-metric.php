@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 use BrightLiu\LowCode\Controllers\Resident\ResidentMetricController;
 use Illuminate\Support\Facades\Route;
+use BrightLiu\LowCode\Enums\Foundation\Middleware;
 
-Route::group(['prefix' => 'v2/resident', 'middleware' => ['bmp.disease.auth']], function () {
+Route::group(['prefix' => 'v2/resident', 'middleware' => [Middleware::AUTH_DISEASE]], function () {
     Route::get('resident-metric/optional', [ResidentMetricController::class, 'optional']);
     //        ->comment('居民-居民指标:可选指标');
 
