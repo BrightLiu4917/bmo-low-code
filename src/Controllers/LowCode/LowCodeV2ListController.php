@@ -50,7 +50,7 @@ final class LowCodeV2ListController extends BaseController
                            ->customPaginate(true);
 
         try {
-            // 追加个性化菜单
+            // 获取个性化菜单
             $personalizeModuels = LowCodePersonalizeModule::query()
                                                           ->where('module_type',
                                                               'crowd_patients')
@@ -72,11 +72,16 @@ final class LowCodeV2ListController extends BaseController
                                                               'route_group' => [
                                                                   $item->metadata['path'],
                                                               ],
-                                                          ]));
+                                                        ]));
 
-            // 修改$list分页对象的数据
-            $list->setCollection($list->getCollection()
-                                      ->merge($personalizeModuels));
+            // 个性化菜单的tab与“本机构患者”一至，如果后期每个人性菜单需要定制化，则需要改造“自定义菜单功能模块”
+            $list->map(function($item) use ($personalizeModuels) {
+                $item['route_group'] = array_merge(
+                    $item['route_group'],
+                    $personalizeModuels->pluck('route_group')->flatten()->toArray()
+                );
+                return $item;
+            });
         } catch (\Throwable $e) {
         }
 
