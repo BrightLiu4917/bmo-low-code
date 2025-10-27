@@ -23,6 +23,8 @@ class CreateLowCodeListsTable extends Migration
                 $table->string('family_doctor_name', 64)->default('')->comment('家庭医生列表名字');
                 $table->string('mobile_doctor_name', 64)->default('')->comment('移动医生列表名字');
 
+                $table->string('crowd_type_code', 64)->default('')->comment('人群分类编码');
+
                 // 权重字段
                 $table->unsignedInteger('admin_weight')->default(0)->comment('专病后台权重(降序)');
                 $table->unsignedInteger('family_doctor_weight')->default(0)->comment('家庭医生权重(降序)');
