@@ -15,6 +15,10 @@ trait WithOrgContext
 
     protected ?string $contextArcCode = null;
 
+    protected ?string $contextArcName = null;
+
+    protected ?string $contextArcType = null;
+
     /**
      * @param string|object $orgCode
      *
@@ -44,10 +48,28 @@ trait WithOrgContext
 
     public function getArcCode(): string
     {
-        if (empty($this->contextOrgCode)) {
+        if (empty($this->contextArcCode)) {
             $this->contextArcCode = OrgContext::instance()->getArcCode();
         }
 
         return $this->contextArcCode;
+    }
+
+    public function getArcName(): string
+    {
+        if (empty($this->contextArcName)) {
+            $this->contextArcName = OrgContext::instance()->getArcName();
+        }
+
+        return $this->contextArcName;
+    }
+
+    public function getArcType(): string
+    {
+        if (empty($this->contextArcType)) {
+            $this->contextArcName = OrgContext::instance()->getArcType();
+        }
+
+        return $this->contextArcType;
     }
 }

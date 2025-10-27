@@ -260,7 +260,7 @@ class ResidentService extends BaseService
      *
      * @return array
      */
-    public function createPatient (string $idCardNo = '' ,array $args = []):array
+    public function create (string $idCardNo = '' ,array $args = []):array
     {
        return BmpCheetahMedicalPlatformApiService::instance()->createPatient(idCardNo:$idCardNo,args: $args);
     }
