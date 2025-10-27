@@ -177,11 +177,11 @@ final class LowCodeV2ListController extends BaseController
             }
 
             //$grouped 将患者的人群分类收集到一起
-            $data = $data->each(function($item) use ($grouped) {
+            $data->each(function($item) use ($grouped) {
                 if (isset($grouped[$item->empi])){
-                    $res = (array)$grouped[($item->empi ?? '')];
-                    return $item->_crowds = implode(',',
-                        array_column($res ?? [], 'group_name'));
+                    $res = (array)$grouped[$item->empi ?? ''];
+                    $item->_crowds = implode(',',
+                        array_filter(array_column($res ?? [], 'group_name')));
                 }
             });
         } catch (\Throwable $exception) {

@@ -305,7 +305,7 @@ class BmpBaseLineService extends LowCodeBaseService
                                  ->select(['empi', 'group_id'])
                                  ->getAllResult();
 
-        // 附加人群分类信息
+        // 附加人群分类名称
         return transform($data, function ($items) {
             try {
                 foreach ($items as $item) {
