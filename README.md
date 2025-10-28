@@ -12,7 +12,7 @@ php artisan vendor:publish --provider="BrightLiu\LowCode\Providers\LowCodeServic
 -----
 ### env配置文件
 ```text
-#### 是否开启调试模式 开启后安全代理不执行事务
+#### 是否开启调试模式 开启后 执行初始化 “/innerapi/v2/init/org-disease” 不会执行事务
 DEV_ENABLE=false
 
 #### 用户中心 #####
