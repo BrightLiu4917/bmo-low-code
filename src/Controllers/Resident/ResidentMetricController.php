@@ -79,6 +79,9 @@ class ResidentMetricController extends BaseController
         // 时间范围-截至
         $dateRangeMax = (string) $request->input('date_range.1', '');
 
+        // 限制条数
+        $limit = (int) $request->input('limit', 0);
+
         // TODO: 写法待完善
         $data = CrowdConnection::table('personal_archive')
             ->where('tenant_id', $this->getTenantId())
@@ -88,6 +91,7 @@ class ResidentMetricController extends BaseController
             ->where('org_code', $this->getOrgCode())
             ->where('empi', $empi)
             ->whereBetweenDate('fill_date', $dateRangeMin, $dateRangeMax, forceFullDay: true)
+            ->when($limit > 0, fn ($query) => $query->limit($limit))
             ->get(['col_value', 'fill_date', 'data_source'])
             ->sortBy('fill_date')
             ->toArray();

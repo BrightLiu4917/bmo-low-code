@@ -15,6 +15,7 @@ class MonitorTrendItemsRequest extends BaseRequest
             'date_range' => ['bail', 'nullable', 'array'],
             'date_range.0' => ['bail', 'nullable', 'date_format:Y-m-d'],
             'date_range.1' => ['bail', 'nullable', 'date_format:Y-m-d'],
+            'limit' => ['bail', 'nullable', 'numeric'],
         ];
     }
 
@@ -24,6 +25,7 @@ class MonitorTrendItemsRequest extends BaseRequest
             'empi' => '居民主索引',
             'metric_id' => '指标ID',
             'date_range' => '时间范围',
+            'limit' => '条数',
         ];
     }
 }
