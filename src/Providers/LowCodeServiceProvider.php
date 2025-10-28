@@ -8,8 +8,9 @@ use BrightLiu\LowCode\Context\AuthContext;
 use BrightLiu\LowCode\Context\AdminContext;
 use BrightLiu\LowCode\Context\DiseaseContext;
 use Illuminate\Contracts\Foundation\CachesRoutes;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Routing\Route;
 
 class LowCodeServiceProvider extends ServiceProvider
 {
@@ -33,6 +34,11 @@ class LowCodeServiceProvider extends ServiceProvider
         );
 
         $this->loadDependencies();
+
+        // 兼容历史版本的better-laravel
+        if (!Route::hasMacro('comment')) {
+            Route::macro('comment', fn () => true);
+        }
     }
 
     /**
@@ -105,7 +111,7 @@ class LowCodeServiceProvider extends ServiceProvider
             config('low-code.http.modules', []),
             function($modules) use ($rootPath) {
                 foreach ($modules as $moduleName => $options) {
-                    Route::group(
+                    RouteFacade::group(
                         $options,
                         array_map(
                             fn ($file) => "{$rootPath}/{$file}",
