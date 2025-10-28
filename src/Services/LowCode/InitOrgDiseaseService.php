@@ -43,7 +43,24 @@ final class InitOrgDiseaseService extends LowCodeBaseService
             }
         }
 
-        DB::transaction(function () use ($dataTableName) {
+        $devEnable = config('low-code.dev-enable', false);
+        //开发模式
+        if ($devEnable == false) {
+            DB::transaction(function () use ($dataTableName) {
+                // 前置清理
+                $this->clean();
+
+                // 初始化: 数据源
+                $dataSource = $this->initDataSource($dataTableName);
+
+                if (empty($dataSource)) {
+                    throw new ServiceException('数据源初始化异常');
+                }
+
+                // low-code 初始化
+                $this->initLowCodeConfig($dataSource);
+            });
+        } else {
             // 前置清理
             $this->clean();
 
@@ -56,7 +73,8 @@ final class InitOrgDiseaseService extends LowCodeBaseService
 
             // low-code 初始化
             $this->initLowCodeConfig($dataSource);
-        });
+        }
+
 
         return true;
     }

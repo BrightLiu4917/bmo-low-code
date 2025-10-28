@@ -4,6 +4,9 @@ use BrightLiu\LowCode\Enums\Foundation\Middleware;
 use BrightLiu\LowCode\Resources\LowCode\LowCodeList\QuerySource;
 
 return [
+    // 开发环境是否
+    'dev-enable'=>env('DEV_ENABLE',false),
+
     "cache-model" => [
         // 是否开启 id/code 缓存
         'enable-id-code-cache' => env('ENABLE_ID_CODE_CACHE',false),
