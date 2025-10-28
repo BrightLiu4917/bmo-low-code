@@ -9,7 +9,7 @@ class Converted
     public function __construct(
         protected string $key,
         protected mixed $value = null,
-        protected ?string $variant = null,
+        protected mixed $variant = null,
         protected ?string $unit = null,
         protected ?string $information = null,
         protected ?bool $readonly = null,

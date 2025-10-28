@@ -92,6 +92,72 @@ ResidentService::instance()->removeManageResident($empi,boolean(是否清理纳�
 ResidentService::instance()->createManagePlan(....)  
 ```
 -----
+
+### dependencies
+
+通过配置 `low-code.dependencies` 项，重写包内部的处理逻辑，目前支持如下映射：
+
+| 路由                                  | 源                                                                      | 说明             |
+| ------------------------------------- | ----------------------------------------------------------------------- | ---------------- |
+| api/v2/resident/resident-archive/info | \BrightLiu\LowCode\Resources\Resident\ResidentArchive\InfoResource::php | 居民档案详情数据 |
+| api/v2/low-code/list/query            | \BrightLiu\LowCode\Resources\LowCode\LowCodeList\QuerySource::php       | 患者列表数据     |
+
+
+#### QuerySource
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use BrightLiu\LowCode\Resources\Resident\ResidentArchive\InfoResource;
+use BrightLiu\LowCode\Support\Attribute\Converters\Age;
+use BrightLiu\LowCode\Support\Attribute\Converters\IdCrdNo;
+use BrightLiu\LowCode\Support\Attribute\Converters\SlfTelNo;
+
+class BizInfoResource extends InfoResource
+{
+    protected function fetchConversion(): Conversion
+    {
+        // 可选为每个字段转换类，在其中处理值转换逻辑
+        // 参考 BrightLiu\LowCode\Support\Attribute\Converters 中的内置转换类
+
+        return Conversion::make([
+            Age::class,
+            IdCrdNo::class,
+            SlfTelNo::class
+        ]);
+    }
+
+    /**
+     * 白名单
+     * PS: 优先级高于黑名单
+     */
+    protected function fillable(): ?array
+    {
+        // PS: 只有在其中的字段才会返给前端，null时不限，默认为null。
+        // - 优先级高于黑名单。
+
+        return null;
+    }
+
+    /**
+     * 黑名单
+     */
+    public function guarded(): ?array
+    {
+        // PS: 在其中的字段不会返给前端，null时不限，默认为null。
+        // - 优先级低于黑名单。
+        // - 当filleable方法存在有效值时，该方法无效。
+
+        return null;
+    }
+}
+```
+
+#### InfoResource
+
+
 ### 注意事项
 ```text
 1.
