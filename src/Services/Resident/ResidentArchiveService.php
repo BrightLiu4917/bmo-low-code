@@ -39,7 +39,9 @@ class ResidentArchiveService extends BaseService
             ->where('empi', $info['empi'])
             ->get(['group_id'])
             ->each(function ($item) {
-                $item->offsetSet('group_name', (string) CrowdKitService::instance()->resolveGroupName(intval($item->group_id ?? '')));
+                $item->group_name =  (string) CrowdKitService::instance()->resolveGroupName(intval($item->group_id ?? ''));
+
+//                $item->offsetSet('group_name', (string) CrowdKitService::instance()->resolveGroupName(intval($item->group_id ?? '')));
             })
             ->toArray();
 
