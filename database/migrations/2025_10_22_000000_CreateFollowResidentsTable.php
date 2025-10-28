@@ -12,7 +12,7 @@ class CreateFollowResidentsTable extends Migration
             $table->id()->comment('主键');
             $table->string('disease_code', 32)->default('')->comment('疾病编码');
             $table->unsignedBigInteger('admin_id')->default(0)->comment('管理员ID');
-            $table->string('resident_empi', 32)->default('')->comment('居民empi');
+            $table->string('resident_empi', 64)->default('')->comment('居民empi');
             $table->dateTime('created_at')->nullable()->comment('创建时间');
         });
     }
