@@ -12,6 +12,8 @@ php artisan vendor:publish --provider="BrightLiu\LowCode\Providers\LowCodeServic
 -----
 ### env配置文件
 ```text
+#### 是否开启调试模式 开启后安全代理不执行事务
+DEV_ENABLE=false
 
 #### 用户中心 #####
 BMO_ORG_ID=用户中心ID 用户中心 org_id 可以不写，预留的
@@ -25,7 +27,8 @@ BMP_CHEETAH_MEDICAL_CROWD_KIT_URI=人群基线接口地址 童java
 #### 业务中台 #####
 
 #### 低代码配置 #####
-LOW_CODE_SET_USE_TABLE_FIELD= 如果前端入参有"X-Gp-Scene-Code" scene_code 否则 disease_code
+#### 如果前端入参有"X-Gp-Scene-Code"参数 配置scene_code 否则 disease_code
+LOW_CODE_SET_USE_TABLE_FIELD = scene_code #默认
 #### 低代码配置 #####
 
 #### 基线表 等配置 #####
