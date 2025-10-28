@@ -111,7 +111,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
     {
         $dataWarehouseConfig = (array) config('low-code.bmo-baseline.database.default', []);
         $data =  [];
-        $data['disease_code'] = $this->getDiseaseCode();
+        $data['disease_code'] = $this->getSceneCode() ?: $this->getDiseaseCode();
         $data['name'] = $this->getDiseaseCode();
         $data['host'] = $dataWarehouseConfig['host'] ?? '';
         $data['database'] = $dataWarehouseConfig['database'] ?? '';
