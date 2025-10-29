@@ -9,7 +9,7 @@ class Converted
     public function __construct(
         protected string $key,
         protected mixed $value = null,
-        protected ?string $variant = null,
+        protected mixed $variant = null,
         protected ?string $unit = null,
         protected ?string $information = null,
         protected ?bool $readonly = null,
@@ -34,7 +34,7 @@ class Converted
         $data = $this->toArray($realityKey);
 
         // 仅保留指定字段
-        if (!empty($only)) {
+        if (!empty($only) || in_array('*', $only, true)) {
             $data = array_filter($data, fn ($key) => in_array($key, $only, true), ARRAY_FILTER_USE_KEY);
         }
 

@@ -48,6 +48,8 @@ class BasicInfoResource extends JsonResource
             // 人群分类
             'crowds' => collect($this['crowd_info'] ?? [])
                 ->map(fn ($crowd) => ['id' => $crowd->group_id ?? '', 'name' => $crowd->group_name ?? ''])
+                ->filter(fn ($crowd) => !empty($crowd['name']))
+                ->values()
                 ->toArray(),
         ];
     }
