@@ -47,7 +47,7 @@ final class OrgContext
     {
         return tap(
             static::instance(),
-            function (OrgContext $context) use ($orgCode,$arcCode) {
+            function (OrgContext $context) use ($orgCode,$arcCode,$token) {
                 $context->setOrgCode($orgCode);
                 $context->setArcCode($arcCode);
 

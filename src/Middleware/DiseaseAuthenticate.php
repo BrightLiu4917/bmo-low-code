@@ -71,7 +71,7 @@ class DiseaseAuthenticate
         return $next($request);
     }
 
-    protected function autoContext(array $admin,string $token): void
+    protected function autoContext(array $admin,string $token = ''): void
     {
         $request = request();
         DiseaseContext::init(

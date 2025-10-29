@@ -19,6 +19,8 @@ trait WithOrgContext
 
     protected ?string $contextArcType = null;
 
+    protected ?array $contextManageAreaCodes = [];
+
     /**
      * @param string|object $orgCode
      *
@@ -53,6 +55,14 @@ trait WithOrgContext
         }
 
         return $this->contextArcCode;
+    }
+
+    public function getManageAreaCodes(): array
+    {
+        if (empty($this->contextManageAreaCodes)) {
+            $this->contextManageAreaCodes = OrgContext::instance()->getManageAreaCode();
+        }
+        return $this->contextManageAreaCodes;
     }
 
     public function getArcName(): string
