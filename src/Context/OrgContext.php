@@ -5,7 +5,11 @@ namespace BrightLiu\LowCode\Context;
 
 
 
+use BrightLiu\LowCode\Tools\Region;
+use BrightLiu\LowCode\Services\RegionService;
+use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Services\BmoAuthApiService;
+use BrightLiu\LowCode\Services\Resident\ResidentService;
 
 /**
  * 机构上下文
@@ -21,6 +25,8 @@ final class OrgContext
 
     protected string $arcName = '';
     protected string $arcType = '';
+
+    protected array $manageAreaCodes = [];
 
 
     /**
@@ -51,13 +57,44 @@ final class OrgContext
                     if (!empty($data)){
                         $context->setArcName($data['name'] ?? '');
                         $context->setArcType($data['arc_type'] ?? '');
+                        $areaCodes = data_get($data, 'org_extension.arc_manage_areas',[]);
+                        if (!empty($areaCodes)){
+                            $areaCodes = RegionService::instance()->getBatchRegionLevel($areaCodes);
+                        }
+                        $context->setManageAreaCodes($areaCodes);
                     }
                 }catch (\Throwable $throwable){
-
+                    Logger::API_SERVICE->error(
+                        '获取用户中心机构地区编码错误',
+                        [
+                            'error'    => $throwable->getMessage(),
+                            'org_code' => $orgCode,
+                            'arc_code' => $arcCode,
+                            'message'  => $throwable->getMessage(),
+                            'file'     => $throwable->getFile(),
+                            'trace'    => $throwable->getTraceAsString(),
+                            'line'     => $throwable->getLine(),
+                        ]);
                 }
             }
         );
     }
+
+    public function setManageAreaCodes(array $value): void
+    {
+        if ($value === $this->manageAreaCodes) {
+            return;
+        }
+
+        $this->manageAreaCodes = $value;
+    }
+
+
+    public function getManageAreaCode(): array
+    {
+        return $this->manageAreaCodes;
+    }
+
 
     public function setArcName(string $value): void
     {
