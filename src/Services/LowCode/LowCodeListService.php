@@ -12,6 +12,7 @@ use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Traits\CastDefaultFixHelper;
 use BrightLiu\LowCode\Services\LowCodeBaseService;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
+use BrightLiu\LowCode\Services\RegionPermissionService;
 use BrightLiu\LowCode\Enums\Model\LowCode\LowCodeList\ListTypeEnum;
 use BrightLiu\LowCode\Core\TemplatePartCacheManager;
 use BrightLiu\LowCode\Services\QueryEngineService;
@@ -201,6 +202,18 @@ class LowCodeListService extends LowCodeBaseService
             if (!empty($filters)) {
                 $queryEngine->whereMixed($filters);
             }
+
+            //数据权限条件
+            $dataPermission = config('low-code.use-data-permission', '');
+            if (!empty($dataPermission)) {
+                $dataPermission = strtolower($dataPermission);
+                $condition      = match ($dataPermission) {
+                    'region' => RegionPermissionService::instance()
+                        ->formatPermission(),
+                    default  => [],
+                };
+                $queryEngine->whereMixed($condition);
+            };
 
             // 合并排序条件
             $inputOrderBy = $queryParams['order_by'] ?? [];

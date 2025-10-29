@@ -51,10 +51,11 @@ enum Logger: string
     //开放接口错误日志
     case OPEN_API_ERROR = 'open-api-error';
 
-    case BMP_BASE_LINE_ERROR = 'bmp_base_line_error';
+    case BMP_BASE_LINE_ERROR = 'bmp-base-line-error';
 
-    case BMP_CHEETAH_MEDICAL_CROWDKIT_ERROR = 'bmp_cheetah_medical_crowdkit_error';
+    case BMP_CHEETAH_MEDICAL_CROWDKIT_ERROR = 'bmp-cheetah-medical-crowdkit-error';
 
+    case REGION_PERMISSION_ERROR = 'region-permission-error';
 
 
 }

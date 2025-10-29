@@ -80,5 +80,12 @@ return [
          QuerySource::class=>'你的resource文件路径'
     ],
 
-    'low-code-set-use-table-field' => env('LOW_CODE_SET_USE_TABLE_FIELD','disease_code')
+    //使用什么字段作为查询条件 默认 disease_code
+    'low-code-set-use-table-field' => env('LOW_CODE_SET_USE_TABLE_FIELD','disease_code'),
+
+    //区域权限条件符号默认or
+    'region-permission-symbolic-condition'=>env('REGION_PERMISSION_SYMBOLIC_CONDITION','or'),
+
+    //使用奢么数据权限 默认区域
+    'use-data-permission'=>env('USE_DATA_PERMISSION','region')
 ];
