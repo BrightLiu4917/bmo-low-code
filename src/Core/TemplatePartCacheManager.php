@@ -5,7 +5,7 @@ namespace BrightLiu\LowCode\Core;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use App\Models\LowCode\LowCodeList;
+use BrightLiu\LowCode\Models\LowCodeList;
 
 /**
  * @Class
