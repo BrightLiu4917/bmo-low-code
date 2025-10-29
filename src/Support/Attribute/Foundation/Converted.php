@@ -34,7 +34,7 @@ class Converted
         $data = $this->toArray($realityKey);
 
         // 仅保留指定字段
-        if (!empty($only)) {
+        if (!empty($only) || in_array('*', $only, true)) {
             $data = array_filter($data, fn ($key) => in_array($key, $only, true), ARRAY_FILTER_USE_KEY);
         }
 
