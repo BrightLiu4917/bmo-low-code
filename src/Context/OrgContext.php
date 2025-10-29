@@ -43,25 +43,21 @@ final class OrgContext
      *
      * @return static
      */
-    public static function init(string $orgCode,string $arcCode,string $token): static
+    public static function init(string $orgCode = '',string $arcCode = '',string $token = '',array $manageAreaCodes = []): static
     {
         return tap(
             static::instance(),
-            function (OrgContext $context) use ($orgCode,$arcCode,$token) {
+            function (OrgContext $context) use ($orgCode,$arcCode,$token,$manageAreaCodes) {
                 $context->setOrgCode($orgCode);
                 $context->setArcCode($arcCode);
 
+                $context->setManageAreaCodes($manageAreaCodes);
                 //这里获取用户中心的arc 信息
                 try {
-                    $data = BmoAuthApiService::instance()->getUserByToken($token,$arcCode);
+                    $data = BmoAuthApiService::instance()->getArcDetail($arcCode);
                     if (!empty($data)){
                         $context->setArcName($data['name'] ?? '');
                         $context->setArcType($data['arc_type'] ?? '');
-                        $areaCodes = data_get($data, 'org_extension.arc_manage_areas',[]);
-                        if (!empty($areaCodes)){
-                            $areaCodes = RegionService::instance()->getBatchRegionLevel($areaCodes);
-                        }
-                        $context->setManageAreaCodes($areaCodes);
                     }
                 }catch (\Throwable $throwable){
                     Logger::API_SERVICE->error(

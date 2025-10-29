@@ -6,6 +6,7 @@ namespace BrightLiu\LowCode\Middleware;
 
 use BrightLiu\LowCode\Context\AdminContext;
 use BrightLiu\LowCode\Context\OrgContext;
+use BrightLiu\LowCode\Services\RegionService;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Enums\HeaderEnum;
 use BrightLiu\LowCode\Exceptions\AuthenticateException;
@@ -59,7 +60,7 @@ class DiseaseAuthenticate
             }
 
             // 初始化上下文
-            $this->autoContext($bmoAccount,$token);
+            $this->autoContext($bmoAccount,$token,$arcCode);
         } catch (\Throwable $e) {
             Logger::AUTHING->error(
                 sprintf('DiseaseAuthenticate failed: %s', $e->getMessage()),
@@ -71,7 +72,7 @@ class DiseaseAuthenticate
         return $next($request);
     }
 
-    protected function autoContext(array $admin,string $token = ''): void
+    protected function autoContext(array $admin,string $token = '',string $arcCode = ''): void
     {
         $request = request();
         DiseaseContext::init(
@@ -79,6 +80,11 @@ class DiseaseAuthenticate
             sceneCode: (string) $request->header(HeaderEnum::SCENE_CODE, $request->input('scene_code', ''))
         );
 
+        $data = BmoAuthApiService::instance()->getUserByToken($token,$arcCode);
+        $manageAreaCodes = data_get($data, 'org_extension.arc_manage_areas',[]);
+        if (!empty($manageAreaCodes)){
+            $manageAreaCodes = RegionService::instance()->getBatchRegionLevel($manageAreaCodes);
+        }
         OrgContext::init(
             orgCode: (string)$request->header(
                 HeaderEnum::ORG_ID,
@@ -88,7 +94,7 @@ class DiseaseAuthenticate
                 HeaderEnum::ARC_CODE,
                 $request->input('arc_code', '')
             ),
-            token: $token
+            manageAreaCodes: $manageAreaCodes
         );
 
         AuthContext::init(
