@@ -36,7 +36,7 @@ class DiseaseAuthenticate
                 throw new AuthenticateException('Token invalid.');
             }
 
-            if (empty($request->header(HeaderEnum::ARC_CODE, ''))) {
+            if (empty($arcCode = $request->header(HeaderEnum::ARC_CODE, ''))) {
                 throw new AuthenticateException('x-gp-arc-code invalid.');
             }
 
@@ -59,7 +59,7 @@ class DiseaseAuthenticate
             }
 
             // 初始化上下文
-            $this->autoContext($bmoAccount);
+            $this->autoContext($bmoAccount,$token);
         } catch (\Throwable $e) {
             Logger::AUTHING->error(
                 sprintf('DiseaseAuthenticate failed: %s', $e->getMessage()),
@@ -71,7 +71,7 @@ class DiseaseAuthenticate
         return $next($request);
     }
 
-    protected function autoContext(array $admin): void
+    protected function autoContext(array $admin,string $token): void
     {
         $request = request();
         DiseaseContext::init(
@@ -88,6 +88,7 @@ class DiseaseAuthenticate
                 HeaderEnum::ARC_CODE,
                 $request->input('arc_code', '')
             ),
+            token: $token
         );
 
         AuthContext::init(

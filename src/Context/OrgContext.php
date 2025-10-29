@@ -43,7 +43,7 @@ final class OrgContext
      *
      * @return static
      */
-    public static function init(string $orgCode,string $arcCode): static
+    public static function init(string $orgCode,string $arcCode,string $token): static
     {
         return tap(
             static::instance(),
@@ -53,7 +53,7 @@ final class OrgContext
 
                 //这里获取用户中心的arc 信息
                 try {
-                    $data = BmoAuthApiService::instance()->getArcDetail($arcCode);
+                    $data = BmoAuthApiService::instance()->getUserByToken($token,$arcCode);
                     if (!empty($data)){
                         $context->setArcName($data['name'] ?? '');
                         $context->setArcType($data['arc_type'] ?? '');
