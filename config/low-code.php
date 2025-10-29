@@ -80,5 +80,5 @@ return [
          QuerySource::class=>'你的resource文件路径'
     ],
 
-    'low-code-set-use-table-field' => env('LOW_CODE_SET_USE_TABLE_FIELD','scene_code')
+    'low-code-set-use-table-field' => env('LOW_CODE_SET_USE_TABLE_FIELD','disease_code')
 ];
