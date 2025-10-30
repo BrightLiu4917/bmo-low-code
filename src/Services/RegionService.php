@@ -6,6 +6,8 @@ namespace BrightLiu\LowCode\Services;
 
 
 
+use BrightLiu\LowCode\Tools\Tree;
+use Illuminate\Support\Facades\DB;
 use BrightLiu\LowCode\Tools\Region;
 use BrightLiu\LowCode\Traits\Context\WithContext;
 
@@ -40,5 +42,39 @@ class RegionService extends LowCodeBaseService
             }
         }
         return $result;
+    }
+
+    /**
+     * @param  string  $usePermission
+     * @param  array  $targetCodes
+     *
+     * @return array
+     */
+    public function getRegionDataByConfigRegionCode(string $usePermission = '',array $targetCodes):array
+    {
+        $useRegionCode = config('low-code.use-region-code');
+        $connection = config('low-code-database.region');
+        //根据地区编码查询地区数据
+        $regionTable = data_get($connection, 'table','mdm_admnstrt_rgn_y');
+        $lists = Db::connection($connection)
+            ->table($regionTable)
+            ->where('prm_key','like',"%{$useRegionCode}%")
+            ->where('invld_flg','=',0)
+            ->get();
+
+        //空数据
+        if (empty($lists)){
+            return [];
+        }
+        $data = $lists->toArray();
+
+        //使用权限
+        if (!empty($usePermission)){
+           return Tree::listToTree($data,'prm_key','pre_cd','children');
+        }
+        if (empty($targetCodes)){
+            $targetCodes = $this->getManageAreaCodes();
+        }
+        return Tree::buildRegionTree($data,$targetCodes,'prm_key','pre_cd','children');
     }
 }

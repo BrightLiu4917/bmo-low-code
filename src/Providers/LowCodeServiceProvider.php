@@ -67,6 +67,11 @@ class LowCodeServiceProvider extends ServiceProvider
 
         // 配置文件发布
         $this->publishes([
+            __DIR__.'/../../config/low-code-database.php' => config_path('low-code-database.php'),
+        ], 'low-code-database-config');
+
+        // 配置文件发布
+        $this->publishes([
             __DIR__.
             '/../../config/business/bmo-service.php' => config_path('business/bmo-service.php'),
         ], 'bmo-service-config');

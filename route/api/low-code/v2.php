@@ -4,9 +4,13 @@ use Illuminate\Support\Facades\Route;
 use BrightLiu\LowCode\Controllers\LowCode\LowCodePersonalizeModuleController;
 use BrightLiu\LowCode\Controllers\LowCode\LowCodeV2ListController;
 use BrightLiu\LowCode\Controllers\LowCode\ResidentCrowdController;
+use BrightLiu\LowCode\Controllers\LowCode\RegionController;
 
 Route::group([
 ], function () {
+
+    Route::get('v2/region-list', [RegionController::class, 'getRegionList'])->comment('区域列表');
+
 
     Route::prefix('v2/resident')->group(function () {
 

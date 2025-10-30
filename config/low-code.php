@@ -87,5 +87,7 @@ return [
     'region-permission-symbolic-condition'=>env('REGION_PERMISSION_SYMBOLIC_CONDITION','or'),
 
     //使用奢么数据权限 默认区域
-    'use-data-permission'=>env('USE_DATA_PERMISSION','region')
+    'use-data-permission'=>env('USE_DATA_PERMISSION','region'),
+
+    'use-region-code'=>env('USE_REGION_CODE','4602'),
 ];
