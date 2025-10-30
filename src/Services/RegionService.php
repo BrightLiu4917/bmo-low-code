@@ -8,7 +8,6 @@ namespace BrightLiu\LowCode\Services;
 use BrightLiu\LowCode\Tools\Tree;
 use Illuminate\Support\Facades\DB;
 use BrightLiu\LowCode\Tools\Region;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Core\DbConnectionManager;
