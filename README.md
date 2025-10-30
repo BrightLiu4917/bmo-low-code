@@ -40,6 +40,17 @@ DB_MEDICAL_PLATFORM_PASSWORD
 DB_MEDICAL_CROWD_PSN_WDTH_TABLE=人员宽表一般是"crowd_psn_wdth"
 DB_BUSINESS_CENTER_CROWD_TYPE_TABLE=患者标签关系表一般是 "feature_user_detail"
 #### 基线表 等配置 #####
+
+
+## 地区 ##
+DB_REGION_CONNECTION=mysql
+DB_REGION_HOST=dphzmy-ztkrn3qkvmu6fbk9-pub.proxy.dms.aliyuncs.com
+DB_REGION_PORT=3306
+DB_REGION_DATABASE=core_knlg
+DB_REGION_USERNAME=3ArpWTh77g35xSoGAW6gTf0o
+DB_REGION_PASSWORD=2DsVhJkKEb6QuSEMszMdIKxjz0s1UP
+DB_REGION_CONNECTION_TIMEOUT=10
+DB_REGION_PREPARES=false
 ```
 -----
 

@@ -55,19 +55,13 @@ class RegionService extends LowCodeBaseService
     public function getRegionDataByConfigRegionCode(?string $usePermission = null,array $targetCodes = []):array
     {
         try {
-            $useRegionCode = config('low-code.use-region-code');
-            $connection = config('low-code-database.region');
 
-            //根据地区编码查询地区数据
-            $regionTable = data_get($connection, 'table','mdm_admnstrt_rgn_y');
-
-            $lists = $this->getRegionAllData();
+            $data = $this->getRegionAllData();
 
             //空数据
-            if (empty($lists)){
+            if (empty($data)){
                 return [];
             }
-            $data = $lists;
 
             //使用权限
             //            $targetCodes = [
@@ -89,8 +83,9 @@ class RegionService extends LowCodeBaseService
             }
             return Tree::buildRegionTree($data,$targetCodes,'value','parent_code','children');
         }catch (\Throwable $throwable){
-            //            dd($throwable);
+
         }
+        return [];
 
     }
 
@@ -104,7 +99,7 @@ class RegionService extends LowCodeBaseService
         $cacheKey = md5(('region-data-'.$useRegionCode.$regionTable));
 
         // 缓存时间（可配置，默认60分钟）
-        $cacheTtl = config('low-code.region_cache_ttl', 60);
+        $cacheTtl = config('low-code.region-cache-ttl', 60);
 
         try {
             // 尝试从缓存获取数据
@@ -119,7 +114,8 @@ class RegionService extends LowCodeBaseService
                         [
                             'prm_key as value',
                             'admnstrt_rgn_nm as  label',
-                            'pre_cd as parent_code'
+                            'pre_cd as parent_code',
+                            'lvl_flg as  level'
                         ]
                     )
                     ->get()->map(function ($item) {
