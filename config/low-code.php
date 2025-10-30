@@ -90,7 +90,7 @@ return [
     'use-data-permission'=>env('USE_DATA_PERMISSION','region'),
 
     //使用什么字段作为区域权限条件 默认 region_code
-    'use-region-code'=>env('USE_REGION_CODE','4602'),
+    'use-region-code'=> env('USE_REGION_CODE','4602'),
 
     //设置区域缓存时间
     'region-cache-ttl'=>env('REGION_CACHE_TTL',60),

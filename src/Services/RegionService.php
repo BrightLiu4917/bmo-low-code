@@ -5,11 +5,12 @@ declare(strict_types = 1);
 namespace BrightLiu\LowCode\Services;
 
 
-
 use BrightLiu\LowCode\Tools\Tree;
 use Illuminate\Support\Facades\DB;
 use BrightLiu\LowCode\Tools\Region;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Core\DbConnectionManager;
 use BrightLiu\LowCode\Traits\Context\WithContext;
 
@@ -22,7 +23,8 @@ use BrightLiu\LowCode\Traits\Context\WithContext;
 class RegionService extends LowCodeBaseService
 {
     use WithContext;
-    public static function getBatchRegionLevel(array $codes = []):array
+
+    public static function getBatchRegionLevel(array $codes = []): array
     {
         // 初始化返回结构
         $result = [
@@ -52,14 +54,15 @@ class RegionService extends LowCodeBaseService
      *
      * @return array
      */
-    public function getRegionDataByConfigRegionCode(?string $usePermission = null,array $targetCodes = []):array
-    {
+    public function getRegionDataByConfigRegionCode(
+        ?string $usePermission = null,
+        array $targetCodes = [],
+    ): array {
         try {
-
             $data = $this->getRegionAllData();
 
             //空数据
-            if (empty($data)){
+            if (empty($data)) {
                 return [];
             }
 
@@ -69,31 +72,46 @@ class RegionService extends LowCodeBaseService
             //            ];
 
             //            dd(Tree::buildRegionTree($data,$targetCodes,'value','parent_code','children'));
-            if (!empty($usePermission)){
-                return Tree::buildRegionTree($data,$targetCodes,'value','parent_code','children');
-
+            if (!empty($usePermission)) {
+                return Tree::buildRegionTree(
+                    $data,
+                    $targetCodes,
+                    'value',
+                    'parent_code',
+                    'children'
+                );
             }
 
-            if (empty($targetCodes)){
-                $targetCodes = $this->aggregateRegionCode(RegionService::instance()->getManageAreaCodes());
+            if (empty($targetCodes)) {
+                $targetCodes = $this->aggregateRegionCode(
+                    RegionService::instance()->getManageAreaCodes()
+                );
             }
 
-            if (empty($targetCodes)){
+            if (empty($targetCodes)) {
                 return [];
             }
-            return Tree::buildRegionTree($data,$targetCodes,'value','parent_code','children');
-        }catch (\Throwable $throwable){
-
+            return Tree::buildRegionTree(
+                $data,
+                $targetCodes,
+                'value',
+                'parent_code',
+                'children'
+            );
+        } catch (\Throwable $throwable) {
         }
         return [];
-
     }
 
     public function getRegionAllData()
     {
-        $useRegionCode = config('low-code.use-region-code');
+        $useRegionCode    = config('low-code.use-region-code');
         $connectionConfig = config('low-code-database.region');
-        $regionTable = data_get($connectionConfig, 'table', 'mdm_admnstrt_rgn_y');
+        $regionTable      = data_get(
+            $connectionConfig,
+            'table',
+            'mdm_admnstrt_rgn_y'
+        );
 
         // 生成缓存键
         $cacheKey = md5(('region-data-'.$useRegionCode.$regionTable));
@@ -103,32 +121,53 @@ class RegionService extends LowCodeBaseService
 
         try {
             // 尝试从缓存获取数据
-            $lists = Cache::remember($cacheKey, $cacheTtl, function () use ($useRegionCode, $regionTable,$connectionConfig) {
-                return DbConnectionManager::getInstance()->getConnection(
-                    'region',
+            $lists = Cache::remember(
+                $cacheKey,
+                $cacheTtl,
+                function () use (
+                    $useRegionCode,
+                    $regionTable,
                     $connectionConfig
-                )->table($regionTable)
-                    ->where('prm_key', 'like', "{$useRegionCode}%")
-                    ->where('invld_flg', '=', 0)
-                    ->select(
-                        [
-                            'prm_key as value',
-                            'admnstrt_rgn_nm as  label',
-                            'pre_cd as parent_code',
-                            'lvl_flg as  level'
-                        ]
-                    )
-                    ->get()->map(function ($item) {
-                        return (array)$item;
-                    })->toArray();
-
-            });
+                ) {
+                    return DbConnectionManager::getInstance()->getConnection(
+                        'region',
+                        $connectionConfig
+                    )->table($regionTable)->where(
+                            'prm_key',
+                            'like',
+                            "{$useRegionCode}%"
+                        )->where('invld_flg', '=', 0)->select(
+                            DB::raw(
+                                "
+                                        prm_key as value,
+                                        prm_key as code,
+                                        admnstrt_rgn_nm as label,
+                                        admnstrt_rgn_nm as name,
+                                        pre_cd as parent_code,
+                                        lvl_flg as level,
+                                        CASE 
+                                            WHEN lvl_flg = 1 THEN 'province'
+                                            WHEN lvl_flg = 2 THEN 'city'
+                                            WHEN lvl_flg = 3 THEN 'district' 
+                                            WHEN lvl_flg = 4 THEN 'town'
+                                            WHEN lvl_flg = 5 THEN 'community'
+                                            ELSE 'unknown'
+                                        END as type
+                                    "
+                            )
+                        )->get()->map(function ($item) {
+                            return (array)$item;
+                        })->toArray();
+                }
+            );
 
             return $lists;
-
         } catch (\Exception $e) {
             // 如果查询失败，尝试从缓存获取旧数据
-            \Log::error('地区数据查询失败，尝试使用缓存', ['error' => $e->getMessage()]);
+            Logger::REGION_PERMISSION_ERROR->error(
+                '地区数据查询失败，尝试使用缓存',
+                ['error' => $e->getMessage()]
+            );
 
             if (Cache::has($cacheKey)) {
                 return Cache::get($cacheKey);
@@ -143,7 +182,7 @@ class RegionService extends LowCodeBaseService
      *
      * @return array
      */
-    public function aggregateRegionCode(array $codes = []):array
+    public function aggregateRegionCode(array $codes = []): array
     {
         return collect($codes)->values()->flatten(1)->values()->toArray();
     }
