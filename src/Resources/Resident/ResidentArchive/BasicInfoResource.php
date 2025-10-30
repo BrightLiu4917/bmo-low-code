@@ -18,7 +18,9 @@ class BasicInfoResource extends JsonResource
      */
     public function toArray($request)
     {
-        $info = $this['info'] ?? [];
+        $info = (array) ($this['info'] ?? []);
+
+        [$manageStatus, $manageStatusDefinition] = $this->resolveBusinessStatus($info);
 
         return [
             // 基本信息
@@ -42,8 +44,13 @@ class BasicInfoResource extends JsonResource
 
             // 管理状态
             'is_testing' => $info['is_testing'] ?? 0,
-            'biz_mng_flg' => $info['biz_mng_flg'] ?? 0,
+            'biz_mng_flg' => $manageStatus,
+            'biz_mng_flg_nm' => $manageStatusDefinition,
             'is_following' => !empty($this['following']) ? 1 : 0,
+
+            // 保留原始的业务管理状态
+            '_biz_mng_flg' => $info['biz_mng_flg'] ?? 0,
+            '_manage_status' => $info['manage_status'] ?? 0,
 
             // 人群分类
             'crowds' => collect($this['crowd_info'] ?? [])
@@ -52,5 +59,32 @@ class BasicInfoResource extends JsonResource
                 ->values()
                 ->toArray(),
         ];
+    }
+
+    /**
+     * 业务状态映射
+     */
+    protected function businessStatusMapping(): array
+    {
+        return [
+            0 => [0, '待纳管'],
+            1 => [1, '已纳管'],
+            2 => [2, '评估中'],
+            3 => [3, '目标制定中'],
+            4 => [4, '方案制定中'],
+            5 => [5, '管理中'],
+            6 => [6, '疗程结束'],
+            9 => [9, '方案终止'],
+        ];
+    }
+
+    /**
+     * 解析业务状态
+     */
+    protected function resolveBusinessStatus(array $attributes): array
+    {
+        $status = $attributes['manage_status'] ?? 0;
+
+        return $this->businessStatusMapping()[$status] ?? [0, ''];
     }
 }

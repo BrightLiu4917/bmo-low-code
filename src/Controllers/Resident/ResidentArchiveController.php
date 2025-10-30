@@ -58,7 +58,7 @@ class ResidentArchiveController extends BaseController
 
         $data = $srv->getBasicInfo($empi);
 
-        return $this->responseData($data, BasicInfoResource::class);
+        return $this->responseData($data, class_map(BasicInfoResource::class));
     }
 
     /**
