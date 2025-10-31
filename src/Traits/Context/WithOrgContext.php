@@ -82,7 +82,6 @@ trait WithOrgContext
         if (empty($this->contextArcName)) {
             $this->contextArcName = OrgContext::instance()->getArcName();
         }
-
         return $this->contextArcName;
     }
 
@@ -91,7 +90,6 @@ trait WithOrgContext
         if (empty($this->contextArcType)) {
             $this->contextArcType = OrgContext::instance()->getArcType();
         }
-
         return $this->contextArcType;
     }
 }

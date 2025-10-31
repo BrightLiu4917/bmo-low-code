@@ -58,4 +58,7 @@ enum Logger: string
     case REGION_PERMISSION_ERROR = 'region-permission-error';
 
 
+    case DATA_PERMISSION_ERROR = 'data-permission-error';
+
+
 }
