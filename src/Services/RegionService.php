@@ -71,7 +71,7 @@ class RegionService extends LowCodeBaseService
             //            ];
 
             //            dd(Tree::buildRegionTree($data,$targetCodes,'value','parent_code','children'));
-            if (!empty($usePermission)) {
+            if (empty($usePermission)) {
                 return Tree::buildRegionTree(
                     $data,
                     $targetCodes,
