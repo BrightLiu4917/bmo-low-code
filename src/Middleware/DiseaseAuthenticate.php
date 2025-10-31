@@ -81,10 +81,17 @@ class DiseaseAuthenticate
         );
 
         $data = BmoAuthApiService::instance()->getUserByToken($token,$arcCode);
-        $manageAreaCodes = data_get($data, 'org_extension.arc_manage_areas',[]);
-        if (!empty($manageAreaCodes)){
-            $manageAreaCodes = RegionService::instance()->getBatchRegionLevel($manageAreaCodes);
-        }
+        $bmoManageAreaCodes = data_get($data, 'org_extension.arc_manage_areas',[]);
+
+        $manageAreaCodes = match (true) {
+            !empty($bmoManageAreaCodes) => RegionService::instance()->getBatchRegionLevel($bmoManageAreaCodes),
+            default => []
+        };
+
+        $manageOrgCodes = data_get($data, 'org_extension.arc_manage_orgs',[]);
+
+
+
         OrgContext::init(
             orgCode: (string)$request->header(
                 HeaderEnum::ORG_ID,
@@ -94,7 +101,8 @@ class DiseaseAuthenticate
                 HeaderEnum::ARC_CODE,
                 $request->input('arc_code', '')
             ),
-            manageAreaCodes: $manageAreaCodes
+            manageAreaCodes: $manageAreaCodes,
+            manageOrgCodes: $manageOrgCodes,
         );
 
         AuthContext::init(

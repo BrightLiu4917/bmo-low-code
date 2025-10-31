@@ -21,6 +21,8 @@ trait WithOrgContext
 
     protected ?array $contextManageAreaCodes = [];
 
+    protected ?array $contextManageOrgCodes = [];
+
     /**
      * @param string|object $orgCode
      *
@@ -46,6 +48,16 @@ trait WithOrgContext
         }
 
         return $this->contextOrgCode;
+    }
+
+
+    public function getManageOrgCode(): array
+    {
+        if (empty($this->contextManageOrgCodes)) {
+            $this->contextManageOrgCodes = OrgContext::instance()->getManageOrgCode();
+        }
+
+        return $this->contextManageOrgCodes;
     }
 
     public function getArcCode(): string

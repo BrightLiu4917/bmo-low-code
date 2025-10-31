@@ -5,11 +5,9 @@ namespace BrightLiu\LowCode\Context;
 
 
 
-use BrightLiu\LowCode\Tools\Region;
-use BrightLiu\LowCode\Services\RegionService;
+
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Services\BmoAuthApiService;
-use BrightLiu\LowCode\Services\Resident\ResidentService;
 
 /**
  * 机构上下文
@@ -28,6 +26,8 @@ final class OrgContext
 
     protected array $manageAreaCodes = [];
 
+    protected array $manageOrgCodes = [];
+
 
     /**
      * @return static
@@ -43,13 +43,15 @@ final class OrgContext
      *
      * @return static
      */
-    public static function init(string $orgCode = '',string $arcCode = '',string $token = '',array $manageAreaCodes = []): static
+    public static function init(string $orgCode = '',string $arcCode = '',array $manageAreaCodes = [],array $manageOrgCodes = []): static
     {
         return tap(
             static::instance(),
-            function (OrgContext $context) use ($orgCode,$arcCode,$token,$manageAreaCodes) {
+            function (OrgContext $context) use ($orgCode,$arcCode,$manageAreaCodes,$manageOrgCodes) {
                 $context->setOrgCode($orgCode);
                 $context->setArcCode($arcCode);
+
+                $context->setManageOrgCodes($manageOrgCodes);
 
                 $context->setManageAreaCodes($manageAreaCodes);
                 //这里获取用户中心的arc 信息
@@ -84,6 +86,21 @@ final class OrgContext
 
         $this->manageAreaCodes = $value;
     }
+
+    public function setManageOrgCodes(array $value): void
+    {
+        if ($value === $this->manageOrgCodes) {
+            return;
+        }
+
+        $this->manageOrgCodes = $value;
+    }
+
+    public function getManageOrgCode(): array
+    {
+        return $this->manageOrgCodes;
+    }
+
 
 
     public function getManageAreaCode(): array

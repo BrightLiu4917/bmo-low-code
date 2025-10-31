@@ -76,13 +76,6 @@ class LowCodeServiceProvider extends ServiceProvider
             '/../../config/business/bmo-service.php' => config_path('business/bmo-service.php'),
         ], 'bmo-service-config');
 
-        //        $this->publishes([
-        //            __DIR__.'/../../resource/ListSource.php' => app_path('Http/Resources/LowCode'),
-        //        ], 'low-code-list-resource');
-        //
-        //        $this->publishes([
-        //            __DIR__.'/../../resource/BasicInfoSource.php' => app_path('Http/Resources/LowCode'),
-        //        ], 'low-code-basic-info-resource');
 
         // 迁移文件发布
         $this->publishes([
