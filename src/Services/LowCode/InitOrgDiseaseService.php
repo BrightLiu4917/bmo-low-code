@@ -180,6 +180,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
                     $templateMapping = $sceneTemplateMapping;
                 }
 
+
                 $listData[] = [
                     ...$item,
                     'code' => Uuid::generate(),

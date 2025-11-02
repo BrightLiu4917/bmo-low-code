@@ -106,6 +106,11 @@ ResidentService::instance()->removeManageResident($empi,boolean(是否清理纳�
 
 创建管理方案
 ResidentService::instance()->createManagePlan(....)  
+
+DataPermissionService::instance()
+    ->channel($dataPermissionCode)//选择使用权限渠道
+//                    ->setMappingField(['manage_org_code'=>'manage_'])//映射业务字段
+                    ->run();
 ```
 -----
 
