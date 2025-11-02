@@ -212,7 +212,7 @@ class LowCodeListService extends LowCodeBaseService
             $dataPermissionCode = $config['data_permission_code'] ?? '';
             if ($dataPermissionCode !== ''){
                 $dataPermissionCondition = DataPermissionService::instance()->channel($dataPermissionCode)
-                    ->mappingField(['org_code'=>'manage_'])
+//                    ->setMappingField(['org_code'=>'manage_'])
                     ->run();
                 if (empty($dataPermissionCondition)){
                     $queryEngine->whereMixed($dataPermissionCondition);
