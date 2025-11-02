@@ -156,7 +156,7 @@ class DataPermissionService extends LowCodeBaseService
     private function isMultipleField(array $permissionConfig): bool
     {
         $permissionKey = $permissionConfig['permission_key'] ?? '';
-        $operationSymbol = $permissionConfig['operation_symbol'] ?? '';
+        $operationSymbol = $permissionConfig['symbol'] ?? '';
 
         return $permissionKey === 'multiple_field' || $operationSymbol === 'multiple_field';
     }
@@ -212,12 +212,12 @@ class DataPermissionService extends LowCodeBaseService
     private function formatSingleFieldPermission(array $permissionConfig): array
     {
         $permissionKey = $permissionConfig['permission_key'] ?? '';
-        $operationSymbol = $permissionConfig['operation_symbol'] ?? '';
+        $operationSymbol = $permissionConfig['symbol'] ?? '';
         $permissionValue = $this->getChannelPermissionValue();
 
         // 验证必要字段
         if (empty($permissionKey) || empty($operationSymbol)) {
-            \Log::warning("Invalid permission configuration", [
+            Logger::DATA_PERMISSION_ERROR->warning("Invalid permission configuration", [
                 'channel' => $this->channel,
                 'config' => $permissionConfig
             ]);

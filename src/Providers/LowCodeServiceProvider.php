@@ -11,6 +11,7 @@ use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Route;
+use BrightLiu\LowCode\Console\Commands\PublishDataPermissionsCommand;
 
 class LowCodeServiceProvider extends ServiceProvider
 {
@@ -60,6 +61,7 @@ class LowCodeServiceProvider extends ServiceProvider
             return;
         }
 
+
         // 配置文件发布
         $this->publishes([
             __DIR__.'/../../config/low-code.php' => config_path('low-code.php'),
@@ -81,6 +83,11 @@ class LowCodeServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../../database/migrations' => database_path('migrations'),
         ], 'low-code-migrations');
+
+
+        $this->publishes([
+            __DIR__.'/../../database/seeders' => database_path('seeders'),
+        ], 'low-code-seeders');
 
         // 可选：同时发布配置和迁移的统一标签
         $this->publishes([
@@ -119,6 +126,18 @@ class LowCodeServiceProvider extends ServiceProvider
                 }
             }
         );
+    }
+
+    /**
+     * 注册 Artisan 命令
+     */
+    protected function registerCommands(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+//                PublishDataPermissionsCommand::class,
+            ]);
+        }
     }
 
     protected function loadDependencies(): void

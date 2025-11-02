@@ -9,6 +9,11 @@ composer require bright-liu4917/bmo-low-code
 ```text
 php artisan vendor:publish --provider="BrightLiu\LowCode\Providers\LowCodeServiceProvider"
 ```
+
+ ### 执行填充数据 
+```text
+php artisan low-code:publish-data-permissions 
+```
 -----
 ### env配置文件
 ```text
