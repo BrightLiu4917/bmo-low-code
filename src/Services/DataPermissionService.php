@@ -33,7 +33,7 @@ class DataPermissionService extends LowCodeBaseService
     /**
      * 查询所有权限数据
      */
-    public static function getAllPermission(): ?Collection
+    public static function getAllPermission()
     {
         return DataPermission::getAllData();
     }

@@ -31,7 +31,7 @@ class DataPermission extends LowCodeBaseModel
         ModelFetch, //        NewEloquentBuilder,
         SoftDeletes, UniqueCodeRelation, OrgDiseaseRelation, OrgRelation, CacheableModel;
 
-    public static function getAllData(): ?DataPermission
+    public static function getAllData()
     {
         try {
 
