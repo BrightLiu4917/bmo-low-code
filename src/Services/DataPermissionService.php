@@ -27,12 +27,13 @@ class DataPermissionService extends LowCodeBaseService
         'region' => 'handleRegionPermission',
         'org'    => 'handleOrgPermission',
     ];
+    protected array $mappingField = [];
+
 
     /**
      * 查询所有权限数据
-     * @return \BrightLiu\LowCode\Models\DataPermission|null
      */
-    public static function getAllPermission()
+    public static function getAllPermission(): ?Collection
     {
         return DataPermission::getAllData();
     }
@@ -69,6 +70,12 @@ class DataPermissionService extends LowCodeBaseService
         return $permissions->keyBy('code')->toArray();
     }
 
+    public function mappingField(array $values = []):static
+    {
+        $this->mappingField = $values;
+        return  $this;
+    }
+
     /**
      * 执行权限处理流程
      */
@@ -88,25 +95,52 @@ class DataPermissionService extends LowCodeBaseService
 
             // 处理多字段情况
             if ($this->isMultipleField($permissionConfig)) {
-                return $this->getChannelPermissionValue();
+                return $this->processMappingField($this->getChannelPermissionValue());
             }
 
             // 处理单字段权限
-            return $this->formatSingleFieldPermission($permissionConfig);
+            return $this->processMappingField($this->formatSingleFieldPermission($permissionConfig));
         }catch (\Throwable $exception){
-            Logger::DATA_PERMISSION_ERROR->error('', [
-                'exception' => $exception->getMessage(),
-                'line'=>$exception->getLine(),
-                'file'=>$exception->getFile(),
-                'channel' => $this->channel,
-                'permission_config' => $permissionConfig ?? [],
-                'permission_key' => $this->permissionKey,
-                'permission_value' => $this->getChannelPermissionValue(),
-            ]);
+            Logger::DATA_PERMISSION_ERROR->error($exception);
         }
         return  [];
     }
 
+
+    /**
+     * 处理字段映射
+     */
+    public function processMappingField($data)
+    {
+            if (empty($this->mappingField)) {
+                return $data;
+            }
+
+            // 将数据转换为JSON字符串
+            $jsonString = json_encode($data, JSON_UNESCAPED_UNICODE);
+            if ($jsonString === false) {
+                return $data;
+            }
+
+            // 准备替换映射
+            $search  = [];
+            $replace = [];
+
+            foreach ($this->mappingField as $field => $mapping) {
+                // 构造JSON键名格式进行精确替换
+                $search[]  = $field;
+                $replace[] = $mapping;
+            }
+
+            // 执行字符串替换
+            $mappedJson = str_replace($search, $replace, $jsonString);
+
+            // 解码回数组
+            $result = json_decode($mappedJson, true);
+
+            return $result !== null ? $result : $data;
+
+    }
     /**
      * 获取当前渠道的权限配置
      */
@@ -168,7 +202,7 @@ class DataPermissionService extends LowCodeBaseService
     private function handleUnknownChannel(): array
     {
         // 记录日志或抛出异常，根据业务需求决定
-        Logger::DATA_PERMISSION_ERROR->warning("Unknown data permission channel: {$this->channel}");
+        \Log::warning("Unknown data permission channel: {$this->channel}");
         return [];
     }
 
