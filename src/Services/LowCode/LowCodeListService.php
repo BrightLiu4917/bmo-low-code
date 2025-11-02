@@ -115,7 +115,7 @@ class LowCodeListService extends LowCodeBaseService
             'code', $listCodes
         )->get([
             'id', 'crowd_type_code', 'default_order_by_json', 'code',
-            'preset_condition_json',
+            'preset_condition_json','data_permission_code'
         ])->keyBy('code')->toArray();
     }
 
