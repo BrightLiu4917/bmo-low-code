@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace BrightLiu\LowCode\Services;
 
 use BrightLiu\LowCode\Models\DataPermission;
+use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Traits\Context\WithContext;
 use Illuminate\Support\Collection;
 
@@ -29,8 +30,9 @@ class DataPermissionService extends LowCodeBaseService
 
     /**
      * 查询所有权限数据
+     * @return \BrightLiu\LowCode\Models\DataPermission|null
      */
-    public static function getAllPermission(): ?Collection
+    public static function getAllPermission()
     {
         return DataPermission::getAllData();
     }
@@ -56,7 +58,7 @@ class DataPermissionService extends LowCodeBaseService
     /**
      * 格式化权限数据为键值对
      */
-    public function formatPermissionData(): Collection
+    public function formatPermissionData(): array
     {
         $permissions = self::getAllPermission();
 
@@ -64,7 +66,7 @@ class DataPermissionService extends LowCodeBaseService
             return collect();
         }
 
-        return $permissions->keyBy('code');
+        return $permissions->keyBy('code')->toArray();
     }
 
     /**
@@ -72,33 +74,46 @@ class DataPermissionService extends LowCodeBaseService
      */
     public function run(): array
     {
-        // 参数验证
-        if (empty($this->channel)) {
-            throw new \InvalidArgumentException('Data permission channel is required');
-        }
+        try {
+            // 参数验证
+            if (empty($this->channel)) {
+                throw new \InvalidArgumentException('Data permission channel is required');
+            }
 
-        // 获取权限配置
-        $permissionConfig = $this->getPermissionConfig();
-        if (empty($permissionConfig)) {
-            return [];
-        }
+            // 获取权限配置
+            $permissionConfig = $this->getPermissionConfig();
+            if (empty($permissionConfig)) {
+                return [];
+            }
 
-        // 处理多字段情况
-        if ($this->isMultipleField($permissionConfig)) {
-            return $this->getChannelPermissionValue();
-        }
+            // 处理多字段情况
+            if ($this->isMultipleField($permissionConfig)) {
+                return $this->getChannelPermissionValue();
+            }
 
-        // 处理单字段权限
-        return $this->formatSingleFieldPermission($permissionConfig);
+            // 处理单字段权限
+            return $this->formatSingleFieldPermission($permissionConfig);
+        }catch (\Throwable $exception){
+            Logger::DATA_PERMISSION_ERROR->error('', [
+                'exception' => $exception->getMessage(),
+                'line'=>$exception->getLine(),
+                'file'=>$exception->getFile(),
+                'channel' => $this->channel,
+                'permission_config' => $permissionConfig ?? [],
+                'permission_key' => $this->permissionKey,
+                'permission_value' => $this->getChannelPermissionValue(),
+            ]);
+        }
+        return  [];
     }
 
     /**
      * 获取当前渠道的权限配置
      */
-    private function getPermissionConfig(): ?array
+    private function getPermissionConfig()
     {
         $permissions = $this->formatPermissionData();
-        return $permissions->get($this->channel);
+        return $permissions[$this->channel] ?? [];
     }
 
     /**
@@ -153,7 +168,7 @@ class DataPermissionService extends LowCodeBaseService
     private function handleUnknownChannel(): array
     {
         // 记录日志或抛出异常，根据业务需求决定
-        \Log::warning("Unknown data permission channel: {$this->channel}");
+        Logger::DATA_PERMISSION_ERROR->warning("Unknown data permission channel: {$this->channel}");
         return [];
     }
 

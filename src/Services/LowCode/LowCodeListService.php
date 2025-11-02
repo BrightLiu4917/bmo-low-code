@@ -12,6 +12,7 @@ use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Traits\CastDefaultFixHelper;
 use BrightLiu\LowCode\Services\LowCodeBaseService;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
+use BrightLiu\LowCode\Services\DataPermissionService;
 use BrightLiu\LowCode\Services\RegionPermissionService;
 use BrightLiu\LowCode\Enums\Model\LowCode\LowCodeList\ListTypeEnum;
 use BrightLiu\LowCode\Core\TemplatePartCacheManager;
@@ -129,6 +130,10 @@ class LowCodeListService extends LowCodeBaseService
     private function buildQueryConditions($queryEngine, array $queryParams, array $config,string $bizSceneTable)
     {
         try {
+
+            if (empty($queryEngine)){
+                throw new ServiceException('查询引擎未定义，请检查 入参与配置数据库表配置是否一致');
+            }
             $filters = $queryParams['filters'] ?? [];
 
             // 处理 crowd_id 条件并安全移除
@@ -204,16 +209,13 @@ class LowCodeListService extends LowCodeBaseService
             }
 
             //数据权限条件
-            $dataPermission = config('low-code.use-data-permission', '');
-            if (!empty($dataPermission)) {
-                $dataPermission = strtolower($dataPermission);
-                $condition      = match ($dataPermission) {
-                    'region' => RegionPermissionService::instance()
-                        ->formatPermission(),
-                    default  => [],
-                };
-                $queryEngine->whereMixed($condition);
-            };
+            $dataPermissionCode = $config['data_permission_code'] ?? '';
+            if ($dataPermissionCode !== ''){
+                $dataPermissionCondition = DataPermissionService::instance()->channel($dataPermissionCode)->run();
+                if (empty($dataPermissionCondition)){
+                    $queryEngine->whereMixed($dataPermissionCondition);
+                }
+            }
 
             // 合并排序条件
             $inputOrderBy = $queryParams['order_by'] ?? [];
