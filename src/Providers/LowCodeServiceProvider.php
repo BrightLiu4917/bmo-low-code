@@ -20,6 +20,9 @@ class LowCodeServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        // 注册 Artisan 命令
+        $this->registerCommands();
+
         $this->app->singleton('context:org', OrgContext::class);
 
         $this->app->singleton('context:auth', AuthContext::class);
@@ -135,7 +138,7 @@ class LowCodeServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-//                PublishDataPermissionsCommand::class,
+                PublishDataPermissionsCommand::class,
             ]);
         }
     }

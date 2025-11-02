@@ -28,14 +28,14 @@ class PublishDataPermissionsCommand extends Command
             'permission_key' => 'manage_org_code',
             'code' => 'org',
             'title' => '纳管机构',
-            'operation_symbol' => 'in',
+            'symbol' => 'in',
         ],
         [
             'disease_code' => '',
             'permission_key' => 'multiple_field',
             'code' => 'region',
             'title' => '地区编码',
-            'operation_symbol' => 'multiple_field',
+            'symbol' => 'multiple_field',
         ]
     ];
 
