@@ -70,7 +70,7 @@ class DataPermissionService extends LowCodeBaseService
         return $permissions->keyBy('code')->toArray();
     }
 
-    public function mappingField(array $values = []):static
+    public function setMappingField(array $values = []):static
     {
         $this->mappingField = $values;
         return  $this;
