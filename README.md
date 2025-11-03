@@ -33,7 +33,7 @@ BMP_CHEETAH_MEDICAL_CROWD_KIT_URI=人群基线接口地址 童java
 
 #### 低代码配置 #####
 #### 如果前端入参有"X-Gp-Scene-Code"参数 配置scene_code 否则 disease_code
-LOW_CODE_SET_USE_TABLE_FIELD = scene_code #默认
+#LOW_CODE_SET_USE_TABLE_FIELD = disease_code #默认disease_code or 不开启
 #### 低代码配置 #####
 
 #### 基线表 等配置 #####
@@ -42,12 +42,12 @@ DB_MEDICAL_PLATFORM_PORT
 DB_MEDICAL_PLATFORM_DATABASE
 DB_MEDICAL_PLATFORM_USERNAME
 DB_MEDICAL_PLATFORM_PASSWORD
-DB_MEDICAL_CROWD_PSN_WDTH_TABLE=人员宽表一般是"crowd_psn_wdth"
-DB_BUSINESS_CENTER_CROWD_TYPE_TABLE=患者标签关系表一般是 "feature_user_detail"
+DB_MEDICAL_CROWD_PSN_WDTH_TABLE=人员宽表一般是"crowd_psn_wdth" 问童java
+DB_BUSINESS_CENTER_CROWD_TYPE_TABLE=患者标签关系表一般是 "feature_user_detail" 问童java
 #### 基线表 等配置 #####
 
 
-## 地区 ##
+#### 地区#### 
 DB_REGION_CONNECTION=mysql
 DB_REGION_HOST=dphzmy-ztkrn3qkvmu6fbk9-pub.proxy.dms.aliyuncs.com
 DB_REGION_PORT=3306
@@ -56,6 +56,7 @@ DB_REGION_USERNAME=3ArpWTh77g35xSoGAW6gTf0o
 DB_REGION_PASSWORD=2DsVhJkKEb6QuSEMszMdIKxjz0s1UP
 DB_REGION_CONNECTION_TIMEOUT=10
 DB_REGION_PREPARES=false
+#### 地区#### 
 ```
 -----
 
@@ -63,12 +64,10 @@ DB_REGION_PREPARES=false
 ```text
 低代码查询数据
 QueryEngineService::instance()
-        ->autoClient()//自动获取客户端入参数信息
-        
-        //->innerJoin()
-        
-        // 设置查询条件 内置多种查询方法 whereUserId、 whereManageOrgCode、 whereIdCrdNo
-        ->whereMixed(
+        ->autoClient()          //自动获取客户端入参数信息
+        //useTable('$useTable') //强制更换表
+        //->innerJoin()         //内置内联join leftJoin ...
+        ->whereMixed(           // 设置查询条件 内置多种查询方法 whereUserId、 whereManageOrgCode、 whereIdCrdNo
                         [
                             ["ptt_crwd_clsf_cd", "=", "9efe2444eaf14606896bc68290abc5e7"],//模糊查询
                             ["ptt_nm", "like", "朱文奎f"],//模糊查询
@@ -83,34 +82,35 @@ QueryEngineService::instance()
                             // ["raw", "slf_tel_no = 'active' AND slf_tel_no >= 90"]//原生sql
                         ],
         )
-        ->setCache($ttl)//设置缓存时间
+        ->setCache($ttl)                    //设置缓存时间
         ->orderBy([["id_crd_no", "asc"]])//排序
-        ->select(["fields"])//查询字段
-        ->getCountResult()//多个查询方法
+        ->groupBy(["fields"])
+        ->select(["fields"])            //查询字段
+        ->getCountResult()          //多个查询方法 内置多个查询方式
         
 
 获取患者基础信息
-ResidentService::instance()->getBasicInfo($empi)
+ResidentService::instance()->getBasicInfo(empi:$empi)
 
 获取患者完整信息
-ResidentService::instance()->getInfo($empi)
+ResidentService::instance()->getInfo(empi:$empi)
 
 更新患者信息
-ResidentService::instance()->updateInfo($empi,['age'=>18])
+ResidentService::instance()->updateInfo(empi:$empi,attributes:['age'=>18])
 
 纳管患者 相关参数 manage_org_code,manage_org_name,manage_doctor_code,manage_doctor_name 如不入参 会通过上下文获取
-ResidentService::instance()->manageResident($empi,["相关参数"])  
+ResidentService::instance()->manageResident(empi:$empi,attributes:["相关参数"])  
 
 出组患者 相关参数
-ResidentService::instance()->removeManageResident($empi,boolean(是否清理纳管信息默认为true))  
+ResidentService::instance()->removeManageResident(empi:$empi,attributes:['fields'],isClearManageData:true)  //isClearManageData 是否清理纳管相关参数
 
 创建管理方案
 ResidentService::instance()->createManagePlan(....)  
 
 DataPermissionService::instance()
-    ->channel($dataPermissionCode)//选择使用权限渠道
-//                    ->setMappingField(['manage_org_code'=>'manage_'])//映射业务字段
-                    ->run();
+    ->channel($dataPermissionCode)//选择使用权限渠道 data_permissions.code 内容
+//  ->setMappingField(['被替换的字段 如:manage_org_code'=>'业务所需字段 如:biz_org_code'])//映射业务字段
+   ->run();
 ```
 -----
 

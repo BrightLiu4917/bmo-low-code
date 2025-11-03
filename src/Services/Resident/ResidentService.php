@@ -226,9 +226,9 @@ class ResidentService extends BaseService
      * @throws \Gupo\BetterLaravel\Exceptions\ServiceException
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function removeManageResident(string $empi, array $attributes,bool $isClearManageData =  true): void
+    public function removeManageResident(string $empi = '', array $attributes  = [],bool $isClearManageData =  true): void
     {
-        if (empty($empi) || empty($attributes)) {
+        if (empty($empi)) {
             return;
         }
         if (!$this->exists($empi)) {
