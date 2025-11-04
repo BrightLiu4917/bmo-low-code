@@ -97,7 +97,7 @@ class Conversion
         }
 
         if (true === $combine) {
-            $resolved = array_merge(self::$presetConverterClassCollection ??= $this->collectConverterClass(), $resolved);
+            $resolved = array_merge($this->convertClassCollection ?? [], self::$presetConverterClassCollection ??= $this->collectConverterClass(), $resolved);
         }
 
         $this->convertClassCollection = $resolved;
