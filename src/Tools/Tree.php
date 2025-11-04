@@ -49,6 +49,10 @@ final class Tree
         // 构建完整树形结构
         foreach ($map as $code => &$node) {
             if (!empty($node[$pKey]) && isset($map[$node[$pKey]])) {
+                // 动态创建children字段（如果不存在）
+                if (!isset($map[$node[$pKey]]['children'])) {
+                    $map[$node[$pKey]]['children'] = [];
+                }
                 $map[$node[$pKey]]['children'][] = &$node;
             } else {
                 $tree[] = &$node;
@@ -64,7 +68,7 @@ final class Tree
         // 1. 构建索引：code => region
         $map = [];
         foreach ($regions as $r) {
-            $map[$r[$key]] = $r + ['children' => []];
+            $map[$r[$key]] = $r ;
         }
 
         // 如果目标代码为空，构建完整树形结构
@@ -109,11 +113,21 @@ final class Tree
         // 4. 构建树
         $tree = [];
         foreach ($filtered as $code => &$node) {
+            //            if ($node[$pKey] && isset($filtered[$node[$pKey]])) {
+            //                $filtered[$node[$pKey]]['children'][] = &$node;
+            //            } else {
+            //                $tree[] = &$node;
+            //            }
             if ($node[$pKey] && isset($filtered[$node[$pKey]])) {
+                // 动态创建children字段（如果不存在）
+                if (!isset($filtered[$node[$pKey]]['children'])) {
+                    $filtered[$node[$pKey]]['children'] = [];
+                }
                 $filtered[$node[$pKey]]['children'][] = &$node;
             } else {
                 $tree[] = &$node;
             }
+
         }
         unset($node); // 断开引用
 
