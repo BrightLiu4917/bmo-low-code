@@ -92,7 +92,7 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
                 "scene_code" => $sceneCode ?: $this->getSceneCode(),
             ]
         )->json();
-        return $data['data'];
+        return !empty($data['data']) ? true : false;
     }
 
     /**
