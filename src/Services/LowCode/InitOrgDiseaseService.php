@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace BrightLiu\LowCode\Services\LowCode;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Services\LowCodeBaseService;
+use BrightLiu\LowCode\Enums\Model\AdminPreference\SceneEnum;
 use BrightLiu\LowCode\Enums\Model\DatabaseSource\SourceTypeEnum;
+use BrightLiu\LowCode\Models\AdminPreference;
 use BrightLiu\LowCode\Models\DatabaseSource;
 use BrightLiu\LowCode\Models\LowCodeList;
 use BrightLiu\LowCode\Models\LowCodePart;
@@ -24,6 +26,8 @@ use Illuminate\Support\Facades\DB;
 final class InitOrgDiseaseService extends LowCodeBaseService
 {
     use WithContext;
+
+    protected ?Collection $lastLowCodeList = null;
 
     /**
      * @param string $dataTableName 数仓表名
@@ -58,7 +62,10 @@ final class InitOrgDiseaseService extends LowCodeBaseService
                 }
 
                 // low-code 初始化
-                $this->initLowCodeConfig($dataSource);
+                $lowCodeList = $this->initLowCodeConfig($dataSource);
+
+                // 更新AdminPreference配置
+                $this->replaceAdminPreference($lowCodeList);
             });
         } else {
             // 前置清理
@@ -72,7 +79,10 @@ final class InitOrgDiseaseService extends LowCodeBaseService
             }
 
             // low-code 初始化
-            $this->initLowCodeConfig($dataSource);
+            $lowCodeList = $this->initLowCodeConfig($dataSource);
+
+            // 更新AdminPreference配置
+            $this->replaceAdminPreference($lowCodeList);
         }
 
 
@@ -119,6 +129,8 @@ final class InitOrgDiseaseService extends LowCodeBaseService
             LowCodeTemplate::query()->whereIn('code', $templateCodes)->delete();
         }
 
+        $this->lastLowCodeList = LowCodeList::query()->where('disease_code', $diseaseCode)->get(['code', 'admin_name']);
+
         LowCodeList::query()->where('disease_code', $diseaseCode)->delete();
     }
 
@@ -157,7 +169,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
     /**
      * 初始化: 低代码配置
      */
-    protected function initLowCodeConfig(DatabaseSource $dataSource, string $scene = 'normal'): void
+    protected function initLowCodeConfig(DatabaseSource $dataSource, string $scene = 'normal'): array
     {
         $initTemplates = $this->loadTemplates();
 
@@ -204,6 +216,8 @@ final class InitOrgDiseaseService extends LowCodeBaseService
         if (!empty($listData)) {
             LowCodeList::query()->insert($listData);
         }
+
+        return $listData;
     }
 
     /**
@@ -292,5 +306,32 @@ final class InitOrgDiseaseService extends LowCodeBaseService
         }
 
         return [];
+    }
+
+    protected function replaceAdminPreference(array $lowCodeList): bool
+    {
+        if (empty($listCodes = array_column($lowCodeList, 'code'))) {
+            return false;
+        }
+
+        $lastLowCodeList = collect($this->lastLowCodeList)
+            ->mapWithKeys(fn ($item) => [$item['admin_name'] ?? '' => $item['code'] ?? ''])
+            ->filter()
+            ->values()
+            ->toArray();
+
+        // TODO: 写法待完善
+        // 获取新、旧的映射关系，并逐个更新
+        LowCodeList::query()
+            ->whereIn('code', $listCodes)
+            ->get(['code', 'admin_name'])
+            ->mapWithKeys(fn ($item) => [$item['code'] => $lastLowCodeList[$item['admin_name']] ?? ''])
+            ->filter()
+            ->each(function ($oldCode, $newCode) {
+                AdminPreference::query()
+                    ->where('scene', SceneEnum::LIST_COLUMNS)
+                    ->where('pkey', $oldCode)
+                    ->update(['pkey' => $newCode]);
+            });
     }
 }
