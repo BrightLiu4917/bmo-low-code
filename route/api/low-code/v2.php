@@ -7,6 +7,7 @@ use BrightLiu\LowCode\Controllers\LowCode\ResidentCrowdController;
 use BrightLiu\LowCode\Controllers\LowCode\RegionController;
 
 Route::group([
+    'middleware' => [\BrightLiu\LowCode\Enums\Foundation\Middleware::AUTH_DISEASE,]
 ], function () {
 
     Route::get('v2/region-list', [RegionController::class, 'getRegionList'])->comment('区域列表');
