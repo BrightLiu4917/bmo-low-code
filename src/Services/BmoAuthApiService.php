@@ -117,7 +117,7 @@ class BmoAuthApiService extends LowCodeBaseService
                                 ->retry(2, 500) // 重试2次，间隔500毫秒
                                 ->asJson()
                                 ->withHeaders(['Authorization' => $token])
-                                ->throw()
+                               // ->throw()
                                 ->get($this->baseUri . 'api/apiUser/apiUserDetails', ['org_id' => $orgId]);
 
                 // 检查HTTP状态码
