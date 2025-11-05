@@ -185,4 +185,17 @@ class RegionService extends LowCodeBaseService
     {
         return collect($codes)->values()->flatten(1)->values()->toArray();
     }
+
+
+    /**
+     * @param  string  $key
+     * @param  string  $index
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function getRegionDataByColumn(string $key = 'name',string $index = 'code')
+    {
+        return array_column($this->getRegionAllData(), $key,$index);
+    }
 }
