@@ -308,7 +308,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
         return [];
     }
 
-    protected function replaceAdminPreference(array $lowCodeList): bool
+    protected function replaceAdminPreference(array $lowCodeList)
     {
         if (empty($listCodes = array_column($lowCodeList, 'code'))) {
             return false;
