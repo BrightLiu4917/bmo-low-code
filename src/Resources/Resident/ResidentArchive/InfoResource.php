@@ -15,6 +15,7 @@ use BrightLiu\LowCode\Support\Attribute\Converters\SlfTelNo;
 use BrightLiu\LowCode\Support\Attribute\Converters\WeightArrWeight;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\MissingValue;
 
 class InfoResource extends JsonResource
 {
@@ -35,7 +36,7 @@ class InfoResource extends JsonResource
         }
 
         if ($columns->isEmpty()) {
-            return [];
+            return new MissingValue();
         }
 
         $attributes = $columns->mapWithKeys(fn ($item) => [$item['column'] => $item['value']])->toArray();
