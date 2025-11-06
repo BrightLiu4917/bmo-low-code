@@ -16,6 +16,7 @@ use Gupo\BetterLaravel\Service\BaseService;
 use Illuminate\Support\Facades\DB;
 use BrightLiu\LowCode\Tools\BetterArr;
 use Closure;
+use BrightLiu\LowCode\Events\Resident\ResidentInfoUpdated;
 
 /**
  * 居民相关
@@ -133,6 +134,8 @@ class ResidentService extends BaseService
             $empi,
             $attributes
         );
+
+        silence_event(new ResidentInfoUpdated($empi, $attributes));
     }
 
 
