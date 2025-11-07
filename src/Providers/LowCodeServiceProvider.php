@@ -87,7 +87,6 @@ class LowCodeServiceProvider extends ServiceProvider
             __DIR__.'/../../database/migrations' => database_path('migrations'),
         ], 'low-code-migrations');
 
-
         // 可选：同时发布配置和迁移的统一标签
         $this->publishes([
             __DIR__.'/../../config/low-code.php'             => config_path('low-code.php'),

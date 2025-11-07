@@ -193,6 +193,9 @@ class ResidentService extends BaseService
         string $baseDate = '',
         string $arcCode = '',
         string $areaCode = '',
+        string $orgCode = '',
+        int $adminId = 0,
+        string $adminName = '',
         int $splitFlag = 0,
     ):int
     {
@@ -203,7 +206,10 @@ class ResidentService extends BaseService
            baseDate: $baseDate,
            arcCode: $arcCode,
            areaCode: $areaCode,
-           splitFlag: $splitFlag
+           splitFlag: $splitFlag,
+           orgCode:$orgCode,
+           adminId: $adminId,
+            adminName: $adminName,
         );
     }
 

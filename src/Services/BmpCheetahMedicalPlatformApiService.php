@@ -117,6 +117,8 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
         string $areaCode = '',
         string $orgCode = '',
         int $splitFlag = 0,
+        int $adminId = 0,
+        string $adminName = '',
     ):int
     {
         $data = Http::asJson()->timeout(3)->post($this->baseUriVia() . '/innerapi/patient/manager',
@@ -125,7 +127,7 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
                 "area_code"    => $areaCode,
                 "base_date"    => $baseDate,
                 "disease_code" => $this->getDiseaseCode(),
-                "org_code"     => $orgCode ?: $this->getOrgCode(),
+                "org_code"     => $orgCode ?: $this->getOrgId(),
                 "patient_id"   => $empi,
                 "patient_name" => $patientName,
                 "project_id"   => $projectId,
@@ -133,6 +135,8 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
                 "split_flag"   => $splitFlag,
                 "sys_code"     => $this->getSystemCode(),
                 "tenant_id"    => $this->getTenantId(),
+                "admin_id"     => $adminId,
+                "admin_name"   => $adminName,
         ]
         )->json();
         return $data['data']['user_project_id'] ?? 0;
