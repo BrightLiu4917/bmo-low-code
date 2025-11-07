@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BrightLiu\LowCode\Services;
 
 use Illuminate\Support\Facades\Http;
+use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
 use BrightLiu\LowCode\Traits\Context\WithContext;
 use BrightLiu\LowCode\Services\Resident\ResidentService;
@@ -139,6 +140,28 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
                 "admin_name"   => $adminName,
         ]
         )->json();
+        Logger::BMP_CHEETAH_MEDICAL_ERROR->debug(
+            '纳管患者响应',
+            [
+                'input_args' => [
+                    "arc_code"     => $arcCode ?: $this->getArcCode(),
+                    "area_code"    => $areaCode,
+                    "base_date"    => $baseDate,
+                    "disease_code" => $this->getDiseaseCode(),
+                    "org_code"     => $orgCode ?: $this->getOrgId(),
+                    "patient_id"   => $empi,
+                    "patient_name" => $patientName,
+                    "project_id"   => $projectId,
+                    "scene_code"   => $this->getSceneCode(),
+                    "split_flag"   => $splitFlag,
+                    "sys_code"     => $this->getSystemCode(),
+                    "tenant_id"    => $this->getTenantId(),
+                    "admin_id"     => $adminId,
+                    "admin_name"   => $adminName,
+                ],
+                'respose'=>$data
+            ]
+        );
         return $data['data']['user_project_id'] ?? 0;
     }
 

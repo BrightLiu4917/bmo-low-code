@@ -61,4 +61,8 @@ enum Logger: string
     case DATA_PERMISSION_ERROR = 'data-permission-error';
 
 
+    case BMP_CHEETAH_MEDICAL_ERROR = 'bmp-cheetah-medical-error';
+
+
+
 }
