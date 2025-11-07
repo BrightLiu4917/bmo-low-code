@@ -88,9 +88,9 @@ class LowCodeServiceProvider extends ServiceProvider
         ], 'low-code-migrations');
 
 
-        $this->publishes([
-            __DIR__.'/../../database/seeders' => database_path('seeders'),
-        ], 'low-code-seeders');
+//        $this->publishes([
+//            __DIR__.'/../../database/seeders' => database_path('seeders'),
+//        ], 'low-code-seeders');
 
         // 可选：同时发布配置和迁移的统一标签
         $this->publishes([
