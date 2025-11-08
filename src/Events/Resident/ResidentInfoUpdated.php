@@ -11,7 +11,8 @@ class ResidentInfoUpdated
 {
     public function __construct(
         public readonly string $empi,
-        public readonly array $attributes
+        public readonly array $attributes,
+        public readonly array $operator = []
     ) {
     }
 
@@ -44,5 +45,10 @@ class ResidentInfoUpdated
     public function any(string|array $key): bool
     {
         return !empty(array_intersect((array) $key, array_keys($this->attributes)));
+    }
+
+    public function getOperator(): array
+    {
+        return $this->operator;
     }
 }

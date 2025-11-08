@@ -17,13 +17,15 @@ use Illuminate\Support\Facades\DB;
 use BrightLiu\LowCode\Tools\BetterArr;
 use Closure;
 use BrightLiu\LowCode\Events\Resident\ResidentInfoUpdated;
+use BrightLiu\LowCode\Traits\Context\WithAdminContext;
 
 /**
  * 居民相关
  */
 class ResidentService extends BaseService
 {
-    use WithContext, WithAuthContext;
+    use WithContext, WithAuthContext, WithAdminContext;
+
     /**
      * 判断居民是否存在
      */
@@ -135,7 +137,7 @@ class ResidentService extends BaseService
             $attributes
         );
 
-        silence_event(new ResidentInfoUpdated($empi, $attributes));
+        silence_event(new ResidentInfoUpdated($empi, $attributes, (array) $this->getAdmin()));
     }
 
 
