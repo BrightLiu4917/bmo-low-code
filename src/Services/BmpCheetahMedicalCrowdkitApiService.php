@@ -50,16 +50,19 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
     /**
      * 获取人群分类
      */
-    public function getCrowds(int $selectType = 1): array
+    public function getCrowds(int $selectType = 0): array
     {
-        $data = Http::asJson()->post($this->baseUriVia() . 'innerapi/userGroup/page', [
-            'select_type' => $selectType,
+        $args = [
             'org_code' => $this->getOrgCode(),
             'sys_code' => $this->getSystemCode(),
             'disease_code' => $this->getDiseaseCode(),
             'scene_code' => $this->getSceneCode(),
             'tenant_id' => $this->getTenantId(),
-        ])->json();
+        ];
+        if ($selectType != 0 && is_numeric($selectType)){
+            $args['select_type'] = $selectType;
+        }
+        $data = Http::asJson()->post($this->baseUriVia() . 'innerapi/userGroup/page',$args)->json();
         return $data['data']['results'] ??[];
     }
 

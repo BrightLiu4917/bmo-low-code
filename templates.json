@@ -156,7 +156,7 @@
                     "field": "curr_addr_vlg_cd",
                     "label": "居住地",
                     "props": {},
-                    "apiUrl": "/api/allAddressListLowCode",
+                    "apiUrl": "/api/v2/region-list?use_permission=1",
                     "search": "=",
                     "showLabel": null,
                     "placeholder": "请选择居住地"
@@ -361,7 +361,7 @@
                     "field": "curr_addr_vlg_cd",
                     "label": "居住地",
                     "props": {},
-                    "apiUrl": "/api/allAddressListLowCode",
+                    "apiUrl": "/api/v2/region-list?use_permission=1",
                     "search": "=",
                     "showLabel": null,
                     "placeholder": "请选择居住地"
@@ -581,7 +581,7 @@
                     "field": "curr_addr_vlg_cd",
                     "label": "居住地",
                     "props": {},
-                    "apiUrl": "/api/allAddressListLowCode",
+                    "apiUrl": "/api/v2/region-list?use_permission=1",
                     "search": "=",
                     "showLabel": null,
                     "placeholder": "请选择居住地"
@@ -780,7 +780,7 @@
                     "field": "curr_addr_vlg_cd",
                     "label": "居住地",
                     "props": {},
-                    "apiUrl": "/api/allAddressListLowCode",
+                    "apiUrl": "/api/v2/region-list?use_permission=1",
                     "search": "=",
                     "showLabel": null,
                     "placeholder": "请选择居住地"
@@ -975,7 +975,7 @@
                     "field": "curr_addr_vlg_cd",
                     "label": "居住地",
                     "props": {},
-                    "apiUrl": "/api/allAddressListLowCode",
+                    "apiUrl": "/api/v2/region-list?use_permission=1",
                     "search": "=",
                     "showLabel": null,
                     "placeholder": "请选择居住地"
@@ -1185,7 +1185,7 @@
                     "field": "curr_addr_vlg_cd",
                     "label": "居住地",
                     "props": {},
-                    "apiUrl": "/api/allAddressListLowCode",
+                    "apiUrl": "/api/v2/region-list?use_permission=1",
                     "search": "=",
                     "showLabel": null,
                     "placeholder": "请选择居住地"
@@ -1374,7 +1374,7 @@
                     "field": "curr_addr_vlg_cd",
                     "label": "居住地",
                     "props": {},
-                    "apiUrl": "/api/allAddressListLowCode",
+                    "apiUrl": "/api/v2/region-list?use_permission=1",
                     "search": "=",
                     "showLabel": null,
                     "placeholder": "请选择居住地"
@@ -1854,7 +1854,7 @@
                 "field": "curr_addr_vlg_cd",
                 "label": "居住地",
                 "props": {},
-                "apiUrl": "/api/allAddressListLowCode",
+                "apiUrl": "/api/v2/region-list?use_permission=1",
                 "search": "=",
                 "showLabel": null,
                 "placeholder": "请选择居住地"
