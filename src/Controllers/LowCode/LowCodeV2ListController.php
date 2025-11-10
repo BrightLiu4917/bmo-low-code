@@ -22,6 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use BrightLiu\LowCode\Services\LowCode\LowCodeListService;
 use BrightLiu\LowCode\Services\CrowdKitService;
+use BrightLiu\LowCode\Services\LowCode\LowCodeCombiService;
 
 /**
  * 低代码-列表
@@ -51,7 +52,7 @@ final class LowCodeV2ListController extends BaseController
 
         try {
             // 获取个性化菜单
-            $personalizeModuels = LowCodePersonalizeModule::query()
+            $personalizeModules = LowCodePersonalizeModule::query()
                                                           ->where('module_type',
                                                               'crowd_patients')
                                                           ->orderByDesc('weight')
@@ -74,14 +75,22 @@ final class LowCodeV2ListController extends BaseController
                                                               ],
                                                         ]));
 
-            // 个性化菜单的tab与“本机构患者”一至，如果后期每个人性菜单需要定制化，则需要改造“自定义菜单功能模块”
-            $list->map(function($item) use ($personalizeModuels) {
-                $item['route_group'] = array_merge(
-                    $item['route_group'],
-                    $personalizeModuels->pluck('route_group')->flatten()->toArray()
-                );
-                return $item;
+
+            $combiSrv = LowCodeCombiService::make();
+
+            // 个性化菜单的code由 列表code + 特征人群code  组成
+            $personalizeList = collect();
+            $personalizeModules->each(function ($personalizeModule) use ($personalizeList, $list, $combiSrv) {
+                // TODO: 目录所有个性化菜单共用tabs，待完善
+                $list->each(function($item) use ($personalizeModule, $personalizeList, $combiSrv) {
+                    $item['route_group'] = $personalizeModule['route_group'];
+                    $item['code'] = $combiSrv->combiListCode((string) $item['code'], (string) $personalizeModule->code);
+
+                    $personalizeList->push($item);
+                });
             });
+
+            $list->setCollection($personalizeList);
         } catch (\Throwable $e) {
         }
 
@@ -113,7 +122,7 @@ final class LowCodeV2ListController extends BaseController
     {
         $code = (string)$request->input('code', null);
 
-        $data = $srv->pre(LowCodeListService::instance()->covertCrowdPatientCode($code));
+        $data = $srv->pre(LowCodeCombiService::instance()->resolveListCode($code));
 
         try {
             $preference = AdminPreference::query()
@@ -143,20 +152,6 @@ final class LowCodeV2ListController extends BaseController
     public function query(Request $request): JsonResponse
     {
         $inputArgs = $request->input('input_args');
-        $codes     = LowCodeListService::instance()->covertCrowdPatientCode(array_column($inputArgs,
-            'code'));
-        $inputArgs = array_map(
-            function($item) use ($codes) {
-                if ($item['code'] !== $codes[$item['code']]) {
-                    $item['filters'][] = ['crowd_id', '=', $item['code']];
-                }
-
-                // 将人群code映射到"通用人群页"
-                $item['code'] = $codes[$item['code']] ?? $item['code'];
-                return $item;
-            },
-            $inputArgs
-        );
         $data      = LowCodeListService::instance()->query($inputArgs);
         try {
             // 追加人群分类信息
@@ -241,8 +236,7 @@ final class LowCodeV2ListController extends BaseController
 
         // 缺省时，从low_code_part中解析获取
         if (empty($columns)) {
-            $listCode = LowCodeListService::instance()->covertCrowdPatientCode($listCode);
-
+            $listCode = LowCodeCombiService::instance()->resolveListCode($listCode);
             $lowCodeList = LowCodeList::query()->where('code', $listCode)
                                       ->first(['template_code_column']);
             if (empty($lowCodeList)) {
@@ -300,35 +294,5 @@ final class LowCodeV2ListController extends BaseController
         }
 
         return $this->responseSuccess();
-    }
-
-
-    /**
-     * 转换人群患者编码
-     */
-    protected function covertCrowdPatientCode(string|array $codes): string|array
-    {
-        return Cache::remember('crowd_patient_code:'.md5(json_encode($codes)),
-            60 * 5, function() use ($codes) {
-                $isOnce = !is_array($codes);
-
-                $codes = (array)$codes;
-
-                $existsCodes = LowCodeList::query()->whereIn('code', $codes)
-                                          ->pluck('code')->toArray();
-
-                // TODO: 写法待完善
-                $crowdPatientCode = LowCodeList::query()->byContextDisease()
-                                               ->where('admin_name',
-                                                   '人群患者列表')
-                                               ->value('code');
-
-                return transform(
-                    array_combine($codes,
-                        array_map(fn ($code) => in_array($code, $existsCodes) ?
-                            $code : $crowdPatientCode, $codes)),
-                    fn ($value) => $isOnce ? end($value) ?? '' : $value
-                );
-            });
     }
 }

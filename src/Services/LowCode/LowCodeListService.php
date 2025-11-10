@@ -244,8 +244,13 @@ class LowCodeListService extends LowCodeBaseService
     public function query(array $inputArgs = [],int $setCacheTtl = 10)
     {
         try {
+            // 解析code(code中可能携带中台的人群ID)
+            $inputArgs = LowCodeCombiService::make()->handleInputArgs($inputArgs);
+
+            $listCodes = collect($inputArgs)->pluck('code')->toArray();
+
             // 1.获取列表
-            $list = $this->getLowCodeListByCodes(collect($inputArgs)->pluck('code')->toArray());
+            $list = $this->getLowCodeListByCodes($listCodes);
 
             $queryEngine = QueryEngineService::instance()->autoClient();
             $bizSceneTable = $queryEngine->table ?? '';
@@ -278,8 +283,13 @@ class LowCodeListService extends LowCodeBaseService
     public function queryCount(array $inputArgs = [],int $setCacheTtl = 10)
     {
         try {
+            // 解析code(code中可能携带中台的人群ID)
+            $inputArgs = LowCodeCombiService::make()->handleInputArgs($inputArgs);
+
+            $listCodes = collect($inputArgs)->pluck('code')->toArray();
+
             // 1.获取列表
-            $list = $this->getLowCodeListByCodes(collect($inputArgs)->pluck('code')->toArray());
+            $list = $this->getLowCodeListByCodes($listCodes);
 
             $queryEngine = QueryEngineService::instance()->autoClient();
             $bizSceneTable = $queryEngine->table ?? '';
@@ -300,36 +310,5 @@ class LowCodeListService extends LowCodeBaseService
                 'input_args' => $inputArgs ?? null,
             ]);
         }
-    }
-
-    /**
-     * @param string|array $codes
-     *
-     * @return string|array
-     */
-    public function covertCrowdPatientCode(string|array $codes): string|array
-    {
-        return Cache::remember('crowd_patient_code:'.md5(json_encode($codes)),
-            60 * 5, function() use ($codes) {
-                $isOnce = !is_array($codes);
-
-                $codes = (array)$codes;
-
-                $existsCodes = LowCodeList::query()->whereIn('code', $codes)
-                                          ->pluck('code')->toArray();
-
-                // TODO: 写法待完善
-                $crowdPatientCode = LowCodeList::query()->byContextDisease()
-                                               ->where('admin_name',
-                                                   '人群患者列表')
-                                               ->value('code');
-
-                return transform(
-                    array_combine($codes,
-                        array_map(fn ($code) => in_array($code, $existsCodes) ?
-                            $code : $crowdPatientCode, $codes)),
-                    fn ($value) => $isOnce ? end($value) ?? '' : $value
-                );
-            });
     }
 }
