@@ -20,7 +20,9 @@ final class ResidentCrowdController extends BaseController
     public function optional(Request $request): JsonResponse
     {
         try {
-            $data = BmpCheetahMedicalCrowdkitApiService::make()->getCrowds();
+            $selectType = (int) $request->input('select_type', 0);
+
+            $data = BmpCheetahMedicalCrowdkitApiService::make()->getCrowds($selectType);
         } catch (\Throwable $e) {
             Logger::LARAVEL->error($e);
             $data = [];
