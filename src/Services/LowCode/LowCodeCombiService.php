@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Services\LowCode;
 
@@ -10,7 +10,6 @@ final class LowCodeCombiService extends BaseService
 {
     /**
      * 解析code(code中可能携带中台的人群ID)
-     * @param array $inputArgs
      */
     public function handleInputArgs(array $inputArgs): array
     {
@@ -22,13 +21,15 @@ final class LowCodeCombiService extends BaseService
 
                 [0 => $exploded] = $this->resolveCombiCodeMapping($item['code']);
 
-                return array_merge($item, [
-                    'code'    => $exploded['code'],
-                    'filters' => array_merge(
-                        $item['filters'] ?? [],
-                        [['crowd_id', '=', $exploded['crowd_id']]]
-                    ),
-                ]);
+                $item['code'] = $exploded['code'];
+
+                $latestCrowdIdIndex = array_search('crowd_id', array_column($item['filters'] ?? [], 0));
+
+                if (false === $latestCrowdIdIndex) {
+                    $item['filters'] = array_merge($item['filters'] ?? [], [['crowd_id', '=', $exploded['crowd_id']]]);
+                }
+
+                return $item;
             })
             ->toArray();
     }

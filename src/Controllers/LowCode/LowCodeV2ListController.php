@@ -80,13 +80,17 @@ final class LowCodeV2ListController extends BaseController
 
             // 个性化菜单的code由 列表code + 特征人群code  组成
             $personalizeList = collect();
-            $personalizeModules->each(function ($personalizeModule) use ($personalizeList, $list, $combiSrv) {
+            $personalizeModules->each(function ($personalizeModule, $i) use ($personalizeList, $list, $combiSrv) {
                 // TODO: 目录所有个性化菜单共用tabs，待完善
-                $list->each(function($item) use ($personalizeModule, $personalizeList, $combiSrv) {
-                    $item['route_group'] = $personalizeModule['route_group'];
-                    $item['code'] = $combiSrv->combiListCode((string) $item['code'], (string) $personalizeModule->code);
+                $list->each(function($item) use ($i, $personalizeModule, $personalizeList, $combiSrv) {
+                    $listItem = clone $item;
 
-                    $personalizeList->push($item);
+                    // 虚拟ID，避免主键冲突
+                    $listItem['id'] = ($i + 1) * 10000000000 + $listItem['id'];
+                    $listItem['route_group'] = $personalizeModule['route_group'];
+                    $listItem['code'] = $combiSrv->combiListCode((string) $listItem['code'], (string) $personalizeModule->code);
+
+                    $personalizeList->push($listItem);
                 });
             });
 
