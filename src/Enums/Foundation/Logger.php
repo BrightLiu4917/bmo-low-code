@@ -63,6 +63,8 @@ enum Logger: string
 
     case BMP_CHEETAH_MEDICAL_ERROR = 'bmp-cheetah-medical-error';
 
+    case BMP_CHEETAH_MEDICAL_DEBUG = 'bmp-cheetah-medical-debug';
+
 
 
 }

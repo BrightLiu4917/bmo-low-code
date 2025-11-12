@@ -140,8 +140,8 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
                 "admin_name"   => $adminName,
         ]
         )->json();
-        Logger::BMP_CHEETAH_MEDICAL_ERROR->debug(
-            '纳管患者响应',
+        Logger::BMP_CHEETAH_MEDICAL_DEBUG->debug(
+            '创建管理方案debug',
             [
                 'input_args' => [
                     "arc_code"     => $arcCode ?: $this->getArcCode(),
@@ -162,6 +162,9 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
                 'respose'=>$data
             ]
         );
+        if (empty($data['data'])){
+            return -1;
+        }
         return $data['data']['user_project_id'] ?? 0;
     }
 
