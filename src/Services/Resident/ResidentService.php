@@ -232,7 +232,7 @@ class ResidentService extends BaseService
         int $adminId = 0,
         string $adminName = '',
         int $splitFlag = 0,
-    ):int
+    )
     {
        return BmpCheetahMedicalPlatformApiService::instance()->createUserManagePlanTask(
            empi: $empi,

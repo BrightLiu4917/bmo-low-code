@@ -106,8 +106,10 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
      * @param  string  $areaCode
      * @param  string  $orgCode
      * @param  int  $splitFlag
+     * @param  int  $adminId
+     * @param  string  $adminName
      *
-     * @return int
+     * @return string
      */
     public function createUserManagePlanTask(
         string $empi = '',
@@ -120,7 +122,7 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
         int $splitFlag = 0,
         int $adminId = 0,
         string $adminName = '',
-    ):int
+    )
     {
         $data = Http::asJson()->timeout(3)->post($this->baseUriVia() . '/innerapi/patient/manager',
             [
@@ -141,7 +143,7 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
         ]
         )->json();
         Logger::BMP_CHEETAH_MEDICAL_DEBUG->debug(
-            '创建管理方案debug',
+            '创建管理方案-debug',
             [
                 'input_args' => [
                     "arc_code"     => $arcCode ?: $this->getArcCode(),
@@ -162,10 +164,12 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
                 'respose'=>$data
             ]
         );
-        if (empty($data['data'])){
-            return -1;
+        $result = $data['data'];
+        $isSuccess = $data['success'];
+        if ($isSuccess == false){
+            return [null,null,$data['message']];
         }
-        return (int)($data['data']['user_project_id'] ?? 0);
+        return [$result,'',''];
     }
 
 
