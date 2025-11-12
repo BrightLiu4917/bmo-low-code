@@ -105,6 +105,39 @@ class ResidentService extends BaseService
         return !empty($result) ? BetterArr::toArray($result) : null;
     }
 
+
+    /**
+     * @param  \Closure  $query
+     * @param  array  $columns
+     *
+     * @return array|null
+     */
+    public function get(\Closure $query, array $columns = ['t2.*', 't1.*']): ?array
+    {
+        $psnTable = config('low-code.bmo-baseline.database.crowd-psn-wdth-table');
+
+        // TODO: log
+        if (empty($psnTable)) {
+            return null;
+        }
+
+        if (in_array('empi', $columns)) {
+            $columns = array_map(fn ($c) => $c === 'empi' ? 't1.empi' : $c, $columns);
+        }
+
+        $connection = CrowdConnection::connection();
+
+        $sceneTable = $connection->getConfig('table');
+
+        $result = $connection
+            ->table($psnTable, 't1')
+            ->leftJoin("{$sceneTable} as t2", 't1.empi', '=', 't2.empi')
+            ->where($query)
+            ->get($columns);
+
+        return !empty($result) ? BetterArr::toArray($result) : null;
+    }
+
     /**
      * 更新居民基本信息
      *
