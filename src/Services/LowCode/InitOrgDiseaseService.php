@@ -314,24 +314,52 @@ final class InitOrgDiseaseService extends LowCodeBaseService
             return false;
         }
 
-        $lastLowCodeList = collect($this->lastLowCodeList)
+        // 获取历史code映射 (admin_name => code)
+        $lastLowCodeNameMapping = collect($this->lastLowCodeList)
             ->mapWithKeys(fn ($item) => [$item['admin_name'] ?? '' => $item['code'] ?? ''])
             ->filter()
-            ->values()
             ->toArray();
 
-        // TODO: 写法待完善
-        // 获取新、旧的映射关系，并逐个更新
-        LowCodeList::query()
+        if (empty($lastLowCodeNameMapping)) {
+            return false;
+        }
+
+        // 获取新老code映射关系
+        $codeMapping = LowCodeList::query()
             ->whereIn('code', $listCodes)
             ->get(['code', 'admin_name'])
-            ->mapWithKeys(fn ($item) => [$item['code'] => $lastLowCodeList[$item['admin_name']] ?? ''])
-            ->filter()
-            ->each(function ($oldCode, $newCode) {
-                AdminPreference::query()
-                    ->where('scene', SceneEnum::LIST_COLUMNS)
-                    ->where('pkey', $oldCode)
-                    ->update(['pkey' => $newCode]);
+            ->map(fn ($item) => ['new_code' => $item['code'], 'old_code' => $lastLowCodeNameMapping[$item['admin_name']] ?? ''])
+            ->filter();
+
+        if ($codeMapping->isEmpty()) {
+            return false;
+        }
+
+        $combiSrv = LowCodeCombiService::make();
+
+        $deleted = [];
+
+        AdminPreference::query()
+            ->where('scene', SceneEnum::LIST_COLUMNS)
+            ->get(['id', 'pkey'])
+            ->each(function (AdminPreference $item) use ($combiSrv, $codeMapping, &$deleted) {
+                // 解析出list.code
+                if (empty($listCode = $combiSrv->resolveListCode((string) $item->pkey))) {
+                    $deleted[] = $item->id;
+
+                    return true;
+                }
+
+                if (!empty($newListCode = $codeMapping->where('old_code', $listCode)->value('new_code'))) {
+                    $item->pkey = str_replace($listCode, $newListCode, $item->pkey);
+                    $item->save();
+                } else {
+                    $deleted[] = $item->id;
+                }
             });
+
+        if (!empty($deleted)) {
+            AdminPreference::query()->whereIn('id', $deleted)->where('scene', SceneEnum::LIST_COLUMNS)->delete();
+        }
     }
 }

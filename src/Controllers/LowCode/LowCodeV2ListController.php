@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Cache;
 use BrightLiu\LowCode\Services\LowCode\LowCodeListService;
 use BrightLiu\LowCode\Services\CrowdKitService;
 use BrightLiu\LowCode\Services\LowCode\LowCodeCombiService;
+use BrightLiu\LowCode\Services\LowCode\AdminPreferenceService;
 
 /**
  * 低代码-列表
@@ -129,22 +130,10 @@ final class LowCodeV2ListController extends BaseController
         $data = $srv->pre(LowCodeCombiService::instance()->resolveListCode($code));
 
         try {
-            $preference = AdminPreference::query()
-                                         ->where('scene',
-                                             SceneEnum::LIST_COLUMNS)
-                                         ->where('pkey', $code)
-                                         ->value('pvalue');
-
-            if (!empty($preference)) {
-                $data['pre_config']['column'] = array_map(
-                    fn ($item) => [
-                        'title' => $item['name'],
-                        'key'   => $item['column'],
-                    ],
-                    $preference
-                );
-            }
-        } catch (\Throwable) {
+            $data['pre_config']['column'] = AdminPreferenceService::make()->handleColumnConfig(
+                listCode: $code, columnConfig: $data['pre_config']['column'] ?? []
+            );
+        } catch (\Throwable $e) {
         }
 
         return $this->responseData($data);
