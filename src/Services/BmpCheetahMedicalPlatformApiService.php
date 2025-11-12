@@ -165,7 +165,7 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
         if (empty($data['data'])){
             return -1;
         }
-        return $data['data']['user_project_id'] ?? 0;
+        return (int)($data['data']['user_project_id'] ?? 0);
     }
 
 
