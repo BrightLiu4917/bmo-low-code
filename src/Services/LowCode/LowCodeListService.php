@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use BrightLiu\LowCode\Models\LowCodeList;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
+use BrightLiu\LowCode\Services\BmoAIApiService;
 use BrightLiu\LowCode\Traits\CastDefaultFixHelper;
 use BrightLiu\LowCode\Services\LowCodeBaseService;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
@@ -244,6 +245,26 @@ class LowCodeListService extends LowCodeBaseService
             }
             $filters = $queryParams['filters'] ?? [];
 
+            //这里是使用api 服务
+            $aifilters = [];
+            foreach ($filters as $key => $value) {
+                $aiMark   = $value[0] ?? '';
+                $aiCotent = $value[2] ?? '';
+                if (!empty($aiMark) && $aiMark == 'send-ai-service' &&
+                    !empty($aiCotent)) {
+                    if (config('business.bmo-service.ai.enable', true) ==
+                        true) {
+                        $aifilters = BmoAIApiService::instance()
+                            ->completionSend($aiCotent);
+                    }
+                    unset($filters[$key]);
+                }
+            }
+
+            if (!empty($aifilters)) {
+                $filters = array_merge($filters, $aifilters);
+            }
+
             // 处理 crowd_id 条件并安全移除
             $crowdIdIndex = Arr::first(
                 array_keys($filters),
@@ -296,11 +317,12 @@ class LowCodeListService extends LowCodeBaseService
 
             //数据权限条件
             $dataPermissionCode = $config['data_permission_code'] ?? '';
+            Logger::DATA_PERMISSION_ERROR->debug('low-code-list-service-data-permission',['data_permission_code'=>$dataPermissionCode]);
             if ($dataPermissionCode !== '') {
                 $dataPermissionCondition = DataPermissionService::instance()
                     ->channel($dataPermissionCode)
-                    //                    ->setMappingField(['org_code'=>'manage_'])
                     ->run();
+                Logger::DATA_PERMISSION_ERROR->debug('low-code-list-service-data-permission-get-result',['data_permission_code'=>$dataPermissionCode]);
                 if (empty($dataPermissionCondition)) {
                     $queryEngine->whereMixed($dataPermissionCondition);
                 }

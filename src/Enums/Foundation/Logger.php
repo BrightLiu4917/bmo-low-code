@@ -65,6 +65,8 @@ enum Logger: string
 
     case BMP_CHEETAH_MEDICAL_DEBUG = 'bmp-cheetah-medical-debug';
 
+    case BMO_AI = 'bmp-ai';
+
 
 
 }
