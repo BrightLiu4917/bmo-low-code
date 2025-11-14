@@ -295,7 +295,13 @@ final class InitOrgDiseaseService extends LowCodeBaseService
     protected function loadTemplates(): array
     {
         try {
-            $fileContent = file_get_contents(storage_path('templates.json'));
+            if (!file_exists($templateJson = storage_path('templates.json'))) {
+                $templateJson = app_path('templates.json');
+                if (!file_exists($templateJson)) {
+                    throw new ServiceException('模板文件不存在');
+                }
+            }
+            $fileContent = file_get_contents($templateJson);
             $array = json_decode($fileContent, true);
             if (!is_array($array)){
                 throw new ServiceException('模板文件格式错误');
