@@ -6,10 +6,12 @@ use BrightLiu\LowCode\Resources\Resident\ResidentArchive\InfoResource;
 use BrightLiu\LowCode\Support\Attribute\Conversion;
 use BrightLiu\LowCode\Support\Attribute\Converters\Age;
 use BrightLiu\LowCode\Support\Attribute\Converters\BthDt;
+use BrightLiu\LowCode\Support\Attribute\Converters\CurrAddr;
 use BrightLiu\LowCode\Support\Attribute\Converters\GdrCd;
 use BrightLiu\LowCode\Support\Attribute\Converters\HeightArrHeight;
 use BrightLiu\LowCode\Support\Attribute\Converters\IdCrdNo;
 use BrightLiu\LowCode\Support\Attribute\Converters\NtnCd;
+use BrightLiu\LowCode\Support\Attribute\Converters\RegisAddr;
 use BrightLiu\LowCode\Support\Attribute\Converters\SlfTelNo;
 use BrightLiu\LowCode\Support\Attribute\Converters\WeightArrWeight;
 
@@ -29,6 +31,8 @@ class SimpleInfoResource extends InfoResource
             NtnCd::class,
             HeightArrHeight::class,
             WeightArrWeight::class,
+            RegisAddr::class,
+            CurrAddr::class,
         ]);
     }
 
