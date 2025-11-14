@@ -29,7 +29,7 @@ return [
         ),
         'enable'       => env('BMO_AI_ENABLE', false),
         'cache_ttl'    => env('BMO_AI_CACHE_TTL', 30),
-        'cache_enable' => env('BMO_AI_CACHE_TTL', false),
+        'cache_enable' => env('BMO_AI_CACHE_ENABLE', false),
     ],
 
     //童java 基线人群服务
