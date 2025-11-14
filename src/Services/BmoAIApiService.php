@@ -104,13 +104,13 @@ class BmoAIApiService extends LowCodeBaseService
         string $content = '',
         bool $stream = false,
     ): array {
-        $cacheKey = 'bmo-ai-completion-send-'.md5($content);
-        $aiResult = cache()->get($cacheKey);
-        if ($aiResult) {
+        $cacheEnable = config('business.bmo-service.ai.cache_enable', false);
+        $cacheKey    = 'bmo-ai-completion-send-'.md5($content);
+        $aiResult    = cache()->get($cacheKey);
+        if ($aiResult && $cacheEnable == true) {
             return $aiResult;
         }
         try {
-
             $resposeData = Http::asJson()->baseUrl($this->baseUri)->timeout(120)
                 ->withHeaders(
                     ['Authorization' => 'Bearer '.$this->getAccessToken()]
@@ -140,11 +140,14 @@ class BmoAIApiService extends LowCodeBaseService
                         $responseData['data']['response']['content'],
                         true
                     );
-                    cache()->put(
-                        $cacheKey,
-                        $data,
-                        15
-                    );
+
+                    if ($cacheEnable == true) {
+                        cache()->put(
+                            $cacheKey,
+                            $data,
+                            config('business.bmo-service.ai.cache_ttl', 20)
+                        );
+                    }
                     return $data;
                 }
             }

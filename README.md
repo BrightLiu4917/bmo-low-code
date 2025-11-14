@@ -66,6 +66,8 @@ BMO_AI_BOT_ID
 BMO_AI_APP_SECRET
 BMO_AI_URI
 BMO_AI_ENABLE=false# 是否开启AI
+BMO_AI_CACHE_TTL=30# 结果缓存时间
+BMO_AI_CACHE_ENABLE=false# 结果缓是否开启
 ```
 -----
 
