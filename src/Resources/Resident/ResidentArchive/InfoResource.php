@@ -28,6 +28,8 @@ class InfoResource extends JsonResource
     {
         $columns = collect($this['columns'] ?? []);
 
+        $attributes = $columns->mapWithKeys(fn ($item) => [$item['column'] => $item['value']])->toArray();
+
         // 按 白名单/黑名单 过滤字段
         if (is_array($fillable = $this->fillable())) {
             $columns = $columns->filter(fn ($item) => in_array($item['column'] ?? '', $fillable, true))->values();
@@ -38,8 +40,6 @@ class InfoResource extends JsonResource
         if ($columns->isEmpty()) {
             return new MissingValue();
         }
-
-        $attributes = $columns->mapWithKeys(fn ($item) => [$item['column'] => $item['value']])->toArray();
 
         $conversion = $this->fetchConversion();
 
