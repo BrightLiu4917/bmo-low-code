@@ -18,6 +18,7 @@ final class OrgContext
      * @var string
      */
     protected string $orgCode = '';
+    protected string $orgName = '';
 
     protected string $arcCode = '';
 
@@ -43,21 +44,25 @@ final class OrgContext
      *
      * @return static
      */
-    public static function init(string $orgCode = '',string $arcCode = '',array $manageAreaCodes = [],array $manageOrgCodes = []): static
+    public static function init(
+        string $orgCode = '',
+        string $arcCode = '',
+        array $manageAreaCodes = [],
+        array $manageOrgCodes = [],
+    ): static
     {
         return tap(
             static::instance(),
             function (OrgContext $context) use ($orgCode,$arcCode,$manageAreaCodes,$manageOrgCodes) {
                 $context->setOrgCode($orgCode);
                 $context->setArcCode($arcCode);
-
                 $context->setManageOrgCodes($manageOrgCodes);
-
                 $context->setManageAreaCodes($manageAreaCodes);
-                //这里获取用户中心的arc 信息
                 try {
+                    //这里获取用户中心的 arc 信息 org_name = arc_name 用户中心后端开发说的
                     $data = BmoAuthApiService::instance()->getArcDetail($arcCode);
                     if (!empty($data)){
+                        $context->setOrgName($data['name'] ?? '');
                         $context->setArcName($data['name'] ?? '');
                         $context->setArcType($data['arc_type'] ?? '');
                     }
@@ -149,6 +154,21 @@ final class OrgContext
         }
 
         $this->arcCode = $value;
+    }
+
+
+    public function setOrgName(string $value): void
+    {
+        if ($value === $this->orgName) {
+            return;
+        }
+
+        $this->orgName = $value;
+    }
+
+    public function getOrgName(): string
+    {
+        return $this->orgName;
     }
 
     /**

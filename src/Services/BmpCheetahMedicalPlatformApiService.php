@@ -130,7 +130,8 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
                 "area_code"    => $areaCode,
                 "base_date"    => $baseDate,
                 "disease_code" => $this->getDiseaseCode(),
-                "org_code"     => $orgCode ?: $this->getOrgId(),
+                "org_code" => $orgCode ?:
+                    $this->getOrgCode() ?: $this->getOrgId(),
                 "patient_id"   => $empi,
                 "patient_name" => $patientName,
                 "project_id"   => $projectId,

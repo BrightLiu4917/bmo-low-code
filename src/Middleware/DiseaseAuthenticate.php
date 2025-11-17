@@ -54,7 +54,7 @@ class DiseaseAuthenticate
             }
 
             //获取用户中心账号信息
-            $bmoAccount = BmoAuthApiService::instance()->getUserInfoByToken($token);
+            $bmoAccount = BmoAuthApiService::instance()->getUserByToken($token,$arcCode);
             if (empty($bmoAccount)){
                 throw new AuthenticateException('BmoAuth Account invalid.');
             }
@@ -80,17 +80,14 @@ class DiseaseAuthenticate
             sceneCode: (string) $request->header(HeaderEnum::SCENE_CODE, $request->input('scene_code', ''))
         );
 
-        $data = BmoAuthApiService::instance()->getUserByToken($token,$arcCode);
-        $bmoManageAreaCodes = data_get($data, 'org_extension.arc_manage_areas',[]);
+        $bmoManageAreaCodes = data_get($admin, 'org_extension.arc_manage_areas',[]);
 
         $manageAreaCodes = match (true) {
             !empty($bmoManageAreaCodes) => RegionService::instance()->getBatchRegionLevel($bmoManageAreaCodes),
             default => []
         };
 
-        $manageOrgCodes = data_get($data, 'org_extension.arc_manage_orgs',[]);
-
-
+        $manageOrgCodes = data_get($admin, 'org_extension.arc_manage_orgs',[]);
 
         OrgContext::init(
             orgCode: (string)$request->header(

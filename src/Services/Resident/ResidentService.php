@@ -200,9 +200,12 @@ class ResidentService extends BaseService
         $latestData['manage_status']      = 1;
         $latestData['manage_start_dt']    = date('Y-m-d H:i:s');
         $latestData['manage_org_code']    = $this->getOrgCode();
+        $latestData['manage_org_name']    = $this->getOrgName();
+        $latestData['manage_arc_code']     = $this->getArcCode();
+//        $latestData['manage_arc_name']     = $this->getArcName();
         $latestData['manage_end_at']      = null;
-        $latestData['manage_doctor_code'] = auth()->user()->account ?? '';
-        $latestData['manage_doctor_name'] = auth()->user()->name ?? '';
+        $latestData['manage_doctor_code'] = (string)($this->getAdminId() ?? '');
+        $latestData['manage_doctor_name'] = ($this->getAdminName() ?? '');
 
         BmpCheetahMedicalCrowdkitApiService::make()->updatePatientInfo(
             $empi,
@@ -217,9 +220,12 @@ class ResidentService extends BaseService
      * @param  string  $baseDate
      * @param  string  $arcCode
      * @param  string  $areaCode
+     * @param  string  $orgCode
+     * @param  int  $adminId
+     * @param  string  $adminName
      * @param  int  $splitFlag
      *
-     * @return int
+     * @return array|string
      */
     public function createUserManagePlanTask(
         string $empi = '',
@@ -290,6 +296,8 @@ class ResidentService extends BaseService
             $latestData['manage_team_name']   = '';
             $latestData['manage_dept_name']   = '';
             $latestData['manage_dept_code']   = '';
+            $latestData['manage_arc_code']   = '';
+//            $latestData['manage_arc_name']   = '';
         }
 
         BmpCheetahMedicalCrowdkitApiService::make()->updatePatientInfo(

@@ -13,6 +13,8 @@ trait WithOrgContext
      */
     protected ?string $contextOrgCode = null;
 
+    protected ?string $contextOrgName = null;
+
     protected ?string $contextArcCode = null;
 
     protected ?string $contextArcName = null;
@@ -50,6 +52,15 @@ trait WithOrgContext
         return $this->contextOrgCode;
     }
 
+
+    public function getOrgName(): string
+    {
+        if (empty($this->contextOrgName)) {
+            $this->contextOrgName = OrgContext::instance()->getOrgName();
+        }
+
+        return $this->contextOrgName;
+    }
 
     public function getManageOrgCode(): array
     {
