@@ -61,7 +61,7 @@ class BmoAuthApiService extends LowCodeBaseService
                             ['arc_code' => $arcCode]
                         )
                         ->json();
-        Logger::BMO_AUTH_DEBUG->info('获取用户信息成功', [
+        Logger::BMO_AUTH_DEBUG->info('获取用户中心数据', [
             'token_prefix' => substr($token, 0, 8) . '...',
             'arc_code' => $arcCode,
             'response' => $response,
