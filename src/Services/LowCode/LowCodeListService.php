@@ -51,8 +51,8 @@ class LowCodeListService extends LowCodeBaseService
                 'topButton:name,code,content_type',
                 'column:name,code,content_type',
                 'field:name,code,content_type',
-                'updater:id,realname',
-                'creator:id,realname',
+//                'updater:id,realname',
+//                'creator:id,realname',
             ]
         )->first();
     }

@@ -52,7 +52,8 @@ final class DatabaseSourceService extends LowCodeBaseService
              'username', 'password', 'created_at', 'updated_at', 'creator_id']
         )->with(
             [
-                'creator:id,realname', 'updater:id,realname',
+//                'creator:id,realname',
+//                'updater:id,realname',
                 'disease:code,name']
         )->find($id);
     }
