@@ -23,6 +23,10 @@ class BasicInfoResource extends JsonResource
         [$manageStatus, $manageStatusDefinition] = $this->resolveBusinessStatus($info);
 
         return [
+            // TODO：敏感信息，后期需要国密处理
+            // 原始身份证号
+            'real_id_crd_no' => $info['id_crd_no'] ?? '',
+
             // 基本信息
             'id_crd_no' => Mask::idcard($info['id_crd_no'] ?? ''),
             'rsdnt_nm' => $info['rsdnt_nm'] ?? '',
