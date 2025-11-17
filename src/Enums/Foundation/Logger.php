@@ -68,5 +68,7 @@ enum Logger: string
     case BMO_AI = 'bmp-ai';
 
 
+    case BMO_AUTH_DEBUG = 'bmp-auth-debug';
+
 
 }

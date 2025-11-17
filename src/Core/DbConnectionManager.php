@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use App\Exceptions\ServiceException;
+use \Gupo\BetterLaravel\Exceptions\ServiceException;
 use BrightLiu\LowCode\Services\LowCode\DatabaseSourceService;
 use Illuminate\Database\Connection;
 use PDO;
@@ -85,7 +85,7 @@ final class DbConnectionManager
 
             return $this->connections[$code] = $this->createConnection($code, $dbConfig);
 
-        } catch (\Gupo\BetterLaravel\Exceptions\ServiceException $e) {
+        } catch (ServiceException $e) {
             throw $e;
         } catch (\Throwable $exception) {
             Log::error("低代码动态链接数据库连接失败 [{$code}]：" . $exception->getMessage(), [

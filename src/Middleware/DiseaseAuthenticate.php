@@ -59,6 +59,8 @@ class DiseaseAuthenticate
                 throw new AuthenticateException('BmoAuth Account invalid.');
             }
 
+            Logger::BMO_AUTH_DEBUG->debug('获取用户中心数据',['result'=>$bmoAccount]);
+
             // 初始化上下文
             $this->autoContext($bmoAccount,$token,$arcCode);
         } catch (\Throwable $e) {
