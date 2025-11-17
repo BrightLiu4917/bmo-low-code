@@ -85,7 +85,7 @@ final class DbConnectionManager
 
             return $this->connections[$code] = $this->createConnection($code, $dbConfig);
 
-        } catch (ServiceException $e) {
+        } catch (\Gupo\BetterLaravel\Exceptions\ServiceException $e) {
             throw $e;
         } catch (\Throwable $exception) {
             Log::error("低代码动态链接数据库连接失败 [{$code}]：" . $exception->getMessage(), [
