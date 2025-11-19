@@ -182,9 +182,9 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
             if (empty($args)) {
                 return [null,null,'参数错误'];
             }
-            if (!empty(ResidentService::instance()->getInfoByCardNo(idCardNo:$idCardNo,columns: ['empi']))){
-                return [null,null,'患者存在: '.$idCardNo];
-            }
+//            if (!empty(ResidentService::instance()->getInfoByCardNo(idCardNo:$idCardNo,columns: ['empi']))){
+//                return [null,null,'患者存在: '.$idCardNo];
+//            }
 
             $args['user_id'] = md5($idCardNo);
             $data =  Http::asJson()->timeout(3)
