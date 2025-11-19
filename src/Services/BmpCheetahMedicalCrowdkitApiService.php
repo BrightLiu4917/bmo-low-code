@@ -198,7 +198,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                     '/innerapi/get_document_byidcrdno',
             ]);
 
-            if ($data['code'] == 200){
+            if (!empty($data['data'])){
                 return [$data['data']['colvalue'] ?? [],'',''];
             }
             return [null,null,$data['message']];
