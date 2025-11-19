@@ -70,5 +70,7 @@ enum Logger: string
 
     case BMO_AUTH_DEBUG = 'bmp-auth-debug';
 
+    case BMP_GET_RESIDENT_ARCHIVE_DETAIL = 'bmp-get-resident-archive-detail';
+
 
 }

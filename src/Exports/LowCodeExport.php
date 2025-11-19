@@ -126,7 +126,6 @@ class LowCodeExport
             return [];
         }
 
-        $resourcesKey = config('low-code.dependencies.BrightLiu\LowCode\Resources\LowCode\LowCodeList\QuerySource');
 
         $data         = is_array($this->originalData) ?
             collect($this->originalData) : $this->originalData;

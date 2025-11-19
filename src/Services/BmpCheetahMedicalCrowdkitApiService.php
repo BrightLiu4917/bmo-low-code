@@ -6,6 +6,7 @@ namespace BrightLiu\LowCode\Services;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
+use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Traits\Context\WithContext;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
 
@@ -157,5 +158,62 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                    
                    ->json();
         return $data['data'] ?? [];
+    }
+
+
+    /**
+     * @param  string  $idCrdNo
+     *
+     * @return array
+     */
+    /**
+     * 档案数据
+     * @param  string  $idCardNo
+     *
+     * @return array
+     */
+    public function getResidentArchiveData(
+        string $idCardNo = ''): array
+    {
+        try {
+            $args = [
+                'id_crd_no' => $idCardNo,
+                'disease_code' => $this->getDiseaseCode(),
+                'sys_code' => $this->getSystemCode(),
+                'org_code' => $this->getOrgCode(),
+                'scene_code'=>$this->getSceneCode()
+            ];
+
+            $data = Http::asJson()
+                ->baseUrl($this->baseUriVia())
+                ->retry(3)
+                ->timeout(30)
+                ->post('/innerapi/get_document_byidcrdno',$args)
+                ->json();
+
+            Logger::BMP_GET_RESIDENT_ARCHIVE_DETAIL->debug('获取患者档案信息', [
+                'id_crd_no' => $idCardNo,
+                'response'  => $data,
+                'uri'       => $this->baseUriVia().
+                    '/innerapi/get_document_byidcrdno',
+            ]);
+
+            if ($data['code'] == 200){
+                return [$data['data']['colvalue'] ?? [],'',''];
+            }
+            return [null,null,$data['message']];
+        }catch (\Exception $exception){
+            Logger::BMP_GET_RESIDENT_ARCHIVE_DETAIL->error('获取患者档案信息异常', [
+                'id_crd_no' => $idCardNo  ?? '',
+                'response'  => $data ?? [],
+                'uri'       => $this->baseUriVia().
+                    '/innerapi/get_document_byidcrdno',
+                'message' => $exception->getMessage(),
+                'trace'   => $exception->getTraceAsString(),
+                'file'    => $exception->getFile(),
+                'line'    => $exception->getLine(),
+            ]);
+            return [null,null,$exception->getMessage()];
+        }
     }
 }

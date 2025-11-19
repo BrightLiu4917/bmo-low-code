@@ -118,6 +118,9 @@ ResidentService::instance()->removeManageResident(empi:$empi,attributes:['fields
 创建管理方案
 ResidentService::instance()->createManagePlan(....)  
 
+获取档案数据
+ResidentService::instance()->getResidentArchiveData($idCardNo)  
+
 DataPermissionService::instance()
     ->channel($dataPermissionCode)//选择使用权限渠道 data_permissions.code 内容
 //  ->setMappingField(['被替换的字段 如:manage_org_code'=>'业务所需字段 如:biz_org_code'])//映射业务字段
