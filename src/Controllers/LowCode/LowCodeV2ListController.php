@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace BrightLiu\LowCode\Controllers\LowCode;
 
+use BrightLiu\LowCode\Tools\Uuid;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Enums\Model\AdminPreference\SceneEnum;
 use BrightLiu\LowCode\Services\QueryEngineService;
@@ -44,37 +45,37 @@ final class LowCodeV2ListController extends BaseController
     public function simpleList(Request $request): JsonResponse
     {
         $list = LowCodeList::query()
-                           ->where('list_type', '<>', ListTypeEnum::GENERAL)
-                           ->select([
-                               'id', 'admin_name', 'code', 'parent_code',
-                               'crowd_type_code', 'route_group',
-                           ])
-                           ->customPaginate(true);
+            ->where('list_type', '<>', ListTypeEnum::GENERAL)
+            ->select([
+                'id', 'admin_name', 'code', 'parent_code',
+                'crowd_type_code', 'route_group',
+            ])
+            ->customPaginate(true);
 
         try {
             // 获取个性化菜单
             $personalizeModules = LowCodePersonalizeModule::query()
-                                                          ->where('module_type',
-                                                              'crowd_patients')
-                                                          ->orderByDesc('weight')
-                                                          ->get([
-                                                              'id', 'title',
-                                                              'module_id',
-                                                              'module_type',
-                                                              'metadata',
-                                                              'created_at',
-                                                          ])
-                                                          ->map(fn (
-                                                              LowCodePersonalizeModule $item,
-                                                          ) => new LowCodeList([
-                                                              'id'          => $item->id,
-                                                              'admin_name'  => $item->title,
-                                                              'code'        => $item->module_id,
-                                                              'parent_code' => '',
-                                                              'route_group' => [
-                                                                  $item->metadata['path'],
-                                                              ],
-                                                        ]));
+                ->where('module_type',
+                    'crowd_patients')
+                ->orderByDesc('weight')
+                ->get([
+                    'id', 'title',
+                    'module_id',
+                    'module_type',
+                    'metadata',
+                    'created_at',
+                ])
+                ->map(fn (
+                    LowCodePersonalizeModule $item,
+                ) => new LowCodeList([
+                    'id'          => $item->id,
+                    'admin_name'  => $item->title,
+                    'code'        => $item->module_id,
+                    'parent_code' => '',
+                    'route_group' => [
+                        $item->metadata['path'],
+                    ],
+                ]));
 
 
             $combiSrv = LowCodeCombiService::make();
@@ -142,10 +143,11 @@ final class LowCodeV2ListController extends BaseController
     /**
      * 查询数据
      */
-    public function query(Request $request): JsonResponse
+    public function query(Request $request)
     {
         $inputArgs = $request->input('input_args');
-        $data      = LowCodeListService::instance()->query($inputArgs);
+        $export = $request->input('export',false);
+        $data      = LowCodeListService::instance()->query(inputArgs:$inputArgs,export:$export);
         try {
             // 追加人群分类信息
             $empis = $data->pluck('empi')->toArray();
@@ -172,13 +174,26 @@ final class LowCodeV2ListController extends BaseController
                         array_filter(array_column($res ?? [], 'group_name')));
                 }
             });
+
+            if ($export){
+                $code = data_get($inputArgs, '0.code','');
+                if (!empty($code)){
+                    $code = explode('#', $code);
+                }
+                $headers = $this->service->pre(($code[0] ?? ''));
+                $headersCloumns = $headers['pre_config']['column'] ?? [];
+                return $this->service->exportWithMaatExcel(data:$data,filename: Uuid::generate(),headers: $headersCloumns);
+            }
+
         } catch (\Throwable $exception) {
+            dd($exception);
             Logger::LOW_CODE_LIST->error('list-query-控制器 查询异常', [
-                'inputs'     => $inputArgs ?? [],
-                'error'      => $exception->getMessage(),
-                'trace'      => $exception->getTraceAsString(),
-                'line'       => $exception->getLine(),
-                'file'       => $exception->getFile(),
+                'inputs'      => $inputArgs ?? [],
+                'error'       => $exception->getMessage(),
+                'trace'       => $exception->getTraceAsString(),
+                'line'        => $exception->getLine(),
+                'file'        => $exception->getFile(),
+                'export_data' => $export ?? false,
             ]);
         }
         return $this->responseData($data, class_map(QuerySource::class));
@@ -223,33 +238,33 @@ final class LowCodeV2ListController extends BaseController
         }
 
         $columns = AdminPreference::query()
-                                  ->where('scene', SceneEnum::LIST_COLUMNS)
-                                  ->where('pkey', $listCode)
-                                  ->value('pvalue');
+            ->where('scene', SceneEnum::LIST_COLUMNS)
+            ->where('pkey', $listCode)
+            ->value('pvalue');
 
         // 缺省时，从low_code_part中解析获取
         if (empty($columns)) {
             $listCode = LowCodeCombiService::instance()->resolveListCode($listCode);
             $lowCodeList = LowCodeList::query()->where('code', $listCode)
-                                      ->first(['template_code_column']);
+                ->first(['template_code_column']);
             if (empty($lowCodeList)) {
                 return $this->responseData(['items' => []]);
             }
 
             $partCodes = LowCodeTemplateHasPart::query()
-                                               ->where('template_code',
-                                                   $lowCodeList['template_code_column'])
-                                               ->pluck('part_code');
+                ->where('template_code',
+                    $lowCodeList['template_code_column'])
+                ->pluck('part_code');
 
             if ($partCodes->isEmpty()) {
                 return $this->responseData(['items' => []]);
             }
 
             $columns = LowCodePart::query()
-                                  ->whereIn('code', $partCodes->toArray())
-                                  ->where('content_type', 1)
-                                  ->pluck('content')
-                                  ->pluck('key');
+                ->whereIn('code', $partCodes->toArray())
+                ->where('content_type', 1)
+                ->pluck('content')
+                ->pluck('key');
         } else {
             $columns = array_column($columns, 'column');
         }
@@ -271,9 +286,9 @@ final class LowCodeV2ListController extends BaseController
         }
 
         $preference = AdminPreference::query()
-                                     ->where('scene', SceneEnum::LIST_COLUMNS)
-                                     ->where('pkey', $listCode)
-                                     ->first();
+            ->where('scene', SceneEnum::LIST_COLUMNS)
+            ->where('pkey', $listCode)
+            ->first();
 
         if (empty($preference)) {
             AdminPreference::query()->create([

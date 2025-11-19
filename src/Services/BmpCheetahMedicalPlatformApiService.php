@@ -165,9 +165,9 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
                 'respose'=>$data
             ]
         );
-        $result = $data['data'];
-        $isSuccess = $data['success'];
-        if ($isSuccess == false){
+        $result = data_get($data,'data',[]);
+        $successCode = (int)data_get($data,'code',0);
+        if ($successCode == 200){
             return [null,null,$data['message']];
         }
         return [$result,'',''];

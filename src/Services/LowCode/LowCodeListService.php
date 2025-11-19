@@ -6,8 +6,10 @@ namespace BrightLiu\LowCode\Services\LowCode;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Cache;
 use BrightLiu\LowCode\Models\LowCodeList;
+use BrightLiu\LowCode\Exports\LowCodeExport;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Services\BmoAIApiService;
 use BrightLiu\LowCode\Traits\CastDefaultFixHelper;
@@ -51,8 +53,8 @@ class LowCodeListService extends LowCodeBaseService
                 'topButton:name,code,content_type',
                 'column:name,code,content_type',
                 'field:name,code,content_type',
-//                'updater:id,realname',
-//                'creator:id,realname',
+                //                'updater:id,realname',
+                //                'creator:id,realname',
             ]
         )->first();
     }
@@ -137,7 +139,7 @@ class LowCodeListService extends LowCodeBaseService
      * @return void
      * @throws \Gupo\BetterLaravel\Exceptions\ServiceException
      */
-    public function query(array $inputArgs = [], int $setCacheTtl = 10)
+    public function query(array $inputArgs = [], int $setCacheTtl = 10,bool$export = false)
     {
         try {
             // 解析code(code中可能携带中台的人群ID)
@@ -163,6 +165,11 @@ class LowCodeListService extends LowCodeBaseService
                     $config,
                     $bizSceneTable
                 );
+
+                // 如果是导出模式
+                if ($export) {
+                    return $builtQuery->setCache($setCacheTtl)->getAllResult();
+                }
                 return $builtQuery->setCache($setCacheTtl)->getPaginateResult();
             }
         } catch (QueryEngineException $e) {
@@ -174,6 +181,27 @@ class LowCodeListService extends LowCodeBaseService
                 'input_args' => $inputArgs ?? null,
             ]);
         }
+    }
+
+    /**
+     * 使用 maatwebsite/excel 导出
+     */
+    public function exportWithMaatExcel($data, string $filename = '',array $headers = [])
+    {
+        if (empty($data)) {
+            throw new \Exception('没有数据可导出');
+        }
+
+        // 使用自定义导出类
+        return Excel::download(new LowCodeExport(data:$data,headings: $headers), $filename . '_' . date('YmdHis') . '.xlsx');
+    }
+
+    /**
+     * 专门的导出方法
+     */
+    public function exportQuery(array $inputArgs = [], string $filename = 'export')
+    {
+        return $this->query($inputArgs, 10, true, $filename);
     }
 
     /**
@@ -281,7 +309,7 @@ class LowCodeListService extends LowCodeBaseService
             if (null !== $crowdIdIndex) {
                 $conditionOfCrowd = $filters[$crowdIdIndex];
                 $queryEngine->useTable($crowdTable.' as t3')//重新引入基表
-                    ->innerJoin($widhtTable.' as t1', 't3.empi', '=', 't1.empi')
+                ->innerJoin($widhtTable.' as t1', 't3.empi', '=', 't1.empi')
                     ->leftJoin(
                         $bizSceneTable.' as t2',
                         't3.empi',
@@ -292,7 +320,8 @@ class LowCodeListService extends LowCodeBaseService
                             't2.*',
                             't1.*',
                         ]
-                    )->whereMixed([['t3.group_id', '=', $conditionOfCrowd[2]]]);
+                    );
+                //->whereMixed([['t3.group_id', '=', $conditionOfCrowd[2]]]);
                 unset($filters[$crowdIdIndex]);
             } else {
                 $t1Empi      = 't1.empi';
