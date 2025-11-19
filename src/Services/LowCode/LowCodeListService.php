@@ -320,8 +320,8 @@ class LowCodeListService extends LowCodeBaseService
                             't2.*',
                             't1.*',
                         ]
-                    );
-                //->whereMixed([['t3.group_id', '=', $conditionOfCrowd[2]]]);
+                    )
+                ->whereMixed([['t3.group_id', '=', $conditionOfCrowd[2]]]);
                 unset($filters[$crowdIdIndex]);
             } else {
                 $t1Empi      = 't1.empi';

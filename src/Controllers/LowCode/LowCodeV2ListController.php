@@ -186,7 +186,6 @@ final class LowCodeV2ListController extends BaseController
             }
 
         } catch (\Throwable $exception) {
-            dd($exception);
             Logger::LOW_CODE_LIST->error('list-query-控制器 查询异常', [
                 'inputs'      => $inputArgs ?? [],
                 'error'       => $exception->getMessage(),
