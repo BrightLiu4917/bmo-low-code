@@ -314,7 +314,7 @@ class ResidentService extends BaseService
      */
     public function create (string $idCardNo = '' ,array $args = []):array
     {
-       return BmpCheetahMedicalPlatformApiService::instance()->createPatient(idCardNo:$idCardNo,args: $args);
+       return BmpCheetahMedicalCrowdkitApiService::instance()->createPatient(idCardNo:$idCardNo,args: $args);
     }
 
     public function getResidentArchiveData (string $idCardNo):array

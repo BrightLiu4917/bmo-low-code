@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Http;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
 use BrightLiu\LowCode\Traits\Context\WithContext;
-use BrightLiu\LowCode\Services\Resident\ResidentService;
 
 /**
  * 业务平台-服务平台模块
@@ -171,57 +170,5 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
             return [null,null,$data['message']];
         }
         return [$result,'',''];
-    }
-
-
-
-    public function createPatient(string $idCardNo = '',array $args):array
-    {
-        try {
-            //验证患者是否存在
-            if (empty($args)) {
-                return [null,null,'参数错误'];
-            }
-//            if (!empty(ResidentService::instance()->getInfoByCardNo(idCardNo:$idCardNo,columns: ['empi']))){
-//                return [null,null,'患者存在: '.$idCardNo];
-//            }
-
-            $args['user_id'] = md5($idCardNo);
-            $data =  Http::asJson()->timeout(3)
-                         ->post($this->baseUriVia() .'innerapi/personal-crowd/create',[
-                             'personal_batch_list' => [
-                                 ['col_values' => BmpBaseLineService::instance()->formatColumnValues($args)],
-                             ],
-                             'data_source'  => 1,
-                             'org_code'     => $this->getOrgCode(),
-                             'sys_code'     => $this->getSystemCode(),
-                             'disease_code' => $this->getDiseaseCode(),
-                             'scene_code'   => $this->getSceneCode()
-                         ])->json();
-
-            Logger::BMP_CHEETAH_MEDICAL_DEBUG->debug(
-                '创建患者-debug',
-                [
-                    'uri' => $this->baseUriVia().
-                        'innerapi/personal-crowd/create',
-                    'respose'=>$data,
-                    'personal_batch_list' => [
-                        [
-                            'col_values' => BmpBaseLineService::instance()
-                                ->formatColumnValues($args),
-                        ],
-                    ],
-                    'data_source' => 1,
-                    'org_code' => $this->getOrgCode(),
-                    'sys_code' => $this->getSystemCode(),
-                    'disease_code' => $this->getDiseaseCode(),
-                    'scene_code' => $this->getSceneCode(),
-                ]
-            );
-            $empi = $data['data']['empi'] ?? '';
-        }catch (\Throwable $throwable){
-            return [null,null,$throwable->getMessage()];
-        }
-        return [$empi,'',''];
     }
 }
