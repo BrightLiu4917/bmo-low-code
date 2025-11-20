@@ -251,13 +251,12 @@ class LowCodeListService extends LowCodeBaseService
     }
 
     /**
-     * 构建查询条件组
-     *
-     * @param       $queryEngine
+     * @param $queryEngine
      * @param  array  $queryParams
      * @param  array  $config
+     * @param  string  $bizSceneTable
      *
-     * @return mixed
+     * @return mixed|void
      */
     private function buildQueryConditions(
         $queryEngine,
