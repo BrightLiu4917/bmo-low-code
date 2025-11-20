@@ -299,7 +299,7 @@ class LowCodeListService extends LowCodeBaseService
                 fn($key) => isset($filters[$key][0]) &&
                     'crowd_id' === $filters[$key][0]
             );
-            $widhtTable   = config(
+            $widthTable   = config(
                 'low-code.bmo-baseline.database.crowd-psn-wdth-table'
             );//宽表
             $crowdTable   = config(
@@ -309,7 +309,7 @@ class LowCodeListService extends LowCodeBaseService
             if (null !== $crowdIdIndex) {
                 $conditionOfCrowd = $filters[$crowdIdIndex];
                 $queryEngine->useTable($crowdTable.' as t3')//重新引入基表
-                ->innerJoin($widhtTable.' as t1', 't3.empi', '=', 't1.empi')
+                ->innerJoin($widthTable.' as t1', 't3.empi', '=', 't1.empi')
                     ->leftJoin(
                         $bizSceneTable.' as t2',
                         't3.empi',
@@ -326,7 +326,7 @@ class LowCodeListService extends LowCodeBaseService
             } else {
                 $t1Empi      = 't1.empi';
                 $queryEngine = $queryEngine->useTable($bizSceneTable.' as t2')
-                    ->innerJoin("$widhtTable as t1", $t1Empi, '=', 't2.empi');
+                    ->innerJoin("$widthTable as t1", $t1Empi, '=', 't2.empi');
 
             }
 
