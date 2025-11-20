@@ -100,7 +100,7 @@ abstract class QueryEngineAbstract implements QueryEngineContract
     {
         try {
             $sourceCode = DatabaseSourceService::instance()
-                                               ->getDataByDiseaseCode($diseaseCode);
+                ->getDataByDiseaseCode($diseaseCode);
             $this->clientConnByCode($sourceCode);
             $this->useTable();
             $this->fillableFields();
@@ -145,6 +145,15 @@ abstract class QueryEngineAbstract implements QueryEngineContract
     {
         $this->printSql = $printSql;
         return $this;
+    }
+    public function innerJoinSub(
+        $query,
+        string $as,
+        string $first,
+        string $operator = '=',
+        string $second = null
+    ): self {
+        return $this->joinSub($query, $as, $first, $operator, $second, self::JOIN_INNER);
     }
 
     /**
@@ -248,6 +257,11 @@ abstract class QueryEngineAbstract implements QueryEngineContract
             fn ($columns) => $this->queryBuilder->get($columns), $columns,
             $useCache, $this->randomKey(column: $columns, method: __FUNCTION__)
         );
+    }
+
+    public function dumpSql()
+    {
+        return $this->queryBuilder->dd();
     }
 
     /**
@@ -362,6 +376,12 @@ abstract class QueryEngineAbstract implements QueryEngineContract
         }
     }
 
+    public function fromSub($query, $as): self
+    {
+        $this->confirmQueryBuilderInit();
+        $this->queryBuilder = $this->queryBuilder->fromSub($query->getQueryBuilder(), $as);
+        return $this;
+    }
     /**
      * 添加原生SQL条件
      *
@@ -477,12 +497,12 @@ abstract class QueryEngineAbstract implements QueryEngineContract
             $cacheKey       = "fillable_fields:{$this->database}:{$this->table}";
             $this->fillable = Cache::remember($cacheKey, 86400, function() {
                 return $this->connection->table('INFORMATION_SCHEMA.COLUMNS')
-                                        ->where(
-                                            [
-                                                'TABLE_SCHEMA' => $this->database,
-                                                'TABLE_NAME'   => $this->table,
-                                            ]
-                                        )->pluck('COLUMN_NAME')->toArray();
+                    ->where(
+                        [
+                            'TABLE_SCHEMA' => $this->database,
+                            'TABLE_NAME'   => $this->table,
+                        ]
+                    )->pluck('COLUMN_NAME')->toArray();
             });
         } catch (\Throwable $e) {
             Logger::WIDTH_TABLE_DATA_RESIDENT->error(

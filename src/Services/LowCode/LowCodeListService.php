@@ -139,8 +139,11 @@ class LowCodeListService extends LowCodeBaseService
      * @return void
      * @throws \Gupo\BetterLaravel\Exceptions\ServiceException
      */
-    public function query(array $inputArgs = [], int $setCacheTtl = 10,bool$export = false)
-    {
+    public function query(
+        array $inputArgs = [],
+        int $setCacheTtl = 10,
+        bool $export = false,
+    ) {
         try {
             // 解析code(code中可能携带中台的人群ID)
             $inputArgs = LowCodeCombiService::make()->handleInputArgs(
@@ -186,21 +189,29 @@ class LowCodeListService extends LowCodeBaseService
     /**
      * 使用 maatwebsite/excel 导出
      */
-    public function exportWithMaatExcel($data, string $filename = '',array $headers = [])
-    {
+    public function exportWithMaatExcel(
+        $data,
+        string $filename = '',
+        array $headers = [],
+    ) {
         if (empty($data)) {
             throw new \Exception('没有数据可导出');
         }
 
         // 使用自定义导出类
-        return Excel::download(new LowCodeExport(data:$data,headings: $headers), $filename . '_' . date('YmdHis') . '.xlsx');
+        return Excel::download(
+            new LowCodeExport(data: $data, headings: $headers),
+            $filename.'_'.date('YmdHis').'.xlsx'
+        );
     }
 
     /**
      * 专门的导出方法
      */
-    public function exportQuery(array $inputArgs = [], string $filename = 'export')
-    {
+    public function exportQuery(
+        array $inputArgs = [],
+        string $filename = 'export',
+    ) {
         return $this->query($inputArgs, 10, true, $filename);
     }
 
@@ -251,12 +262,13 @@ class LowCodeListService extends LowCodeBaseService
     }
 
     /**
-     * @param $queryEngine
+     * 构建查询条件组
+     *
+     * @param       $queryEngine
      * @param  array  $queryParams
      * @param  array  $config
-     * @param  string  $bizSceneTable
      *
-     * @return mixed|void
+     * @return mixed
      */
     private function buildQueryConditions(
         $queryEngine,
@@ -272,7 +284,7 @@ class LowCodeListService extends LowCodeBaseService
             }
             $filters = $queryParams['filters'] ?? [];
 
-            //这里是使用api 服务
+            //这里是使用 AI 服务
             $aifilters = [];
             foreach ($filters as $key => $value) {
                 $aiMark   = $value[0] ?? '';
@@ -298,7 +310,7 @@ class LowCodeListService extends LowCodeBaseService
                 fn($key) => isset($filters[$key][0]) &&
                     'crowd_id' === $filters[$key][0]
             );
-            $widthTable   = config(
+            $widhtTable   = config(
                 'low-code.bmo-baseline.database.crowd-psn-wdth-table'
             );//宽表
             $crowdTable   = config(
@@ -306,27 +318,34 @@ class LowCodeListService extends LowCodeBaseService
             );//人群表
 
             if (null !== $crowdIdIndex) {
+                $priorityFilters = $filters;
+                unset($priorityFilters[$crowdIdIndex]);
                 $conditionOfCrowd = $filters[$crowdIdIndex];
-                $queryEngine->useTable($crowdTable.' as t3')//重新引入基表
-                ->innerJoin($widthTable.' as t1', 't3.empi', '=', 't1.empi')
-                    ->leftJoin(
+                $queryEngineSub = clone $queryEngine;
+                $queryEngineMain = clone $queryEngine;
+                $subQuery = clone $queryEngineSub->useTable($crowdTable.' as t3')
+                    ->innerJoin($widhtTable.' as t1', 't3.empi', '=', 't1.empi')
+                    ->select(['t1.empi'])
+                    ->whereMixed([
+                        ['t3.group_id', '=', $conditionOfCrowd[2]],
+                    ])->whereMixed($priorityFilters);
+                $queryEngine = clone $queryEngineMain->fromSub($subQuery, 't3')
+                    ->innerJoin(
+                        $widhtTable.' as t1',
+                        't3.empi',
+                        '=',
+                        't1.empi'
+                    )->leftJoin(
                         $bizSceneTable.' as t2',
                         't3.empi',
                         '=',
                         't2.empi'
-                    )->select(
-                        [
-                            't2.*',
-                            't1.*',
-                        ]
-                    )
-                ->whereMixed([['t3.group_id', '=', $conditionOfCrowd[2]]]);
+                    )->select([ 't1.*', 't2.*']);
                 unset($filters[$crowdIdIndex]);
             } else {
                 $t1Empi      = 't1.empi';
                 $queryEngine = $queryEngine->useTable($bizSceneTable.' as t2')
-                    ->innerJoin("$widthTable as t1", $t1Empi, '=', 't2.empi');
-
+                    ->innerJoin("$widhtTable as t1", $t1Empi, '=', 't2.empi');
             }
 
 
@@ -345,12 +364,17 @@ class LowCodeListService extends LowCodeBaseService
 
             //数据权限条件
             $dataPermissionCode = $config['data_permission_code'] ?? '';
-            Logger::DATA_PERMISSION_ERROR->debug('low-code-list-service-data-permission',['data_permission_code'=>$dataPermissionCode]);
+            Logger::DATA_PERMISSION_ERROR->debug(
+                'low-code-list-service-data-permission',
+                ['data_permission_code' => $dataPermissionCode]
+            );
             if ($dataPermissionCode !== '') {
                 $dataPermissionCondition = DataPermissionService::instance()
-                    ->channel($dataPermissionCode)
-                    ->run();
-                Logger::DATA_PERMISSION_ERROR->debug('low-code-list-service-data-permission-get-result',['data_permission_code'=>$dataPermissionCode]);
+                    ->channel($dataPermissionCode)->run();
+                Logger::DATA_PERMISSION_ERROR->debug(
+                    'low-code-list-service-data-permission-get-result',
+                    ['data_permission_code' => $dataPermissionCode]
+                );
                 if (!empty($dataPermissionCondition)) {
                     $queryEngine->whereMixed($dataPermissionCondition);
                 }
@@ -364,6 +388,7 @@ class LowCodeListService extends LowCodeBaseService
             );
             return $queryEngine;
         } catch (\Throwable $exception) {
+            dd($exception);
             Logger::LOW_CODE_LIST->error(
                 '低代码列表查询异常-buildQueryConditions',
                 [
