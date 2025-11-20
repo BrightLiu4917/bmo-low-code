@@ -68,10 +68,6 @@ final class DbConnectionManager
             return $this->createConnection($code, $dbConfig);
         }
 
-        if (isset($this->connections[$code])) {
-            return $this->connections[$code];
-        }
-
         $cacheKey = self::CONFIG_CACHE_KEY_PREFIX . $code;
 
         try {
