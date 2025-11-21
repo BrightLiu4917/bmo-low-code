@@ -22,6 +22,7 @@ use BrightLiu\LowCode\Core\TemplatePartCacheManager;
 use BrightLiu\LowCode\Services\QueryEngineService;
 use BrightLiu\LowCode\Exceptions\QueryEngineException;
 use Gupo\BetterLaravel\Database\CustomLengthAwarePaginator;
+use Illuminate\Database\Query\Builder;
 
 /**
  * 低代码-列表
@@ -304,12 +305,6 @@ class LowCodeListService extends LowCodeBaseService
                 $filters = array_merge($filters, $aifilters);
             }
 
-            // 处理 crowd_id 条件并安全移除
-            $crowdIdIndex = Arr::first(
-                array_keys($filters),
-                fn($key) => isset($filters[$key][0]) &&
-                    'crowd_id' === $filters[$key][0]
-            );
             $widhtTable   = config(
                 'low-code.bmo-baseline.database.crowd-psn-wdth-table'
             );//宽表
@@ -317,37 +312,21 @@ class LowCodeListService extends LowCodeBaseService
                 'low-code.bmo-baseline.database.crowd-type-table'
             );//人群表
 
-            if (null !== $crowdIdIndex) {
-                $priorityFilters = $filters;
-                unset($priorityFilters[$crowdIdIndex]);
-                $conditionOfCrowd = $filters[$crowdIdIndex];
-                $queryEngineSub = clone $queryEngine;
-                $queryEngineMain = clone $queryEngine;
-                $subQuery = clone $queryEngineSub->useTable($crowdTable.' as t3')
-                    ->innerJoin($widhtTable.' as t1', 't3.empi', '=', 't1.empi')
-                    ->select(['t1.empi'])
-                    ->whereMixed([
-                        ['t3.group_id', '=', $conditionOfCrowd[2]],
-                    ])->whereMixed($priorityFilters);
-                $queryEngine = clone $queryEngineMain->fromSub($subQuery, 't3')
-                    ->innerJoin(
-                        $widhtTable.' as t1',
-                        't3.empi',
-                        '=',
-                        't1.empi'
-                    )->leftJoin(
-                        $bizSceneTable.' as t2',
-                        't3.empi',
-                        '=',
-                        't2.empi'
-                    )->select([ 't1.*', 't2.*']);
+            // 转换“人群分类”条件为标准的查询条件
+            $crowdIdIndex = Arr::first(
+                array_keys($filters),
+                fn ($key) => isset($filters[$key][0]) && 'crowd_id' === $filters[$key][0]
+            );
+            if (!empty($conditionOfCrowd = $filters[$crowdIdIndex] ?? null)) {
                 unset($filters[$crowdIdIndex]);
-            } else {
-                $t1Empi      = 't1.empi';
-                $queryEngine = $queryEngine->useTable($bizSceneTable.' as t2')
-                    ->innerJoin("$widhtTable as t1", $t1Empi, '=', 't2.empi');
+                $filters[] = ['t3.group_id', '=', $conditionOfCrowd[2]];
             }
 
+            // 查询前置准备
+            $queryEngine->useTable($crowdTable . ' as t3')
+                ->innerJoin($widhtTable . ' as t1', 't3.empi', '=', 't1.empi')
+                ->leftJoin($bizSceneTable . ' as t2', 't3.empi', '=', 't2.empi')
+                ->select(['t2.*', 't1.*']);
 
             // 安全合并预设条件
             $presetCondition = $config['preset_condition_json'] ?? [];
@@ -359,7 +338,23 @@ class LowCodeListService extends LowCodeBaseService
             }
 
             if (!empty($filters)) {
-                $queryEngine->whereMixed($filters);
+                // 提交 QueryEngine 处理混合查询条件
+                /** @var QueryEngineService $mixedQueryEngine */
+                $mixedQueryEngine = tap(
+                    QueryEngineService::make(),
+                    function (QueryEngineService $query) use ($queryEngine, $filters) {
+                        $query->setQueryBuilder($queryEngine->getQueryBuilder()->newQuery());
+                        $query->whereMixed($filters);
+                    }
+                );
+
+                // 应用混合查询条件
+                $queryEngine->getQueryBuilder()
+                    ->whereExists(fn (Builder $query) => $query->from($bizSceneTable, 't2')
+                        ->selectRaw('1')
+                        ->whereRaw('t2.empi = t3.empi')
+                        ->addNestedWhereQuery($mixedQueryEngine->getQueryBuilder())
+                    );
             }
 
             //数据权限条件
