@@ -263,10 +263,10 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                     'scene_code' => $this->getSceneCode(),
                 ]
             );
-            $empi = $data['data']['empi'] ?? '';
+            $result = $data['data'] ?? [];
         }catch (\Throwable $throwable){
             return [null,null,$throwable->getMessage()];
         }
-        return [$empi,'',''];
+        return [$result,'',''];
     }
 }
