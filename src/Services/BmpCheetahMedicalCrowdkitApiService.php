@@ -232,6 +232,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
             //            }
 
             $args['user_id'] = md5($idCardNo);
+            $args['id_crd_no'] = $idCardNo;
             $data =  Http::asJson()->timeout(3)
                 ->post($this->baseUriVia() .'innerapi/personal-crowd/create',[
                     'personal_batch_list' => [

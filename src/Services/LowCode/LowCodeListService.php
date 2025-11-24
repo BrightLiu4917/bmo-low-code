@@ -286,26 +286,26 @@ class LowCodeListService extends LowCodeBaseService
             $filters = $queryParams['filters'] ?? [];
 
             //这里是使用 AI 服务
-            $aifilters = [];
+            $AiFilters = [];
             foreach ($filters as $key => $value) {
                 $aiMark   = $value[0] ?? '';
-                $aiCotent = $value[2] ?? '';
+                $aiContent = $value[2] ?? '';
                 if (!empty($aiMark) && $aiMark == 'send-ai-service' &&
-                    !empty($aiCotent)) {
+                    !empty($aiContent)) {
                     if (config('business.bmo-service.ai.enable', true) ==
                         true) {
-                        $aifilters = BmoAIApiService::instance()
-                            ->completionSend($aiCotent);
+                        $AiFilters = BmoAIApiService::instance()
+                            ->completionSend($aiContent);
                     }
                     unset($filters[$key]);
                 }
             }
 
-            if (!empty($aifilters)) {
-                $filters = array_merge($filters, $aifilters);
+            if (!empty($AiFilters)) {
+                $filters = array_merge($filters, $AiFilters);
             }
 
-            $widhtTable   = config(
+            $widthTable   = config(
                 'low-code.bmo-baseline.database.crowd-psn-wdth-table'
             );//宽表
             $crowdTable   = config(
@@ -324,7 +324,7 @@ class LowCodeListService extends LowCodeBaseService
 
             // 查询前置准备
             $queryEngine->useTable($crowdTable . ' as t3')
-                ->innerJoin($widhtTable . ' as t1', 't3.empi', '=', 't1.empi')
+                ->innerJoin($widthTable . ' as t1', 't3.empi', '=', 't1.empi')
                 ->leftJoin($bizSceneTable . ' as t2', 't3.empi', '=', 't2.empi')
                 ->select(['t2.*', 't1.*']);
 
@@ -383,7 +383,6 @@ class LowCodeListService extends LowCodeBaseService
             );
             return $queryEngine;
         } catch (\Throwable $exception) {
-            dd($exception);
             Logger::LOW_CODE_LIST->error(
                 '低代码列表查询异常-buildQueryConditions',
                 [

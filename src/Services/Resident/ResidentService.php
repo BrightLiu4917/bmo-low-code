@@ -307,7 +307,7 @@ class ResidentService extends BaseService
     }
 
     /**
-     * 创建患者
+     * @param  string  $idCardNo
      * @param  array  $args
      *
      * @return array
