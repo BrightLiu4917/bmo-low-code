@@ -217,7 +217,7 @@ final class LowCodeV2ListController extends BaseController
                     (Arr::first($code, null, ''))
                 );
                 $headersColumns = data_get($headers, 'pre_config.column', []);
-                $code           = addslashes($code); // 防止SQL注入
+                $code           = addslashes(Arr::first($code, null, '')); // 防止SQL注入
                 $adminName      = LowCodeList::query()->where('code', $code)
                     ->value('admin_name');
                 $filename       = ($adminName ?? 'export').'-'.
