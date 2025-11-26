@@ -13,7 +13,6 @@ use BrightLiu\LowCode\Resources\Resident\ResidentMetric\MonitorTrendItemsResourc
 use BrightLiu\LowCode\Resources\Resident\ResidentMetric\OptionalResource;
 use BrightLiu\LowCode\Services\BmpCheetahMedicalCrowdkitApiService;
 use BrightLiu\LowCode\Services\Resident\ResidentMetricService;
-use BrightLiu\LowCode\Support\CrowdConnection;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
 use BrightLiu\LowCode\Traits\Context\WithDiseaseContext;
 use BrightLiu\LowCode\Traits\Context\WithOrgContext;
@@ -82,19 +81,26 @@ class ResidentMetricController extends BaseController
         // 限制条数
         $limit = (int) $request->input('limit', 0);
 
-        // TODO: 写法待完善
-        $data = CrowdConnection::table('personal_archive')
-            ->where('tenant_id', $this->getTenantId())
-            ->where('col_name', $metricId)
-            ->where('disease_code', $this->getDiseaseCode())
-            ->where('sys_code', $this->getSystemCode())
-            ->where('org_code', $this->getOrgCode())
-            ->where('empi', $empi)
-            ->whereBetweenDate('fill_date', $dateRangeMin, $dateRangeMax, forceFullDay: true)
-            ->when($limit > 0, fn ($query) => $query->limit($limit))
-            ->get(['col_value', 'fill_date', 'data_source'])
-            ->sortBy('fill_date')
-            ->toArray();
+        try {
+            $data = ResidentMetricService::make()->getMonitorTrendItems(
+                empi: $empi,
+                metricId: $metricId,
+                minDate: $dateRangeMin,
+                maxDate: $dateRangeMax,
+                limit: $limit
+            );
+        } catch (\Throwable $e) {
+            logs()->error('获取居民监测指标趋势失败', [
+                'empi' => $empi,
+                'metric_id' => $metricId,
+                'date_range_min' => $dateRangeMin,
+                'date_range_max' => $dateRangeMax,
+                'limit' => $limit,
+                'error_msg' => $e->getMessage(),
+            ]);
+
+            return $this->responseError('获取居民监测指标趋势失败');
+        }
 
         return $this->responseData([
             'items' => MonitorTrendItemsResource::collection($data),

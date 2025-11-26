@@ -270,4 +270,16 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
         }
         return [$result,'',''];
     }
+
+    /**
+     * 获取健康档案字段映射配置
+     */
+    public function getPersonalArchiveConfig()
+    {
+        return Http::asJson()
+            ->baseUrl($this->baseUriVia())
+            ->timeout(5)
+            ->post('/innerapi/personal-archive-config/list')
+            ->json();
+    }
 }
