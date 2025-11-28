@@ -147,7 +147,9 @@ class ResidentMetricService extends BaseService
         if (0 == $metricConfig['is_vertical']) {
             return CrowdConnection::table($metricConfig['tbl_name'])
                 ->where('id_crd_no', $cardNo)
-                ->whereBetweenDate($businessDateField, $minDate, $maxDate, forceFullDay: true)
+                ->when(!empty($minDate) && !empty($maxDate), fn ($query) => $query
+                    ->whereBetween($businessDateField, [Carbon::make($minDate)->startOfDay(), Carbon::make($maxDate)->endOfDay()])
+                )
                 ->when($limit > 0, fn ($query) => $query->limit($limit))
                 ->get(["{$businessDateField} as fill_date", "{$columnName} as col_value"])
                 ->sortBy($businessDateField)
@@ -156,7 +158,9 @@ class ResidentMetricService extends BaseService
             return CrowdConnection::table($metricConfig['tbl_name'])
                 ->where('id_crd_no', $cardNo)
                 ->where('item_name', $columnName)
-                ->whereBetweenDate($businessDateField, $minDate, $maxDate, forceFullDay: true)
+                ->when(!empty($minDate) && !empty($maxDate), fn ($query) => $query
+                    ->whereBetween($businessDateField, [Carbon::make($minDate)->startOfDay(), Carbon::make($maxDate)->endOfDay()])
+                )
                 ->when($limit > 0, fn ($query) => $query->limit($limit))
                 ->get(["{$businessDateField} as fill_date", 'item_value as col_value'])
                 ->sortBy($businessDateField)
