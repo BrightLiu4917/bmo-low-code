@@ -98,6 +98,9 @@ final class DbConnectionManager
     protected function createConnection(string $code, array $dbConfig): Connection
     {
         if (!Config::has("database.connections.$code")) {
+            // 连接自动重试时，依赖配置中的 name 字段
+            $dbConfig['name'] = $code;
+
             Config::set("database.connections.$code", $dbConfig);
         }
 
