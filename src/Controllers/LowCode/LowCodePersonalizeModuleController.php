@@ -26,7 +26,7 @@ final class LowCodePersonalizeModuleController extends BaseController
         $moduleType = (string) $request->input('module_type', 'crowd_patients');
 
         $data = LowCodePersonalizeModule::query()
-            //            ->byContextDisease()
+                                        ->byContextDisease()
                                         ->where('module_type', $moduleType)
                                         ->orderByDesc('weight')
                                         ->get(['id', 'title', 'module_id', 'module_type', 'metadata', 'created_at']);

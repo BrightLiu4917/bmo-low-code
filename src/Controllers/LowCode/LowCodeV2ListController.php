@@ -44,7 +44,7 @@ final class LowCodeV2ListController extends BaseController
      */
     public function simpleList(Request $request): JsonResponse
     {
-        $list = LowCodeList::query()->where(
+        $list = LowCodeList::query()->byContextDisease()->where(
                 'list_type',
                 '<>',
                 ListTypeEnum::GENERAL
@@ -59,7 +59,7 @@ final class LowCodeV2ListController extends BaseController
 
         try {
             // 获取个性化菜单
-            $personalizeModules = LowCodePersonalizeModule::query()->where(
+            $personalizeModules = LowCodePersonalizeModule::query()->byContextDisease()->where(
                     'module_type',
                     'crowd_patients'
                 )->orderByDesc('weight')->get([
