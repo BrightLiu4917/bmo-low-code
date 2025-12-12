@@ -25,6 +25,49 @@ trait WithOrgContext
 
     protected ?array $contextManageOrgCodes = [];
 
+
+    protected ?string $contextAffiliatedOrgCode = null;
+
+    protected ?string $contextAffiliatedOrgName = null;
+
+
+    /**
+     * 所属机构编码
+     * @return string
+     */
+
+    public function getAffiliatedOrgCode(): string
+    {
+        if (empty($this->contextAffiliatedOrgCode)) {
+            $this->contextAffiliatedOrgCode = OrgContext::instance()->getAffiliatedOrgCode();
+        }
+
+        return $this->contextAffiliatedOrgCode;
+    }
+
+    /**
+     * 所属机构名称
+     * @return string
+     */
+    public function getAffiliatedOrgName(): string
+    {
+        if (empty($this->contextAffiliatedOrgName)) {
+            $this->contextAffiliatedOrgName = OrgContext::instance()->getAffiliatedOrgName();
+        }
+
+        return $this->contextAffiliatedOrgName;
+    }
+
+
+    public function getOrgCode(): string
+    {
+        if (empty($this->contextOrgCode)) {
+            $this->contextOrgCode = OrgContext::instance()->getOrgCode();
+        }
+
+        return $this->contextOrgCode;
+    }
+
     /**
      * @param string|object $orgCode
      *
@@ -40,17 +83,6 @@ trait WithOrgContext
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getOrgCode(): string
-    {
-        if (empty($this->contextOrgCode)) {
-            $this->contextOrgCode = OrgContext::instance()->getOrgCode();
-        }
-
-        return $this->contextOrgCode;
-    }
 
 
     public function getOrgName(): string

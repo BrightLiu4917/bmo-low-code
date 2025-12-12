@@ -66,8 +66,8 @@ final class OrgContext
                 $context->setArcCode($arcCode);
                 $context->setManageOrgCodes($manageOrgCodes);
                 $context->setManageAreaCodes($manageAreaCodes);
-                $context->setAffiliatedOrgCode($affiliatedOrgCode);
-                $context->setAffiliatedOrgName($affiliatedOrgName);
+                $context->setAffiliatedOrgCode($affiliatedOrgCode);//所属机构编码
+                $context->setAffiliatedOrgName($affiliatedOrgName);//所属机构名称
                 try {
                     //这里获取用户中心的 arc 信息 org_name = arc_name 用户中心后端开发说的
                     $data = BmoAuthApiService::instance()->getArcDetail($arcCode);
