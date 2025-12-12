@@ -30,6 +30,12 @@ final class OrgContext
     protected array $manageOrgCodes = [];
 
 
+    protected string $affiliatedOrgCode = '';
+
+    protected string $affiliatedOrgName = '';
+
+
+
     /**
      * @return static
      */
@@ -49,15 +55,19 @@ final class OrgContext
         string $arcCode = '',
         array $manageAreaCodes = [],
         array $manageOrgCodes = [],
+        string $affiliatedOrgName,
+        string $affiliatedOrgCode
     ): static
     {
         return tap(
             static::instance(),
-            function (OrgContext $context) use ($orgCode,$arcCode,$manageAreaCodes,$manageOrgCodes) {
+            function (OrgContext $context) use ($orgCode,$arcCode,$manageAreaCodes,$manageOrgCodes,$affiliatedOrgName,$affiliatedOrgCode) {
                 $context->setOrgCode($orgCode);
                 $context->setArcCode($arcCode);
                 $context->setManageOrgCodes($manageOrgCodes);
                 $context->setManageAreaCodes($manageAreaCodes);
+                $context->setAffiliatedOrgCode($affiliatedOrgCode);
+                $context->setAffiliatedOrgName($affiliatedOrgName);
                 try {
                     //这里获取用户中心的 arc 信息 org_name = arc_name 用户中心后端开发说的
                     $data = BmoAuthApiService::instance()->getArcDetail($arcCode);
@@ -112,6 +122,45 @@ final class OrgContext
     {
         return $this->manageAreaCodes;
     }
+
+
+    /**
+     * 所属机构编码
+     * @return string
+     */
+    public function getAffiliatedOrgCode(): string
+    {
+        return $this->affiliatedOrgCode;
+    }
+
+    /**
+     * 所属机构名字
+     * @return string
+     */
+    public function getAffiliatedOrgName(): string
+    {
+        return $this->affiliatedOrgName;
+    }
+
+
+    public function setAffiliatedOrgName(string $value): void
+    {
+        if ($value === $this->affiliatedOrgName) {
+            return;
+        }
+
+        $this->affiliatedOrgName = $value;
+    }
+
+    public function setAffiliatedOrgCode(string $value): void
+    {
+        if ($value === $this->affiliatedOrgCode) {
+            return;
+        }
+
+        $this->affiliatedOrgCode = $value;
+    }
+
 
 
     public function setArcName(string $value): void

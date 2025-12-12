@@ -59,8 +59,6 @@ class DiseaseAuthenticate
                 throw new AuthenticateException('BmoAuth Account invalid.');
             }
 
-//            Logger::BMO_AUTH_DEBUG->debug('获取用户中心数据',['result'=>$bmoAccount]);
-
             // 初始化上下文
             $this->autoContext($bmoAccount,$token,$arcCode);
         } catch (\Throwable $e) {
@@ -91,6 +89,13 @@ class DiseaseAuthenticate
 
         $manageOrgCodes = data_get($admin, 'org_extension.arc_manage_orgs',[]);
 
+
+        $affiliatedOrgName = data_get($admin, 'org_extension.affiliated_org_name','');
+
+        $affiliatedOrgCode = data_get($admin, 'org_extension.affiliated_org_code','');
+
+
+
         OrgContext::init(
             orgCode: (string)$request->header(
                 HeaderEnum::ORG_ID,
@@ -102,6 +107,8 @@ class DiseaseAuthenticate
             ),
             manageAreaCodes: $manageAreaCodes,
             manageOrgCodes: $manageOrgCodes,
+            affiliatedOrgName: $affiliatedOrgName,
+            affiliatedOrgCode: $affiliatedOrgCode,
         );
 
         AuthContext::init(
