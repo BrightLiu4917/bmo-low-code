@@ -199,8 +199,8 @@ class ResidentService extends BaseService
          */
         $latestData['manage_status']      = 1;
         $latestData['manage_start_dt']    = date('Y-m-d H:i:s');
-        $latestData['manage_org_code']    = $this->getOrgCode();
-        $latestData['manage_org_name']    = $this->getOrgName();
+        $latestData['manage_org_code']    = $this->getAffiliatedOrgCode();
+        $latestData['manage_org_name']    = $this->getAffiliatedOrgName();
         $latestData['manage_arc_code']     = $this->getArcCode();
 //        $latestData['manage_arc_name']     = $this->getArcName();
         $latestData['manage_end_at']      = null;
