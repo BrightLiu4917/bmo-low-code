@@ -135,7 +135,10 @@ class RegionService extends LowCodeBaseService
                             'prm_key',
                             'like',
                             "{$useRegionCode}%"
-                        )->where('invld_flg', '=', 0)->select(
+                        )
+                        ->where('invld_flg', '=', 0)
+                        ->where('admnstrt_rgn_nm',"<>","市辖区")
+                        ->select(
                             DB::raw(
                                 "
                                         prm_key as value,
