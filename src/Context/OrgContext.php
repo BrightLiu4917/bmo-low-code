@@ -55,8 +55,8 @@ final class OrgContext
         string $arcCode = '',
         array $manageAreaCodes = [],
         array $manageOrgCodes = [],
-        string $affiliatedOrgName,
-        string $affiliatedOrgCode
+        string $affiliatedOrgName = '',
+        string $affiliatedOrgCode = ''
     ): static
     {
         return tap(
