@@ -89,23 +89,52 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
     /**
      * 创建患者
      */
-    public function createPatients(array $patients): void
+    public function createPatients(array $patients, int|string $source = 1): void
     {
         if (empty($patients)) {
             return;
         }
 
+        // 标识来源
+        if (!empty($source)) {
+            $patients = array_map(
+                function ($item) use ($source) {
+                    if (!isset($item['patient_source'])) {
+                        $item['patient_source'] = $source;
+
+                        if (!isset($item['spcl_crt_rcd_tm'])) {
+                            $item['spcl_crt_rcd_tm'] = now()->toDateTimeString();
+                        }
+                    }
+
+                    return $item;
+                },
+                $patients
+            );
+        }
+
         Http::asJson()
             ->retry(3)
             ->timeout(15)
-            ->post($this->baseUriVia().'innerapi/get_patient_crowd_col_group',[
-                'data_source' => 1,
-                'org_code' => $this->getOrgCode(),
-                'sys_code' => $this->getSystemCode(),
-                'disease_code' => $this->getDiseaseCode(),
-                'scene_code' => $this->getSceneCode()
-            ])
-            
+            ->post(
+                $this->baseUriVia() . 'innerapi/personal-crowd/create',
+                [
+                    'personal_batch_list' => array_map(
+                        fn ($attributes) => [
+                            'col_values' => array_values(Arr::map(
+                                $attributes,
+                                fn ($value, $key) => ['col_name' => $key, 'col_value' => $value]
+                            )),
+                        ],
+                        $patients
+                    ),
+                    'data_source' => 1,
+                    'org_code' => $this->getOrgCode(),
+                    'sys_code' => $this->getSystemCode(),
+                    'disease_code' => $this->getDiseaseCode(),
+                    'scene_code' => $this->getSceneCode()
+                ]
+            )
             ->json();
     }
 
