@@ -37,6 +37,21 @@ class InfoResource extends JsonResource
             $columns = $columns->filter(fn ($item) => !in_array($item['column'] ?? '', $guarded, true))->values();
         }
 
+        // 自定义排序
+        if (false !== ($sort = $this->sort())) {
+            $sort = match (true) {
+                true === $sort => $fillable,
+                is_array($sort) => $sort,
+                default => []
+            };
+
+            $columns = $columns->sortBy(function ($item) use ($sort) {
+                $index = array_search($item['column'] ?? '', $sort, true);
+
+                return false !== $index ? $index : PHP_INT_MAX;
+            })->values();
+        }
+
         if ($columns->isEmpty()) {
             return new MissingValue();
         }
@@ -106,5 +121,14 @@ class InfoResource extends JsonResource
     public function readonly(): ?array
     {
         return null;
+    }
+
+    /**
+     * 排序
+     * PS: true-按白名单排序；false-不排序；数组-自定义排序
+     */
+    public function sort(): bool|array
+    {
+        return false;
     }
 }
