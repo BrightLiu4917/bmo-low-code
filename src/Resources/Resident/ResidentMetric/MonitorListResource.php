@@ -24,6 +24,9 @@ class MonitorListResource extends JsonResource
             'metric_id' => $this->metric_id,
             // TODO: 指标OPTIONS待实现
             'options' => [],
+
+            // 分组
+            'group_name' => $this->group_name ?? '',
         ];
     }
 }

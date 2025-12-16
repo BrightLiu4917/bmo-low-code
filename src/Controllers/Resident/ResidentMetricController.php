@@ -56,6 +56,21 @@ class ResidentMetricController extends BaseController
             ->orderBy('id')
             ->get();
 
+        // 追加分组名称
+        if ($data->isNotEmpty()) {
+            $metricOptional = array_column(
+                rescue(fn () => BmpCheetahMedicalCrowdkitApiService::make()->getMetricOptional(), []),
+                null,
+                'field'
+            );
+
+            if (!empty($metricOptional)) {
+                $data->each(function ($item) use ($metricOptional) {
+                    $item->offsetSet('group_name', $metricOptional[$item->metric_id]['col_group_name'] ?? '');
+                });
+            }
+        }
+
         return $this->responseData([
             'items' => MonitorListResource::collection($data),
         ]);
