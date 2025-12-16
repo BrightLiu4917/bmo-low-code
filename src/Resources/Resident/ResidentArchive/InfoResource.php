@@ -43,19 +43,26 @@ class InfoResource extends JsonResource
 
         $conversion = $this->fetchConversion();
 
+        $readonly = $this->readonly();
+
         return [
             'id' => $this['id'] ?? '',
             'name' => $this['name'] ?? '',
-            'columns' => $columns->map(function ($column) use ($conversion, $attributes) {
+            'columns' => $columns->map(function ($column) use ($conversion, $attributes, $readonly) {
                 $convertData = $conversion->fetchOnce((string) ($column['column'] ?? ''), $attributes);
 
                 $value = $convertData->getValue($column['value'] ?? null);
+
+                // 判定是否为只读(优先级：转换器指定 > 资源指定)
+                if (is_null($isReadonly = $convertData->getReadonly(null))) {
+                    $isReadonly = is_array($readonly) && in_array($column['column'] ?? '', $readonly, true);
+                }
 
                 return array_merge($column, [
                     'value' => $value,
                     'value.variant' => $convertData->getVariant($value),
                     'unit' => $convertData->getUnit(''),
-                    'readonly' => $convertData->getReadonly(false),
+                    'readonly' => $isReadonly,
                     'metadata' => $convertData->getMetadata([]),
                 ]);
             }),
@@ -89,6 +96,14 @@ class InfoResource extends JsonResource
      * 黑名单
      */
     public function guarded(): ?array
+    {
+        return null;
+    }
+
+    /**
+     * 只读
+     */
+    public function readonly(): ?array
     {
         return null;
     }
