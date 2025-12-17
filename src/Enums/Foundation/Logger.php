@@ -72,5 +72,7 @@ enum Logger: string
 
     case BMP_GET_RESIDENT_ARCHIVE_DETAIL = 'bmp-get-resident-archive-detail';
 
+    case BMP_GET_CROWD_TYPE = 'bmp-get-crowd-type';
+
 
 }
