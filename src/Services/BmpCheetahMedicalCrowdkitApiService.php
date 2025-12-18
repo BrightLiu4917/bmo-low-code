@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Services;
 
+use Gupo\BetterLaravel\Exceptions\ServiceException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
@@ -302,6 +303,10 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                     'scene_code' => $this->getSceneCode(),
                 ]
             );
+
+            if ($data['code'] != 200){
+                return [null,null,$data['message']];
+            }
             $result = $data['data'] ?? [];
         }catch (\Throwable $throwable){
             return [null,null,$throwable->getMessage()];
