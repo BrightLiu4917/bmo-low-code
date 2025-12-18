@@ -52,7 +52,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
     /**
      * 获取人群分类
      */
-    public function getCrowds(int $selectType = 0): array
+    public function getCrowds(int $selectType = 1): array
     {
         $args = [
             'org_code' => $this->getManageOrgCode(),
@@ -64,16 +64,18 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
         if ($selectType != 0 && is_numeric($selectType)){
             $args['select_type'] = $selectType;
         }
+
+        $data = Http::asJson()->post($this->baseUriVia() . 'innerapi/userGroup/page',$args)->json();
         Logger::BMP_GET_CROWD_TYPE->debug('获取人群分类', [
-            'org_code' => $this->getManageOrgCode(),
+            'org_codes' => $this->getManageOrgCode(),
             'sys_code' => $this->getSystemCode(),
             'disease_code' => $this->getDiseaseCode(),
             'scene_code' => $this->getSceneCode(),
             'tenant_id' => $this->getTenantId(),
             'select_type' => $selectType,
-            'uri'=>'innerapi/userGroup/page'
+            'uri'=>'innerapi/userGroup/page',
+            'result'=>$data
         ]);
-        $data = Http::asJson()->post($this->baseUriVia() . 'innerapi/userGroup/page',$args)->json();
         return $data['data']['results'] ??[];
     }
 
