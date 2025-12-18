@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace BrightLiu\LowCode\Controllers\LowCode;
 
+use BrightLiu\LowCode\Context\AdminContext;
 use Illuminate\Support\Arr;
 use BrightLiu\LowCode\Tools\Uuid;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
@@ -289,10 +290,14 @@ final class LowCodeV2ListController extends BaseController
             return $this->responseError('参数错误');
         }
 
-        $columns = AdminPreference::query()->where(
-                'scene',
-                SceneEnum::LIST_COLUMNS
-            )->where('pkey', $listCode)->value('pvalue');
+        // 优先获取用户个性化设置，用户无个性化设置时，获取系统缺省设置
+        $columns = AdminPreference::query()
+            ->whereIn('admin_id', [0, AdminContext::instance()->getAdminId()])
+            ->where('scene', SceneEnum::LIST_COLUMNS)
+            ->where('pkey', $listCode)
+            ->get(['admin_id', 'pvalue'])
+            ->sortByDesc('admin_id')
+            ->first()?->pvalue;
 
         // 缺省时，从low_code_part中解析获取
         if (empty($columns)) {
@@ -338,7 +343,7 @@ final class LowCodeV2ListController extends BaseController
             return $this->responseError('参数错误');
         }
 
-        $preference = AdminPreference::query()->where(
+        $preference = AdminPreference::query()->where('admin_id', AdminContext::instance()->getAdminId())->where(
                 'scene',
                 SceneEnum::LIST_COLUMNS
             )->where('pkey', $listCode)->first();
@@ -348,7 +353,7 @@ final class LowCodeV2ListController extends BaseController
                 'scene'  => SceneEnum::LIST_COLUMNS,
                 'pkey'   => $listCode,
                 'pvalue' => $columns,
-                //                'admin_id' => AdminContext::instance()->getAdminId(),
+                'admin_id' => AdminContext::instance()->getAdminId(),
             ]);
         } else {
             $preference->update(['pvalue' => $columns]);
