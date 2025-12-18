@@ -44,7 +44,9 @@ final class LowCodeV2ListController extends BaseController
      */
     public function simpleList(Request $request): JsonResponse
     {
-        $list = LowCodeList::query()->byContextDisease()->where(
+        $list = LowCodeList::query()
+//            ->byContextDisease()
+            ->where(
                 'list_type',
                 '<>',
                 ListTypeEnum::GENERAL
