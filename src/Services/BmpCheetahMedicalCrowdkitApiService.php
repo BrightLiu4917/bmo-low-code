@@ -76,6 +76,10 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
             'uri'=>'innerapi/userGroup/page',
             'result'=>$data
         ]);
+
+        if ($data['code'] != 200) {
+            throw new ServiceException($data['message']);
+        }
         return $data['data']['results'] ??[];
     }
 
