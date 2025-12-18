@@ -9,6 +9,7 @@ use BrightLiu\LowCode\Resources\PersonalizeMenu\ListResource;
 use BrightLiu\LowCode\Resources\PersonalizeMenu\RoutesResource;
 use BrightLiu\LowCode\Models\LowCodePersonalizeModule;
 use BrightLiu\LowCode\Services\LowCode\LowCodePersonalizeModuleService;
+use BrightLiu\LowCode\Traits\Context\WithOrgContext;
 use Gupo\BetterLaravel\Http\BaseController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,6 +19,8 @@ use Illuminate\Http\Request;
  */
 final class LowCodePersonalizeModuleController extends BaseController
 {
+    use WithOrgContext;
+
     /**
      * 列表
      */
@@ -27,6 +30,7 @@ final class LowCodePersonalizeModuleController extends BaseController
 
         $data = LowCodePersonalizeModule::query()
                                         ->byContextDisease()
+                                        ->where('org_code', $this->getAffiliatedOrgCode())
                                         ->where('module_type', $moduleType)
                                         ->orderByDesc('weight')
                                         ->get(['id', 'title', 'module_id', 'module_type', 'metadata', 'created_at']);
@@ -45,6 +49,7 @@ final class LowCodePersonalizeModuleController extends BaseController
 
         $data = LowCodePersonalizeModule::query()
                                         ->byContextDisease()
+                                        ->where('org_code', $this->getAffiliatedOrgCode())
                                         ->where('module_type', $moduleType)
                                         ->orderByDesc('weight')
                                         ->get(['id', 'title', 'module_id', 'module_type', 'metadata', 'created_at']);

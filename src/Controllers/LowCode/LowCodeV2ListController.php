@@ -26,12 +26,15 @@ use BrightLiu\LowCode\Services\LowCode\LowCodeListService;
 use BrightLiu\LowCode\Services\CrowdKitService;
 use BrightLiu\LowCode\Services\LowCode\LowCodeCombiService;
 use BrightLiu\LowCode\Services\LowCode\AdminPreferenceService;
+use BrightLiu\LowCode\Traits\Context\WithOrgContext;
 
 /**
  * 低代码-列表
  */
 final class LowCodeV2ListController extends BaseController
 {
+    use WithOrgContext;
+
     /**
      * @param  \BrightLiu\LowCode\Services\LowCode\LowCodeListService  $service
      */
@@ -62,6 +65,9 @@ final class LowCodeV2ListController extends BaseController
         try {
             // 获取个性化菜单
             $personalizeModules = LowCodePersonalizeModule::query()->byContextDisease()->where(
+                    'org_code',
+                    $this->getAffiliatedOrgCode()
+                )->where(
                     'module_type',
                     'crowd_patients'
                 )->orderByDesc('weight')->get([

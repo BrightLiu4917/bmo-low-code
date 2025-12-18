@@ -7,6 +7,7 @@ namespace BrightLiu\LowCode\Services\LowCode;
 use BrightLiu\LowCode\Traits\Context\WithDiseaseContext;
 use BrightLiu\LowCode\Models\LowCodePersonalizeModule;
 use BrightLiu\LowCode\Services\LowCodeBaseService;
+use BrightLiu\LowCode\Traits\Context\WithOrgContext;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
 use Gupo\BetterLaravel\Service\BaseService;
 use Illuminate\Support\Facades\DB;
@@ -16,12 +17,13 @@ use Illuminate\Support\Facades\DB;
  */
 final class LowCodePersonalizeModuleService extends LowCodeBaseService
 {
-    use WithDiseaseContext;
+    use WithDiseaseContext, WithOrgContext;
 
     public function save(array $items, string $defaultModuleType = ''): bool
     {
         $formattedItems = collect($items)->map(fn ($item, $index) => [
             'disease_code' => $this->getDiseaseCode(),
+            'org_code' => $this->getAffiliatedOrgCode(),
             'title' => $item['title'] ?? '',
             'metadata' => json_encode($item['metadata'] ?? []),
             'module_id' => $item['module_id'] ?? '',
@@ -39,7 +41,7 @@ final class LowCodePersonalizeModuleService extends LowCodeBaseService
         }
 
         DB::transaction(function () use ($formattedItems) {
-            LowCodePersonalizeModule::query()->where('disease_code', $this->getDiseaseCode())->delete();
+            LowCodePersonalizeModule::query()->where('org_code', $this->getAffiliatedOrgCode())->where('disease_code', $this->getDiseaseCode())->delete();
 
             LowCodePersonalizeModule::query()->insert($formattedItems->toArray());
         });
