@@ -45,7 +45,7 @@ class AdminContext
 
     public function getAdminId(): string
     {
-        return (string) ($this->info['id'] ?? '');
+        return $this->info['id'] ?? '';
     }
 
     public function getAdminName(): string
