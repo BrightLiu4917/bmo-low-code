@@ -19,6 +19,8 @@ enum Logger: string
     // authing中间件
     case AUTHING = 'auth';
 
+    // event
+    case EVENT = 'event';
 
     // 低代码列表
     case LOW_CODE_LIST = 'low-code-list';
