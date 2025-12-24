@@ -59,7 +59,7 @@ class DiseaseAuthenticate
                 throw new AuthenticateException('BmoAuth Account invalid.');
             }
 
-            if (empty($bmoAccountDataPermission = BmoAuthApiService::instance()->getArcDataPermissionByUserId(userId: $bmoAccount['id'],arcCode: $arcCode))){
+            if (empty($bmoAccountDataPermission = BmoAuthApiService::instance()->getArcDataPermissionByUserId(userId: (int)$bmoAccount['id'],arcCode: $arcCode))){
                 throw new AuthenticateException('BmoAuth Account Data Permission invalid.');
             }
 

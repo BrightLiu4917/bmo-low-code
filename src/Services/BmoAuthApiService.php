@@ -70,7 +70,7 @@ class BmoAuthApiService extends LowCodeBaseService
 
 
     public function getArcDataPermissionByUserId(
-        string $userId = '',
+        string|int $userId = '',
         string $arcCode = '',
     ): array {
         $appId     = config('business.bmo-service.app_id');
