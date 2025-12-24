@@ -68,6 +68,37 @@ class BmoAuthApiService extends LowCodeBaseService
     }
 
 
+
+    public function getArcDataPermissionByUserId(
+        string $userId = '',
+        string $arcCode = '',
+    ): array {
+        $appId     = config('business.bmo-service.app_id');
+        $appSecret = config('business.bmo-service.app_secret');
+        if (!$appId || !$appSecret) {
+            throw new \RuntimeException('BMO服务配置错误');
+        }
+
+        $response = Http::timeout(10)->asJson()->retry(2, 500) // 重试2次，间隔500毫秒
+
+        ->withHeaders(
+            [
+                'AppId'         => $appId,
+                'AppSecret'     => $appSecret,
+            ]
+        )->get(
+            $this->baseUri.'/innerapi/arc/data-permission',
+            ['arc_code' => $arcCode, 'user_id' => $userId]
+        )->json();
+        Logger::BMO_AUTH_DEBUG->info('获取该用户的权限', [
+            'user_id' => $userId,
+            'arc_code' => $arcCode,
+            'response' => $response,
+        ]);
+        return $response['data'] ?? [];
+    }
+
+
     public function getArcDetail(string $arcCode = ''): array
     {
         $appId     = config('business.bmo-service.app_id');

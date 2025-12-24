@@ -35,6 +35,14 @@ final class OrgContext
     protected string $affiliatedOrgName = '';
 
 
+    protected string $rcUserId = '';
+
+
+    private array $dataPermissionManageAreaArr = [];
+
+
+    private array $dataPermissionManageOrgArr = [];
+
 
     /**
      * @return static
@@ -46,9 +54,13 @@ final class OrgContext
 
     /**
      * @param string $orgCode
-     * @param  string  $arcCode
-     *
-     * @return static
+     * @param string $arcCode
+     * @param array $manageAreaCodes
+     * @param array $manageOrgCodes
+     * @param string $affiliatedOrgName
+     * @param string $affiliatedOrgCode
+     * @param string $rcUserId
+     * @return statics
      */
     public static function init(
         string $orgCode = '',
@@ -56,18 +68,24 @@ final class OrgContext
         array $manageAreaCodes = [],
         array $manageOrgCodes = [],
         string $affiliatedOrgName = '',
-        string $affiliatedOrgCode = ''
+        string $affiliatedOrgCode = '',
+        string $rcUserId = '',
+        array $dataPermissionManageAreaArr = [],
+        array $dataPermissionManageOrgArr = []
     ): static
     {
         return tap(
             static::instance(),
-            function (OrgContext $context) use ($orgCode,$arcCode,$manageAreaCodes,$manageOrgCodes,$affiliatedOrgName,$affiliatedOrgCode) {
+            function (OrgContext $context) use ($orgCode,$arcCode,$manageAreaCodes,$manageOrgCodes,$affiliatedOrgName,$affiliatedOrgCode,$rcUserId,$dataPermissionManageAreaArr,$dataPermissionManageOrgArr) {
                 $context->setOrgCode($orgCode);
                 $context->setArcCode($arcCode);
                 $context->setManageOrgCodes($manageOrgCodes);
                 $context->setManageAreaCodes($manageAreaCodes);
                 $context->setAffiliatedOrgCode($affiliatedOrgCode);//所属机构编码
                 $context->setAffiliatedOrgName($affiliatedOrgName);//所属机构名称
+                $context->setRcUserId($rcUserId);//资源中心职工主键
+                $context->setDataPermissionManageAreaArr($dataPermissionManageAreaArr);
+                $context->setDataPermissionManageOrgArr($dataPermissionManageOrgArr);
                 try {
                     //这里获取用户中心的 arc 信息 org_name = arc_name 用户中心后端开发说的
                     $data = BmoAuthApiService::instance()->getArcDetail($arcCode);
@@ -91,6 +109,50 @@ final class OrgContext
                 }
             }
         );
+    }
+
+    public function setDataPermissionManageAreaArr(array $value): void
+    {
+        if ($value === $this->dataPermissionManageAreaArr) {
+            return;
+        }
+
+        $this->dataPermissionManageAreaArr = $value;
+    }
+
+    public function getDataPermissionManageAreaArr(): array
+    {
+        return $this->dataPermissionManageAreaArr;
+    }
+
+    public function setDataPermissionManageOrgArr(array $value): void
+    {
+        if ($value === $this->dataPermissionManageOrgArr) {
+            return;
+        }
+
+        $this->dataPermissionManageOrgArr = $value;
+    }
+
+
+    public function getDataPermissionManageOrgArr(): array
+    {
+        return $this->dataPermissionManageOrgArr;
+    }
+
+    public function setRcUserId(string $value): void
+    {
+        if ($value === $this->rcUserId) {
+            return;
+        }
+
+        $this->rcUserId = $value;
+    }
+
+
+    public function getRcUserId(): string
+    {
+        return $this->rcUserId;
     }
 
     public function setManageAreaCodes(array $value): void

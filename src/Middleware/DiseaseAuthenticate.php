@@ -54,13 +54,17 @@ class DiseaseAuthenticate
             }
 
             //获取用户中心账号信息
-            $bmoAccount = BmoAuthApiService::instance()->getUserByToken($token,$arcCode);
+            $bmoAccount = BmoAuthApiService::instance()->getUserByToken(token:$token,arcCode: $arcCode);
             if (empty($bmoAccount)){
                 throw new AuthenticateException('BmoAuth Account invalid.');
             }
 
+            if (empty($bmoAccountDataPermission = BmoAuthApiService::instance()->getArcDataPermissionByUserId(userId: $bmoAccount['id'],arcCode: $arcCode))){
+                throw new AuthenticateException('BmoAuth Account Data Permission invalid.');
+            }
+
             // 初始化上下文
-            $this->autoContext($bmoAccount,$token,$arcCode);
+            $this->autoContext($bmoAccount,$token,$arcCode,$bmoAccountDataPermission);
         } catch (\Throwable $e) {
             Logger::AUTHING->error(
                 sprintf('DiseaseAuthenticate failed: %s', $e->getMessage()),
@@ -72,7 +76,7 @@ class DiseaseAuthenticate
         return $next($request);
     }
 
-    protected function autoContext(array $admin,string $token = '',string $arcCode = ''): void
+    protected function autoContext(array $admin,string $token = '',string $arcCode = '',array $bmoAccountDataPermission = []): void
     {
         $request = request();
         DiseaseContext::init(
@@ -94,6 +98,12 @@ class DiseaseAuthenticate
 
         $affiliatedOrgCode = data_get($admin, 'org_extension.affiliated_org_code','');
 
+        $rcUserId = data_get($admin, 'rc_user_id','');
+
+        $dataPermissionManageAreaArr = data_get($admin, 'manage_area_arr',[]);
+
+        $dataPermissionManageOrgArr = data_get($admin, 'manage_org_arr',[]);
+
 
 
         OrgContext::init(
@@ -109,6 +119,10 @@ class DiseaseAuthenticate
             manageOrgCodes: $manageOrgCodes,
             affiliatedOrgName: $affiliatedOrgName,
             affiliatedOrgCode: $affiliatedOrgCode,
+            rcUserId: $rcUserId,
+            dataPermissionManageAreaArr: $dataPermissionManageAreaArr,
+            dataPermissionManageOrgArr: $dataPermissionManageOrgArr
+
         );
 
         AuthContext::init(
