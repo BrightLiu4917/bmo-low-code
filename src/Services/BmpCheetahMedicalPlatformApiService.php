@@ -158,7 +158,7 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
                     "split_flag"   => $splitFlag,
                     "sys_code"     => $this->getSystemCode(),
                     "tenant_id"    => $this->getTenantId(),
-                    "admin_id"     => $adminId,
+                    "admin_id"     => $this->getAdminRcUserId(),
                     "admin_name"   => $adminName,
                 ],
                 'respose'=>$data

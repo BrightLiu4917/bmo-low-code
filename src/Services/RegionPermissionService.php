@@ -41,7 +41,7 @@ class RegionPermissionService extends LowCodeBaseService
     public function formatPermission(?array $manageAreaCodes = null): array
     {
         try {
-            $manageAreaCodes = $manageAreaCodes ?? $this->getManageAreaCodes();
+            $manageAreaCodes = $manageAreaCodes ?? $this->getDataPermissionManageAreaArr();
 
             if (empty($manageAreaCodes)) {
                 return [];
