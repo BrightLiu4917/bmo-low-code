@@ -31,6 +31,30 @@ trait WithOrgContext
     protected ?string $contextAffiliatedOrgName = null;
 
 
+    protected ?array $dataPermissionManageAreaArr = [];
+
+    protected ?array $dataPermissionManageOrgArr = [];
+
+
+    public function getDataPermissionManageAreaArr(): array
+    {
+        if (empty($this->dataPermissionManageAreaArr)) {
+            $this->dataPermissionManageAreaArr = OrgContext::instance()->getDataPermissionManageAreaArr();
+        }
+
+        return $this->dataPermissionManageAreaArr;
+    }
+
+
+    public function getDataPermissionManageOrgArr(): array
+    {
+        if (empty($this->dataPermissionManageOrgArr)) {
+            $this->dataPermissionManageOrgArr = OrgContext::instance()->getDataPermissionManageOrgArr();
+        }
+
+        return $this->dataPermissionManageOrgArr;
+    }
+
     /**
      * 所属机构编码
      * @return string

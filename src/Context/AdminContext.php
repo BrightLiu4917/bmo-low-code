@@ -48,6 +48,11 @@ class AdminContext
         return $this->info['id'] ?? '';
     }
 
+    public function getAdminRcUserId(): string
+    {
+        return $this->info['rc_user_id'] ?? '';
+    }
+
     public function getAdminName(): string
     {
         return $this->info['name'] ?? '';

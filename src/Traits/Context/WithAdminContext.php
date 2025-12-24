@@ -41,4 +41,10 @@ trait WithAdminContext
     {
         return (string) Arr::get($this->getAdmin(), 'phone', '');
     }
+
+
+    public function getAdminRcUserId(): string
+    {
+        return (string) Arr::get($this->getAdmin(), 'rc_user_id', '');
+    }
 }

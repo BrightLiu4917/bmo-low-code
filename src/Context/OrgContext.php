@@ -35,7 +35,6 @@ final class OrgContext
     protected string $affiliatedOrgName = '';
 
 
-    protected string $rcUserId = '';
 
 
     private array $dataPermissionManageAreaArr = [];
@@ -76,14 +75,13 @@ final class OrgContext
     {
         return tap(
             static::instance(),
-            function (OrgContext $context) use ($orgCode,$arcCode,$manageAreaCodes,$manageOrgCodes,$affiliatedOrgName,$affiliatedOrgCode,$rcUserId,$dataPermissionManageAreaArr,$dataPermissionManageOrgArr) {
+            function (OrgContext $context) use ($orgCode,$arcCode,$manageAreaCodes,$manageOrgCodes,$affiliatedOrgName,$affiliatedOrgCode,$dataPermissionManageAreaArr,$dataPermissionManageOrgArr) {
                 $context->setOrgCode($orgCode);
                 $context->setArcCode($arcCode);
                 $context->setManageOrgCodes($manageOrgCodes);
                 $context->setManageAreaCodes($manageAreaCodes);
                 $context->setAffiliatedOrgCode($affiliatedOrgCode);//所属机构编码
                 $context->setAffiliatedOrgName($affiliatedOrgName);//所属机构名称
-                $context->setRcUserId($rcUserId);//资源中心职工主键
                 $context->setDataPermissionManageAreaArr($dataPermissionManageAreaArr);
                 $context->setDataPermissionManageOrgArr($dataPermissionManageOrgArr);
                 try {
@@ -140,20 +138,7 @@ final class OrgContext
         return $this->dataPermissionManageOrgArr;
     }
 
-    public function setRcUserId(string $value): void
-    {
-        if ($value === $this->rcUserId) {
-            return;
-        }
 
-        $this->rcUserId = $value;
-    }
-
-
-    public function getRcUserId(): string
-    {
-        return $this->rcUserId;
-    }
 
     public function setManageAreaCodes(array $value): void
     {
