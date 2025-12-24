@@ -91,6 +91,17 @@ class DiseaseAuthenticate
             default => []
         };
 
+        $dataPermissionManageAreaArr = data_get($bmoAccountDataPermission, 'manage_area_arr',[]);
+
+
+
+        $dataPermissionManageAreaArr = match (true) {
+            !empty($dataPermissionManageAreaArr) => RegionService::instance()->getBatchRegionLevel($dataPermissionManageAreaArr),
+            default => []
+        };
+
+
+
         $manageOrgCodes = data_get($admin, 'org_extension.arc_manage_orgs',[]);
 
 
@@ -100,9 +111,8 @@ class DiseaseAuthenticate
 
         $rcUserId = data_get($admin, 'rc_user_id','');
 
-        $dataPermissionManageAreaArr = data_get($admin, 'manage_area_arr',[]);
 
-        $dataPermissionManageOrgArr = data_get($admin, 'manage_org_arr',[]);
+        $dataPermissionManageOrgArr = data_get($bmoAccountDataPermission, 'manage_org_arr',[]);
 
 
 
