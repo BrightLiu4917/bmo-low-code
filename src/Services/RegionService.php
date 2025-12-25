@@ -83,7 +83,8 @@ class RegionService extends LowCodeBaseService
 
             if (empty($targetCodes)) {
                 $targetCodes = $this->aggregateRegionCode(
-                    RegionService::instance()->getManageAreaCodes()
+                    RegionService::instance()->getDataPermissionManageOrgArr()
+                        //->getManageAreaCodes()
                 );
             }
 
