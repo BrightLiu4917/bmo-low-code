@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Services;
 
+use Gupo\BetterLaravel\Exceptions\ServiceException;
 use Illuminate\Support\Facades\Http;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
@@ -105,7 +106,7 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
      * @param  string  $areaCode
      * @param  string  $orgCode
      * @param  int  $splitFlag
-     * @param  int  $adminId
+     * @param  string|int  $adminId
      * @param  string  $adminName
      *
      * @return string
@@ -119,10 +120,16 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
         string $areaCode = '',
         string $orgCode = '',
         int $splitFlag = 0,
-        int $adminId = 0,
+        int|string $adminId = '',
         string $adminName = '',
     )
     {
+        $adminId = $adminId ?: $this->getAdminRcUserId();
+
+        if (empty($adminId)){
+            throw new ServiceException('当前登录账号未关联职工信息， 请在资源中心职工管理新增当前职工信息');
+        }
+
         $data = Http::asJson()->timeout(3)->post($this->baseUriVia() . '/innerapi/patient/manager',
             [
                 "arc_code"     => $arcCode ?: $this->getArcCode(),
@@ -138,7 +145,7 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
                 "split_flag"   => $splitFlag,
                 "sys_code"     => $this->getSystemCode(),
                 "tenant_id"    => $this->getTenantId(),
-                "admin_id"     => $this->getAdminRcUserId(),
+                "admin_id"     => $adminId,
                 "admin_name"   => $adminName,
         ]
         )->json();

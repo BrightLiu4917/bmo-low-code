@@ -60,10 +60,10 @@ class DiseaseAuthenticate
             }
 
 
-            $rcUserId = data_get($bmoAccount, 'rc_user_id','');
-            if (empty($rcUserId)){
-                throw new AuthenticateException('当前登录账号未关联职工信息， 请在资源中心职工管理新增当前职工信息');
-            }
+//            $rcUserId = data_get($bmoAccount, 'rc_user_id','');
+//            if (empty($rcUserId)){
+//                throw new AuthenticateException('当前登录账号未关联职工信息， 请在资源中心职工管理新增当前职工信息');
+//            }
 
             if (empty($bmoAccountDataPermission = BmoAuthApiService::instance()->getArcDataPermissionByUserId(userId: (int)$bmoAccount['id'],arcCode: $arcCode))){
                 throw new AuthenticateException('BmoAuth Account Data Permission invalid.');

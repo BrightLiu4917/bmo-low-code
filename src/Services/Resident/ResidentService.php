@@ -235,7 +235,7 @@ class ResidentService extends BaseService
         string $arcCode = '',
         string $areaCode = '',
         string $orgCode = '',
-        int $adminId = 0,
+        int|string $adminId = '',
         string $adminName = '',
         int $splitFlag = 0,
     )
@@ -250,7 +250,7 @@ class ResidentService extends BaseService
            splitFlag: $splitFlag,
            orgCode:$orgCode,
            adminId: $adminId,
-            adminName: $adminName,
+           adminName: $adminName,
         );
     }
 
