@@ -176,6 +176,7 @@ class DataPermissionService extends LowCodeBaseService
         return match ($this->channel) {
             'region' => $this->handleRegionPermission(),
             'org'    => $this->handleOrgPermission(),
+            'apply_org_code'    => $this->handleOrgPermission(),
             default  => $this->handleUnknownChannel(),
         };
     }

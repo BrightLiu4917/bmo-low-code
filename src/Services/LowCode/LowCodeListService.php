@@ -368,7 +368,7 @@ class LowCodeListService extends LowCodeBaseService
                     ->channel($dataPermissionCode)->run();
                 Logger::DATA_PERMISSION_ERROR->debug(
                     'low-code-list-service-data-permission-get-result',
-                    ['data_permission_code' => $dataPermissionCode]
+                    ['data_permission_code' => $dataPermissionCode,'data_permission_condition'=>$dataPermissionCondition]
                 );
                 if (!empty($dataPermissionCondition)) {
                     $queryEngine->whereMixed($dataPermissionCondition);
