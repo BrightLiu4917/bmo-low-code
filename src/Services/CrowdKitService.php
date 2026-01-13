@@ -110,7 +110,7 @@ final class CrowdKitService extends LowCodeBaseService
      *
      * @param int $groupId 人群分类ID
      */
-    public function resolveGroupName(int $groupId, mixed $default = null): mixed
+    public function resolveGroupName(int $groupId, mixed $default = null,int $selectType = 0): mixed
     {
         if (empty($groupId)) {
             return $default;
@@ -118,7 +118,7 @@ final class CrowdKitService extends LowCodeBaseService
 
         $groupNameMapping = self::$groupNameMapping ??= rescue(
             fn () => array_column(
-                BmpCheetahMedicalCrowdkitApiService::instance()->getCrowds(),
+                BmpCheetahMedicalCrowdkitApiService::instance()->getCrowds(selectType: $selectType),
                 'group_name',
                 'id'
             ),

@@ -192,7 +192,7 @@ final class LowCodeV2ListController extends BaseController
             $empis = $data->pluck('empi')->toArray();
 
             //查询人群分类表里人群
-            $crowds  = BmpBaseLineService::instance()->getPatientCrowds($empis);
+            $crowds  = BmpBaseLineService::instance()->getPatientCrowds(empis:$empis,selectType: 0);
             $grouped = [];
             foreach ($crowds as $item) {
                 $empi = $item->empi;

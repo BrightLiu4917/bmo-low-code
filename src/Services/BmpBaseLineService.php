@@ -295,21 +295,21 @@ class BmpBaseLineService extends LowCodeBaseService
      *
      * @return mixed
      */
-    public function getPatientCrowds(array $empis = [])
+    public function getPatientCrowds(array $empis = [],int $selectType = 1):array
     {
         $data = QueryEngineService::instance()
                                  ->autoClient()
                                  ->useTable(config('low-code.bmo-baseline.database.crowd-type-table'))
-                                 ->setCache(50)
+                                 //->setCache(50)
                                  ->whereBatchEmpis($empis)
                                  ->select(['empi', 'group_id'])
                                  ->getAllResult();
 
         // 附加人群分类名称
-        return transform($data, function ($items) {
+        return transform($data, function ($items)use($selectType) {
             try {
                 foreach ($items as $item) {
-                    $item->group_name = (string) CrowdKitService::instance()->resolveGroupName(intval($item->group_id));
+                    $item->group_name = (string) CrowdKitService::instance()->resolveGroupName(groupId: intval($item->group_id),selectType: intval($selectType));
                 }
             } catch(\Throwable) {
 
