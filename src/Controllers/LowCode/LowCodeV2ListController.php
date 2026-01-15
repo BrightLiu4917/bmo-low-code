@@ -193,6 +193,7 @@ final class LowCodeV2ListController extends BaseController
 
             //查询人群分类表里人群
             $crowds  = BmpBaseLineService::instance()->getPatientCrowds(empis:$empis,selectType: 0);
+            Logger::LOW_CODE_LIST->debug('获取人群分类',[$crowds]);
             $grouped = [];
             foreach ($crowds as $item) {
                 $empi = $item->empi;

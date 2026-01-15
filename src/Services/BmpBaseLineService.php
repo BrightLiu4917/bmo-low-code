@@ -290,12 +290,12 @@ class BmpBaseLineService extends LowCodeBaseService
     }
 
     /**
-     * 获取患者人群分类
      * @param array $empis
-     *
-     * @return mixed
+     * @param int $selectType
+     * @return mixed|null
+     * @throws \Gupo\BetterLaravel\Exceptions\ServiceException
      */
-    public function getPatientCrowds(array $empis = [],int $selectType = 1):array
+    public function getPatientCrowds(array $empis = [],int $selectType = 1)
     {
         $data = QueryEngineService::instance()
                                  ->autoClient()
