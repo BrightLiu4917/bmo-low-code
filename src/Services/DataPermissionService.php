@@ -174,10 +174,10 @@ class DataPermissionService extends LowCodeBaseService
 
         // 默认处理器
         return match ($this->channel) {
-            'region' => $this->handleRegionPermission(),
-            'org'    => $this->handleOrgPermission(),
-            'apply_org_code'    => $this->handleOrgPermission(),
-            'refuse_org_code'    => $this->handleOrgPermission(),
+            'region' => $this->handleRegionPermission(),//地区
+            'org'    => $this->handleOrgPermission(),//纳管机构
+            'apply_org_code'    => $this->handleOrgPermission(),//申请机构
+            'refuse_org_code'    => $this->handleOrgPermission(),//拒绝机构
             default  => $this->handleUnknownChannel(),
         };
     }
