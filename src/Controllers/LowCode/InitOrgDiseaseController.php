@@ -20,7 +20,9 @@ final class InitOrgDiseaseController extends BaseController
 
         $force = (bool) $request->input('force', true);
 
-        $srv->handle($tableName, force: $force);
+        $templatePath = (string) $request->input('template_path', '');
+
+        $srv->handle($tableName, force: $force, templatePath: $templatePath);
 
         return $this->responseSuccess();
     }

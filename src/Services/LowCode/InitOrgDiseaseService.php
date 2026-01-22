@@ -33,8 +33,9 @@ final class InitOrgDiseaseService extends LowCodeBaseService
      * @param string $dataTableName 数仓表名
      * @param array $params 其他参数
      * @param bool $force 是否强制初始化
+     * @param string $templatePath 模板路径
      */
-    public function handle(string $dataTableName = '', array $params = [], bool $force = false): bool
+    public function handle(string $dataTableName = '', array $params = [], bool $force = false, string $templatePath = ''): bool
     {
         // 根据 病种&机构 从crowdkit服务中获取
         if (empty($dataTableName)) {
@@ -50,7 +51,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
         $devEnable = config('low-code.dev-enable', false);
         //开发模式
         if ($devEnable == false) {
-            DB::transaction(function () use ($dataTableName) {
+            DB::transaction(function () use ($dataTableName, $templatePath) {
                 // 前置清理
                 $this->clean();
 
@@ -62,7 +63,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
                 }
 
                 // low-code 初始化
-                $lowCodeList = $this->initLowCodeConfig($dataSource);
+                $lowCodeList = $this->initLowCodeConfig($dataSource, templatePath: $templatePath);
 
                 // 更新AdminPreference配置
                 $this->replaceAdminPreference($lowCodeList);
@@ -79,7 +80,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
             }
 
             // low-code 初始化
-            $lowCodeList = $this->initLowCodeConfig($dataSource);
+            $lowCodeList = $this->initLowCodeConfig($dataSource, templatePath: $templatePath);
 
             // 更新AdminPreference配置
             $this->replaceAdminPreference($lowCodeList);
@@ -169,9 +170,9 @@ final class InitOrgDiseaseService extends LowCodeBaseService
     /**
      * 初始化: 低代码配置
      */
-    protected function initLowCodeConfig(DatabaseSource $dataSource, string $scene = 'normal'): array
+    protected function initLowCodeConfig(DatabaseSource $dataSource, string $scene = 'normal', string $templatePath = ''): array
     {
-        $initTemplates = $this->loadTemplates();
+        $initTemplates = $this->loadTemplates($templatePath);
 
         if (empty($sceneTemplates = ($initTemplates[$scene] ?? ''))) {
             throw new ServiceException('场景初始化模板不存在');
@@ -292,11 +293,13 @@ final class InitOrgDiseaseService extends LowCodeBaseService
         }
     }
 
-    protected function loadTemplates(): array
+    protected function loadTemplates(string $templatePath = ''): array
     {
+        $templatePath = $templatePath ?: 'templates.json';
+
         try {
-            if (!file_exists($templateJson = storage_path('templates.json'))) {
-                $templateJson = app_path('templates.json');
+            if (!file_exists($templateJson = storage_path($templatePath))) {
+                $templateJson = app_path($templatePath);
                 if (!file_exists($templateJson)) {
                     throw new ServiceException('模板文件不存在');
                 }
