@@ -121,14 +121,14 @@ return [
                 'permission_key' => 'multiple_field',
             ],
             [
-                'title' => '纳管机构与转诊机构',
-                'code' => 'org_and_referral',
+                'title' => '纳管机构#排除已出组',
+                'code' => 'org_exclude_exited',
                 'symbol' => 'multiple_field',
                 'permission_key' => 'manage_org_code',
             ],
             [
-                'title' => '地区编码与转诊机构',
-                'code' => 'region_and_referral',
+                'title' => '地区编码#排除已出组',
+                'code' => 'region_exclude_exited',
                 'symbol' => 'multiple_field',
                 'permission_key' => 'multiple_field',
             ],

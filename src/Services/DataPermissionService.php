@@ -26,8 +26,8 @@ class DataPermissionService extends LowCodeBaseService
     private const CHANNEL_HANDLERS = [
         'region' => 'handleRegionPermission',
         'org'    => 'handleOrgPermission',
-        'region_and_referral' => 'handleRegionAndReferralPermission',
-        'org_and_referral' => 'handleOrgAndReferralPermission',
+        'region_exclude_exited' => 'handleRegionExcludeExited',
+        'org_exclude_exited' => 'handleOrgExcludeExited',
     ];
     protected array $mappingField = [];
 
@@ -215,9 +215,9 @@ class DataPermissionService extends LowCodeBaseService
     }
 
     /**
-     * 处理区域权限及转诊机构权限
+     * 处理区域权限并排除已出组
      */
-    private function handleRegionAndReferralPermission(array $permissionConfig): array
+    private function handleRegionExcludeExited(array $permissionConfig): array
     {
         $targetOrgCodeField = 'target_org_code';
 
@@ -244,9 +244,9 @@ class DataPermissionService extends LowCodeBaseService
     }
 
     /**
-     * 处理组织权限及转诊机构权限
+     * 处理组织权限并排除已出组
      */
-    private function handleOrgAndReferralPermission(array $permissionConfig): array
+    private function handleOrgExcludeExited(array $permissionConfig): array
     {
         $targetOrgCodeField = 'target_org_code';
 
