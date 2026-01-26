@@ -297,14 +297,26 @@ final class InitOrgDiseaseService extends LowCodeBaseService
     {
         $templatePath = $templatePath ?: 'templates.json';
 
+        // 如果不带后缀，默认加上 .json
+        if (pathinfo($templatePath, PATHINFO_EXTENSION) === '') {
+            $templatePath .= '.json';
+        }
+
         try {
-            if (!file_exists($templateJson = storage_path($templatePath))) {
-                $templateJson = app_path($templatePath);
-                if (!file_exists($templateJson)) {
-                    throw new ServiceException('模板文件不存在');
+            $templatePathResolvers = ['storage_path', 'app_path', 'base_path'];
+
+            $templateFile = '';
+            foreach ($templatePathResolvers as $resolver) {
+                if (file_exists($templateFile = $resolver($templatePath))) {
+                    break;
                 }
             }
-            $fileContent = file_get_contents($templateJson);
+
+            if (empty($templateFile)) {
+                throw new ServiceException('模板文件不存在');
+            }
+
+            $fileContent = file_get_contents($templateFile);
             $array = json_decode($fileContent, true);
             if (!is_array($array)){
                 throw new ServiceException('模板文件格式错误');
