@@ -26,6 +26,8 @@ class DataPermissionService extends LowCodeBaseService
     private const CHANNEL_HANDLERS = [
         'region' => 'handleRegionPermission',
         'org'    => 'handleOrgPermission',
+        'region_and_referral' => 'handleRegionAndReferralPermission',
+        'org_and_referral' => 'handleOrgAndReferralPermission',
     ];
     protected array $mappingField = [];
 
@@ -64,10 +66,24 @@ class DataPermissionService extends LowCodeBaseService
         $permissions = self::getAllPermission();
 
         if ($permissions === null) {
-            return collect();
+            return $this->defaultPermissionData();
         }
 
         return $permissions->keyBy('code')->toArray();
+    }
+
+    /**
+     * 默认的权限数据
+     */
+    protected function defaultPermissionData(): array
+    {
+        $items = [];
+
+        if (config('low-code.preset-permission-data.enabled', false)) {
+            $items = config('low-code.preset-permission-data.items', []);
+        }
+
+        return array_column($items, null, 'code');
     }
 
     public function setMappingField(array $values = []):static
@@ -95,7 +111,7 @@ class DataPermissionService extends LowCodeBaseService
 
             // 处理多字段情况
             if ($this->isMultipleField($permissionConfig)) {
-                return $this->processMappingField($this->getChannelPermissionValue());
+                return $this->processMappingField($this->getChannelPermissionValue($permissionConfig));
             }
 
             // 处理单字段权限
@@ -164,28 +180,28 @@ class DataPermissionService extends LowCodeBaseService
     /**
      * 获取渠道权限值
      */
-    private function getChannelPermissionValue(): array
+    private function getChannelPermissionValue(array $permissionConfig): array
     {
         $handlerMethod = self::CHANNEL_HANDLERS[$this->channel] ?? null;
 
         if ($handlerMethod && method_exists($this, $handlerMethod)) {
-            return $this->{$handlerMethod}();
+            return $this->{$handlerMethod}($permissionConfig);
         }
 
         // 默认处理器
         return match ($this->channel) {
-            'region' => $this->handleRegionPermission(),//地区
-            'org'    => $this->handleOrgPermission(),//纳管机构
-            'apply_org_code'    => $this->handleOrgPermission(),//申请机构
-            'refuse_org_code'    => $this->handleOrgPermission(),//拒绝机构
-            default  => $this->handleUnknownChannel(),
+            'region' => $this->handleRegionPermission($permissionConfig),//地区
+            'org'    => $this->handleOrgPermission($permissionConfig),//纳管机构
+            'apply_org_code'    => $this->handleOrgPermission($permissionConfig),//申请机构
+            'refuse_org_code'    => $this->handleOrgPermission($permissionConfig),//拒绝机构
+            default  => $this->handleUnknownChannel($permissionConfig),
         };
     }
 
     /**
      * 处理区域权限
      */
-    private function handleRegionPermission(): array
+    private function handleRegionPermission(array $permissionConfig): array
     {
         return RegionPermissionService::instance()->formatPermission();
     }
@@ -193,15 +209,75 @@ class DataPermissionService extends LowCodeBaseService
     /**
      * 处理组织权限
      */
-    private function handleOrgPermission(): array
+    private function handleOrgPermission(array $permissionConfig): array
     {
         return OrgPermissionService::instance()->formatOrg();
     }
 
     /**
+     * 处理区域权限及转诊机构权限
+     */
+    private function handleRegionAndReferralPermission(array $permissionConfig): array
+    {
+        $targetOrgCodeField = 'target_org_code';
+
+        $permission = RegionPermissionService::instance()->formatPermission();
+
+        if (!empty($manageOrgArr = $this->getDataPermissionManageOrgArr())) {
+            $permission = [
+                'group:or',
+                $permission,
+                [
+                    [
+                        'raw',
+                        sprintf(
+                            '%s in (%s)',
+                            $targetOrgCodeField,
+                            implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
+                        ),
+                    ],
+                ],
+            ];
+        }
+
+        return $permission;
+    }
+
+    /**
+     * 处理组织权限及转诊机构权限
+     */
+    private function handleOrgAndReferralPermission(array $permissionConfig): array
+    {
+        $targetOrgCodeField = 'target_org_code';
+
+        $permissionKey = $permissionConfig['permission_key'] ?? '';
+
+        $permission = [$permissionKey, 'in', $this->handleOrgPermission($permissionConfig)];
+
+        if (!empty($manageOrgArr = $this->getDataPermissionManageOrgArr())) {
+            $permission = [
+                'group:or',
+                $permission,
+                [
+                    [
+                        'raw',
+                        sprintf(
+                            '%s in (%s)',
+                            $targetOrgCodeField,
+                            implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
+                        ),
+                    ],
+                ],
+            ];
+        }
+
+        return $permission;
+    }
+
+    /**
      * 处理未知渠道
      */
-    private function handleUnknownChannel(): array
+    private function handleUnknownChannel(array $permissionConfig): array
     {
         // 记录日志或抛出异常，根据业务需求决定
         \Log::warning("Unknown data permission channel: {$this->channel}");
@@ -215,7 +291,7 @@ class DataPermissionService extends LowCodeBaseService
     {
         $permissionKey = $permissionConfig['permission_key'] ?? '';
         $operationSymbol = $permissionConfig['symbol'] ?? '';
-        $permissionValue = $this->getChannelPermissionValue();
+        $permissionValue = $this->getChannelPermissionValue($permissionConfig);
 
         // 验证必要字段
         if (empty($permissionKey) || empty($operationSymbol)) {

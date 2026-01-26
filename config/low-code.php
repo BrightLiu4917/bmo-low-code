@@ -2,10 +2,18 @@
 
 use BrightLiu\LowCode\Enums\Foundation\Middleware;
 use BrightLiu\LowCode\Resources\LowCode\LowCodeList\QuerySource;
+use BrightLiu\LowCode\Services\LowCode\QueryBuilder\DefaultQueryBuilder;
 
 return [
     // 开发环境是否
     'dev-enable' => env('DEV_ENABLE', false),
+
+    // 自定义查询构建器
+    'custom-query' => [
+        'enabled' => env('BLC_CUSTOM_QUERY_ENABLED', false),
+
+        'builder' => env('BLC_CUSTOM_QUERY_BUILDER', DefaultQueryBuilder::class),
+    ],
 
     "cache-model" => [
         // 是否开启 id/code 缓存
@@ -94,4 +102,36 @@ return [
 
     //设置区域缓存时间
     'region-cache-ttl'=>env('REGION_CACHE_TTL',60),
+
+    // 数据权限预设(对应 data_permission表)
+    'preset-permission-data' => [
+        'enabled' => env('BLC_PRESET_PERMISSION_DATA_ENABLED', false),
+
+        'items' => [
+            [
+                'title' => '纳管机构',
+                'code' => 'org',
+                'symbol' => 'in',
+                'permission_key' => 'manage_org_code',
+            ],
+            [
+                'title' => '地区编码',
+                'code' => 'region',
+                'symbol' => 'multiple_field',
+                'permission_key' => 'multiple_field',
+            ],
+            [
+                'title' => '纳管机构与转诊机构',
+                'code' => 'org_and_referral',
+                'symbol' => 'multiple_field',
+                'permission_key' => 'manage_org_code',
+            ],
+            [
+                'title' => '地区编码与转诊机构',
+                'code' => 'region_and_referral',
+                'symbol' => 'multiple_field',
+                'permission_key' => 'multiple_field',
+            ],
+        ]
+    ]
 ];

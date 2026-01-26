@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace BrightLiu\LowCode\Services\LowCode;
 
+use BrightLiu\LowCode\Services\Contracts\ILowCodeQueryBuilder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -23,6 +24,8 @@ use BrightLiu\LowCode\Services\QueryEngineService;
 use BrightLiu\LowCode\Exceptions\QueryEngineException;
 use Gupo\BetterLaravel\Database\CustomLengthAwarePaginator;
 use Illuminate\Database\Query\Builder;
+use BrightLiu\LowCode\Services\LowCode\QueryBuilder\DefaultQueryBuilder;
+use BrightLiu\LowCode\Services\LowCode\QueryBuilder\QueryBuilderManager;
 
 /**
  * 低代码-列表
@@ -277,6 +280,13 @@ class LowCodeListService extends LowCodeBaseService
         array $config,
         string $bizSceneTable,
     ) {
+        // TODO: 为保持原版稳定，当前仅通过开关启用新版本的自定义查询构建器，后续功能稳定后可去掉开关控制
+        if (config('low-code.custom-query.enabled', false)) {
+            app()->bindIf(ILowCodeQueryBuilder::class, QueryBuilderManager::resolve());
+
+            return app(ILowCodeQueryBuilder::class)($queryEngine, $queryParams, $config, $bizSceneTable);
+        }
+
         try {
             if (empty($queryEngine)) {
                 throw new ServiceException(

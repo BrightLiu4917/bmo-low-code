@@ -5,6 +5,7 @@ namespace BrightLiu\LowCode\Core\Traits;
 use Closure;
 use Illuminate\Support\Arr;
 use BrightLiu\LowCode\Models\LowCodeList;
+use Gupo\BetterLaravel\Exceptions\ServiceException;
 
 /**
  * 混合查询
@@ -19,7 +20,13 @@ trait DynamicWhereTrait
         if (!empty($conditions) && is_null($this->queryBuilder)){
             throw new ServiceException('queryBuilder实例为null 请检查“场景编码”映射database_sources表中数据是否存在正确');
         }
-        
+
+        // 处理嵌套的条件组，例如 ['group:or', [[['raw', [...]],...], [['raw', [...]],...]]
+        if (!empty($conditions) && is_string($conditions[0]) && preg_match('/^group:(and|or)$/i', $conditions[0], $matches)) {
+            $operationSymbol = $matches[1];
+            return $this->whereGroupMixed(array_slice($conditions, 1), $operationSymbol);
+        }
+
         foreach ($conditions as $key => $condition) {
             // 处理 ['or', Closure] 或 ['and', Closure]
             if (is_array($condition) && count($condition) === 2 &&
@@ -100,6 +107,38 @@ trait DynamicWhereTrait
                     'where'}($column, $operator, $value),
             };
         }
+
+        return $this;
+    }
+
+    /**
+     * 处理嵌套的条件组
+     */
+    public function whereGroupMixed(array $groupConditions, string $operationSymbol = 'and'): self
+    {
+        $operationMethod = match(strtolower($operationSymbol)) {
+            'and' => 'where',
+            'or'  => 'orWhere',
+            default => '',
+        };
+
+        if (empty($operationMethod)) {
+            return $this;
+        }
+
+        $stashQueryBuilder = $this->queryBuilder;
+
+        $stashQueryBuilder->where(function($query) use ($operationMethod, $groupConditions) {
+            foreach ($groupConditions as $groupConditionItem) {
+                $query->{$operationMethod}(function ($orQuery) use ($groupConditionItem) {
+                    $this->queryBuilder = $orQuery;
+                    $this->whereMixed($groupConditionItem);
+                    return $orQuery;
+                });
+            }
+        });
+
+        $this->queryBuilder = $stashQueryBuilder;
 
         return $this;
     }
