@@ -40,6 +40,7 @@ class BasicInfoResource extends JsonResource
             'bth_dt' => transform($info['bth_dt'] ?? '', fn ($value) => Carbon::make($value)->format('Y-m-d')),
             'age' => max(!empty($info['age']) ? $info['age'] : Human::getIdcardAge($info['id_crd_no'] ?? ''), 1),
             'slf_tel_no' => Mask::phone($info['slf_tel_no'] ?? ''),
+            'original_slf_tel_no' => $info['slf_tel_no'] ?? '',
 
             // 基本体征信息
             'height' => BetterArr::get($info, ['height_arr_height', 'height']),
