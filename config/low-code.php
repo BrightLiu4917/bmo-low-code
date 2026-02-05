@@ -124,14 +124,14 @@ return [
                 'permission_key' => 'multiple_field',
             ],
             [
-                'title' => '纳管机构#排除已出组',
-                'code' => 'org_exclude_exited',
+                'title' => '纳管机构#包含转入',
+                'code' => 'org_transferred',
                 'symbol' => 'multiple_field',
                 'permission_key' => 'manage_org_code',
             ],
             [
-                'title' => '地区编码#排除已出组',
-                'code' => 'region_exclude_exited',
+                'title' => '地区编码#包含转入',
+                'code' => 'region_transferred',
                 'symbol' => 'multiple_field',
                 'permission_key' => 'multiple_field',
             ],

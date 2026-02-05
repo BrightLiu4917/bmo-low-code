@@ -26,8 +26,8 @@ class DataPermissionService extends LowCodeBaseService
     private const CHANNEL_HANDLERS = [
         'region' => 'handleRegionPermission',
         'org'    => 'handleOrgPermission',
-        'region_exclude_exited' => 'handleRegionExcludeExited',
-        'org_exclude_exited' => 'handleOrgExcludeExited',
+        'region_transferred' => 'handleRegionTransferred',
+        'org_transferred' => 'handleOrgTransferred',
     ];
     protected array $mappingField = [];
 
@@ -215,9 +215,9 @@ class DataPermissionService extends LowCodeBaseService
     }
 
     /**
-     * 处理区域权限并排除已出组
+     * 处理区域权限并包含转入的
      */
-    private function handleRegionExcludeExited(array $permissionConfig): array
+    private function handleRegionTransferred(array $permissionConfig): array
     {
         $targetOrgCodeField = 'target_org_code';
 
@@ -244,9 +244,9 @@ class DataPermissionService extends LowCodeBaseService
     }
 
     /**
-     * 处理组织权限并排除已出组
+     * 处理组织权限并包含转入的
      */
-    private function handleOrgExcludeExited(array $permissionConfig): array
+    private function handleOrgTransferred(array $permissionConfig): array
     {
         $targetOrgCodeField = 'target_org_code';
 
