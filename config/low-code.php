@@ -88,6 +88,9 @@ return [
          QuerySource::class=>'你的resource文件路径'
     ],
 
+    // 是否启用数据权限(影响LowCodeQuery查询时的数据权限条件)
+    'data-permission-enabled' => env('DATA_PERMISSION_ENABLED', true),
+
     //使用什么字段作为查询条件 默认 disease_code
     'low-code-set-use-table-field' => env('LOW_CODE_SET_USE_TABLE_FIELD','disease_code'),
 

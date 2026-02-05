@@ -10,7 +10,9 @@ class QueryBuilderManager
     {
         return [
             'default' => DefaultQueryBuilder::class,
+            'mysql' => MysqlQueryBuilder::class,
             'exclude_exited' => ExcludeExitedQueryBuilder::class,
+            'exclude_exited_mysql' => ExcludeExitedMysqlQueryBuilder::class,
         ];
     }
 

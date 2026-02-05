@@ -65,8 +65,14 @@ class DiseaseAuthenticate
 //                throw new AuthenticateException('当前登录账号未关联职工信息， 请在资源中心职工管理新增当前职工信息');
 //            }
 
-            if (empty($bmoAccountDataPermission = BmoAuthApiService::instance()->getArcDataPermissionByUserId(userId: (int)$bmoAccount['id'],arcCode: $arcCode))){
-                throw new AuthenticateException('BmoAuth Account Data Permission invalid.');
+            $bmoAccountDataPermission = [];
+            if (config('low-code.data-permission-enabled', true)) {
+                if (empty($bmoAccountDataPermission = BmoAuthApiService::instance()->getArcDataPermissionByUserId(
+                    userId: (int)$bmoAccount['id'],
+                    arcCode: $arcCode)
+                )) {
+                    throw new AuthenticateException('BmoAuth Account Data Permission invalid.');
+                }
             }
 
             // 初始化上下文
@@ -97,16 +103,16 @@ class DiseaseAuthenticate
             default => []
         };
 
-        $dataPermissionManageAreaArr = data_get($bmoAccountDataPermission, 'manage_area_arr',[]);
+        // 当未开启数据权限时，不做额外处理
+        $dataPermissionManageAreaArr = [];
+        if (empty($bmoAccountDataPermission)) {
+            $dataPermissionManageAreaArr = data_get($bmoAccountDataPermission, 'manage_area_arr',[]);
 
-
-
-        $dataPermissionManageAreaArr = match (true) {
-            !empty($dataPermissionManageAreaArr) => RegionService::instance()->getBatchRegionLevel($dataPermissionManageAreaArr),
-            default => []
-        };
-
-
+            $dataPermissionManageAreaArr = match (true) {
+                !empty($dataPermissionManageAreaArr) => RegionService::instance()->getBatchRegionLevel($dataPermissionManageAreaArr),
+                default => []
+            };
+        }
 
         $manageOrgCodes = data_get($admin, 'org_extension.arc_manage_orgs',[]);
 
