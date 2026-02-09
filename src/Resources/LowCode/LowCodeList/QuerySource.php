@@ -271,6 +271,14 @@ final class QuerySource extends JsonResource
             "manage_end_team_name"   => $this->manage_end_team_name ?? '',
             "manage_end_org_code"    => $this->manage_end_org_code ?? '',
             "manage_end_org_name"    => $this->manage_end_org_name ?? '',
+
+            'patient_source.variant' => match (intval($this->patient_source ?? 0)) {
+                1 => '后台建档',
+                2 => '数据采集',
+                3 => '院外义诊',
+                4 => '居民注册',
+                default => '--',
+            }
         ];
     }
 }
