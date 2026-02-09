@@ -295,7 +295,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
 
     protected function loadTemplates(string $templatePath = ''): array
     {
-        $templatePath = $templatePath ?: 'templates.json';
+        $templatePath = $templatePath ?: config('low-code.init.default_template', 'template.json');
 
         // 如果不带后缀，默认加上 .json
         if (pathinfo($templatePath, PATHINFO_EXTENSION) === '') {

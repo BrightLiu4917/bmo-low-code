@@ -8,6 +8,12 @@ return [
     // 开发环境是否
     'dev-enable' => env('DEV_ENABLE', false),
 
+    // 初始化脚本
+    'init' => [
+        // 默认模板
+        'default_template' => env('BLC_INIT_DEFAULT_TEMPLATE', 'template.json'),
+    ],
+
     // 自定义查询构建器
     'custom-query' => [
         'enabled' => env('BLC_CUSTOM_QUERY_ENABLED', false),
