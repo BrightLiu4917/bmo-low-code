@@ -127,7 +127,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                         }
                     }
 
-                    if (!empty($manageOrgCode)) {
+                    if (!isset($item['ehr_health_rcd_rcd_mng_org_cd'])) {
                         $item['ehr_health_rcd_rcd_mng_org_cd'] = $manageOrgCode;
                     }
 
