@@ -109,7 +109,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
     /**
      * 创建患者
      */
-    public function createPatients(array $patients, int|string $source = 1): void
+    public function createPatients(array $patients, int|string $source = 1, int|string $manageOrgCode = ''): void
     {
         if (empty($patients)) {
             return;
@@ -118,13 +118,17 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
         // 标识来源
         if (!empty($source)) {
             $patients = array_map(
-                function ($item) use ($source) {
+                function ($item) use ($source, $manageOrgCode) {
                     if (!isset($item['patient_source'])) {
                         $item['patient_source'] = $source;
 
                         if (!isset($item['spcl_crt_rcd_tm'])) {
                             $item['spcl_crt_rcd_tm'] = now()->toDateTimeString();
                         }
+                    }
+
+                    if (!empty($manageOrgCode)) {
+                        $item['ehr_health_rcd_rcd_mng_org_cd'] = $manageOrgCode;
                     }
 
                     return $item;

@@ -56,7 +56,7 @@ final class ResidentMaintenanceService extends BaseService
 
         try {
             // TODO: 写法待完善(需要过滤掉不存在的字段)
-            BmpCheetahMedicalCrowdkitApiService::make()->createPatients([$data]);
+            BmpCheetahMedicalCrowdkitApiService::make()->createPatients([$data], manageOrgCode: (string) $this->getAffiliatedOrgCode());
         } catch (\Throwable $e) {
             Logger::LARAVEL->error('导入失败：' . $e->getMessage());
             throw new ServiceException('数据格式不正确');
@@ -97,7 +97,7 @@ final class ResidentMaintenanceService extends BaseService
             $crowdSrv = BmpCheetahMedicalCrowdkitApiService::make();
 
             $data->chunk(100)->each(function ($data) use ($crowdSrv) {
-                $crowdSrv->createPatients($data->toArray());
+                $crowdSrv->createPatients($data->toArray(), manageOrgCode: (string) $this->getAffiliatedOrgCode());
             });
         } catch (\Throwable $e) {
             Logger::LARAVEL->error('导入失败：' . $e->getMessage());

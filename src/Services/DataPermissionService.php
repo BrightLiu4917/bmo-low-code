@@ -237,6 +237,31 @@ class DataPermissionService extends LowCodeBaseService
                         ),
                     ],
                 ],
+                [
+                    [
+                        'raw',
+                        sprintf(
+                            '%s in (%s)',
+                            'ehr_health_rcd_rcd_mng_org_cd',
+                            implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
+                        ),
+                    ]
+                ]
+            ];
+        } else {
+            $permission = [
+                'group:or',
+                $permission,
+                [
+                    [
+                        'raw',
+                        sprintf(
+                            '%s in (%s)',
+                            'ehr_health_rcd_rcd_mng_org_cd',
+                            implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
+                        ),
+                    ]
+                ]
             ];
         }
 
@@ -268,6 +293,31 @@ class DataPermissionService extends LowCodeBaseService
                         ),
                     ],
                 ],
+                [
+                    [
+                        'raw',
+                        sprintf(
+                            '%s in (%s)',
+                            'ehr_health_rcd_rcd_mng_org_cd',
+                            implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
+                        ),
+                    ]
+                ]
+            ];
+        } else {
+            $permission = [
+                'group:or',
+                $permission,
+                [
+                    [
+                        'raw',
+                        sprintf(
+                            '%s in (%s)',
+                            'ehr_health_rcd_rcd_mng_org_cd',
+                            implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
+                        ),
+                    ]
+                ]
             ];
         }
 
