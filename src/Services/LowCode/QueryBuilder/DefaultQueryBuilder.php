@@ -104,7 +104,7 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
      */
     public function prepareActions(): array
     {
-        return ['prepareAiFilter'];
+        return ['prepareAiFilter', 'prepareCrowdGroup'];
     }
 
     /**
@@ -134,16 +134,10 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
     }
 
     /**
-     * 构建基本的关联查询
+     * 将crowd_id转换为group_id条件
      */
-    public function relationQueryEngine(array $filters): void
+    public function prepareCrowdGroup(array $filters): array
     {
-        // 宽表 表名
-        $widthTable = config('low-code.bmo-baseline.database.crowd-psn-wdth-table', '');
-
-        // 人群表 表名
-        $crowdTable = config('low-code.bmo-baseline.database.crowd-type-table', '');
-
         // 提取并转换“人群分类”条件作为标准的查询条件
         $crowdIdIndex = Arr::first(
             array_keys($filters),
@@ -153,6 +147,20 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
             unset($filters[$crowdIdIndex]);
             $filters[] = ['t3.group_id', '=', $conditionOfCrowd[2]];
         }
+
+        return $filters;
+    }
+
+    /**
+     * 构建基本的关联查询
+     */
+    public function relationQueryEngine(array $filters): void
+    {
+        // 宽表 表名
+        $widthTable = config('low-code.bmo-baseline.database.crowd-psn-wdth-table', '');
+
+        // 人群表 表名
+        $crowdTable = config('low-code.bmo-baseline.database.crowd-type-table', '');
 
         // 构建基本的关联查询
         $this->queryEngine->useTable($crowdTable . ' as t3')
@@ -223,6 +231,8 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
     {
         // 数据权限条件
         $dataPermissionCode = $this->config['data_permission_code'] ?? '';
+
+        $dataPermissionCode = 'region_and_referral';
 
         Logger::DATA_PERMISSION_ERROR->debug(
             'low-code-list-service-data-permission',

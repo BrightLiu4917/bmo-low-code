@@ -25,16 +25,6 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
         // 人群表 表名
         $crowdTable = config('low-code.bmo-baseline.database.crowd-type-table', '');
 
-        // 提取并转换“人群分类”条件作为标准的查询条件
-        $crowdIdIndex = Arr::first(
-            array_keys($filters),
-            fn ($key) => isset($filters[$key][0]) && 'crowd_id' === $filters[$key][0]
-        );
-        if (!empty($conditionOfCrowd = $filters[$crowdIdIndex] ?? null)) {
-            unset($filters[$crowdIdIndex]);
-            $filters[] = ['t3.group_id', '=', $conditionOfCrowd[2]];
-        }
-
         // 构建基本的关联查询
         $this->queryEngine->useTable($crowdTable . ' as t3')
             ->innerJoin($widthTable . ' as t1', 't3.empi', '=', 't1.empi')
