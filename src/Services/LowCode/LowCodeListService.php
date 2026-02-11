@@ -250,7 +250,8 @@ class LowCodeListService extends LowCodeBaseService
                     clone $queryEngine,
                     $value,
                     $config,
-                    $bizSceneTable
+                    $bizSceneTable,
+                    isQueryCount: true
                 );
                 return $builtQuery->setCache($setCacheTtl)->getCountResult();
             }
@@ -279,12 +280,13 @@ class LowCodeListService extends LowCodeBaseService
         array $queryParams,
         array $config,
         string $bizSceneTable,
+        bool $isQueryCount = false
     ) {
         // TODO: 为保持原版稳定，当前仅通过开关启用新版本的自定义查询构建器，后续功能稳定后可去掉开关控制
         if (config('low-code.custom-query.enabled', false)) {
             app()->bindIf(ILowCodeQueryBuilder::class, QueryBuilderManager::resolve());
 
-            return app(ILowCodeQueryBuilder::class)($queryEngine, $queryParams, $config, $bizSceneTable);
+            return app(ILowCodeQueryBuilder::class)($queryEngine, $queryParams, $config, $bizSceneTable, $isQueryCount);
         }
 
         try {

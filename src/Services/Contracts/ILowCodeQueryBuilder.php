@@ -16,7 +16,8 @@ interface ILowCodeQueryBuilder
         QueryEngineAbstract $queryEngine,
         array $queryParams,
         array $config,
-        string $bizSceneTable
+        string $bizSceneTable,
+        bool $isQueryCount = false
     ): QueryEngineAbstract;
 
     /**

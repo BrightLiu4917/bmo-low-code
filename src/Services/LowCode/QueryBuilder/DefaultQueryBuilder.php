@@ -25,32 +25,37 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
 
     protected string $bizSceneTable;
 
+    protected bool $isQueryCount = false;
+
     /**
      * @param QueryEngineAbstract $queryEngine 查询引擎
      * @param array $queryParams 查询参数
      * @param array $config 低代码配置
      * @param string $bizSceneTable 业务场景表 表名
+     * @param bool $isQueryCount 是否为计数查询
      */
     public function __invoke(
         QueryEngineAbstract $queryEngine,
         array $queryParams,
         array $config,
-        string $bizSceneTable
+        string $bizSceneTable,
+        bool $isQueryCount = false
     ): QueryEngineAbstract {
         $this->queryEngine = $queryEngine;
         $this->queryParams = $queryParams;
         $this->config = $config;
         $this->bizSceneTable = $bizSceneTable;
+        $this->isQueryCount = $isQueryCount;
 
         // 前置准备
         $filters = $this->prepare();
 
         try {
-            // 构建基本的关联查询
-            $this->relationQueryEngine($filters);
-
             // 合并来自config中的预设条件
             $filters = $this->mergeConfigPresetCondition($filters);
+
+            // 构建基本的关联查询
+            $this->relationQueryEngine($filters);
 
             // 应用过滤条件
             if (!empty($filters)) {
