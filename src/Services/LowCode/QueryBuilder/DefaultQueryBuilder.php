@@ -151,6 +151,7 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
         if (!empty($conditionOfCrowd = $filters[$crowdIdIndex] ?? null)) {
             unset($filters[$crowdIdIndex]);
             $filters[] = ['t3.group_id', '=', $conditionOfCrowd[2]];
+            $filters = array_values($filters);
         }
 
         return $filters;
