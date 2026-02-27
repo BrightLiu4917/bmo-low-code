@@ -118,7 +118,10 @@ final class CrowdKitService extends LowCodeBaseService
 
         $groupNameMapping = self::$groupNameMapping ??= rescue(
             fn () => array_column(
-                BmpCheetahMedicalCrowdkitApiService::instance()->getCrowds(selectType: $selectType),
+                array_filter(
+                    BmpCheetahMedicalCrowdkitApiService::instance()->getCrowds(selectType: $selectType),
+                    fn ($item) => empty($item['select_type']) || $item['select_type'] != 9
+                ),
                 'group_name',
                 'id'
             ),
