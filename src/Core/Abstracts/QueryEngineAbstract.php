@@ -15,9 +15,10 @@ use Gupo\BetterLaravel\Exceptions\ServiceException;
 use BrightLiu\LowCode\Core\Traits\DynamicWhereTrait;
 use BrightLiu\LowCode\Exceptions\QueryEngineException;
 use BrightLiu\LowCode\Traits\Context\WithDiseaseContext;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 use BrightLiu\LowCode\Core\Contracts\QueryEngineContract;
 use BrightLiu\LowCode\Core\Traits\DynamicMultiOrderTrait;
+use BrightLiu\LowCode\Core\Traits\InstancePropertiesTrait;
 use BrightLiu\LowCode\Services\LowCode\DatabaseSourceService;
 
 /**
@@ -30,7 +31,8 @@ abstract class QueryEngineAbstract implements QueryEngineContract
     use
         DynamicWhereTrait,
         WithDiseaseContext,
-        DynamicMultiOrderTrait;
+        DynamicMultiOrderTrait,
+        InstancePropertiesTrait;
 
     // 查询构建器
     protected ?Builder $queryBuilder = null;
@@ -296,16 +298,21 @@ abstract class QueryEngineAbstract implements QueryEngineContract
     /**
      * 获取分页查询结果
      *
+     * @param bool $isSimplePaginate 是否使用简单分页
      *
-     * @return LengthAwarePaginator 分页结果
+     * @return Paginator 分页结果
      * @throws QueryEngineException 如果分页查询异常
      */
-    public function getPaginateResult(): LengthAwarePaginator
+    public function getPaginateResult(bool $isSimplePaginate = false): Paginator
     {
         try {
             if ($this->printSql || request()?->input('print_sql')) {
                 //打印SQL语句
                 $this->queryBuilder->dd();
+            }
+
+            if ($isSimplePaginate) {
+                return $this->queryBuilder->customSimplePaginate(true);
             }
             return $this->queryBuilder->customPaginate(true);
         } catch (\Throwable $e) {

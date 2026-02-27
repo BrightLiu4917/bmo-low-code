@@ -38,7 +38,7 @@ interface ILowCodeQueryBuilder
     /**
      * Build base relations for the query.
      */
-    public function relationQueryEngine(array $filters): void;
+    public function relationQueryEngine(array $filters): array;
 
     /**
      * Merge preset conditions from config.

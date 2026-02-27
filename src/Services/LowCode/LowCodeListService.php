@@ -26,6 +26,7 @@ use Gupo\BetterLaravel\Database\CustomLengthAwarePaginator;
 use Illuminate\Database\Query\Builder;
 use BrightLiu\LowCode\Services\LowCode\QueryBuilder\DefaultQueryBuilder;
 use BrightLiu\LowCode\Services\LowCode\QueryBuilder\QueryBuilderManager;
+use BrightLiu\LowCode\Services\CustomQueryEngineService;
 
 /**
  * 低代码-列表
@@ -139,6 +140,8 @@ class LowCodeListService extends LowCodeBaseService
     /**
      * @param  array  $inputArgs
      * @param  int  $setCacheTtl  设置缓存时间
+     * @param  bool  $export 是否为导出模式
+     * @param  bool  $isSimplePaginate 是否为简单分页
      *
      * @return void
      * @throws \Gupo\BetterLaravel\Exceptions\ServiceException
@@ -147,6 +150,7 @@ class LowCodeListService extends LowCodeBaseService
         array $inputArgs = [],
         int $setCacheTtl = 10,
         bool $export = false,
+        bool $isSimplePaginate = false,
     ) {
         try {
             // 解析code(code中可能携带中台的人群ID)
@@ -173,11 +177,15 @@ class LowCodeListService extends LowCodeBaseService
                     $bizSceneTable
                 );
 
+                if ($builtQuery instanceof CustomQueryEngineService) {
+                    $builtQuery->setQueryOptions($queryEngine, $value, $config, $bizSceneTable);
+                }
+
                 // 如果是导出模式
                 if ($export) {
                     return $builtQuery->setCache($setCacheTtl)->getAllResult();
                 }
-                return $builtQuery->setCache($setCacheTtl)->getPaginateResult();
+                return $builtQuery->setCache($setCacheTtl)->getPaginateResult($isSimplePaginate);
             }
         } catch (QueryEngineException $e) {
             Logger::LOW_CODE_LIST->error('低代码列表查询异常', [
@@ -275,7 +283,7 @@ class LowCodeListService extends LowCodeBaseService
      *
      * @return mixed
      */
-    private function buildQueryConditions(
+    public function buildQueryConditions(
         $queryEngine,
         array $queryParams,
         array $config,

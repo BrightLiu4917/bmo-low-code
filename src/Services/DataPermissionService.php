@@ -219,7 +219,7 @@ class DataPermissionService extends LowCodeBaseService
      */
     private function handleRegionTransferred(array $permissionConfig): array
     {
-        $targetOrgCodeField = 'target_org_code';
+        $targetOrgCodeField = 't1.target_org_code';
 
         $permission = RegionPermissionService::instance()->formatPermission();
 
@@ -242,7 +242,7 @@ class DataPermissionService extends LowCodeBaseService
                         'raw',
                         sprintf(
                             '%s in (%s)',
-                            'ehr_health_rcd_rcd_mng_org_cd',
+                            't1.ehr_health_rcd_rcd_mng_org_cd',
                             implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
                         ),
                     ]
@@ -257,7 +257,7 @@ class DataPermissionService extends LowCodeBaseService
                         'raw',
                         sprintf(
                             '%s in (%s)',
-                            'ehr_health_rcd_rcd_mng_org_cd',
+                            't1.ehr_health_rcd_rcd_mng_org_cd',
                             implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
                         ),
                     ]
@@ -273,7 +273,7 @@ class DataPermissionService extends LowCodeBaseService
      */
     private function handleOrgTransferred(array $permissionConfig): array
     {
-        $targetOrgCodeField = 'target_org_code';
+        $targetOrgCodeField = 't1.target_org_code';
 
         $permissionKey = $permissionConfig['permission_key'] ?? '';
 
@@ -298,7 +298,7 @@ class DataPermissionService extends LowCodeBaseService
                         'raw',
                         sprintf(
                             '%s in (%s)',
-                            'ehr_health_rcd_rcd_mng_org_cd',
+                            't1.ehr_health_rcd_rcd_mng_org_cd',
                             implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
                         ),
                     ]
@@ -313,7 +313,7 @@ class DataPermissionService extends LowCodeBaseService
                         'raw',
                         sprintf(
                             '%s in (%s)',
-                            'ehr_health_rcd_rcd_mng_org_cd',
+                            't1.ehr_health_rcd_rcd_mng_org_cd',
                             implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
                         ),
                     ]

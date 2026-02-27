@@ -45,6 +45,9 @@ return [
                 //人员宽表 主表
                 'crowd-psn-wdth-table'=>env('DB_MEDICAL_CROWD_PSN_WDTH_TABLE','crowd_psn_wdth'),
 
+                // 人群分类表 一般都是 user_group
+                'crowd-group-table'=>env('DB_MEDICAL_CROWD_GROUP_TABLE','user_group'),
+
                 'default' => [
                     'driver' => 'mysql',
                     'host' => env('DB_MEDICAL_PLATFORM_HOST', '127.0.0.1'),

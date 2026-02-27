@@ -183,39 +183,45 @@ final class LowCodeV2ListController extends BaseController
     {
         $inputArgs = $request->input('input_args');
         $export    = $request->input('export', false);
+        $isSimplePaginate = (bool) $request->input('is_simple_paginate', false);
+
         $data      = LowCodeListService::instance()->query(
             inputArgs: $inputArgs,
-            export: $export
+            export: $export,
+            isSimplePaginate: $isSimplePaginate
         );
         try {
-            // 追加人群分类信息
-            $empis = $data->pluck('empi')->toArray();
+            // 获取人群分类信息：在新版中已通过更优的方式获取，这里做兜底兼容处理
+            if (!empty($data) && $data->isNotEmpty() && !isset($data->first()->_crowds)) {
+                // 追加人群分类信息
+                $empis = $data->pluck('empi')->toArray();
 
-            //查询人群分类表里人群
-            $crowds  = BmpBaseLineService::instance()->getPatientCrowds(empis:$empis,selectType: 0);
-            Logger::LOW_CODE_LIST->debug('获取人群分类',[$crowds]);
-            $grouped = [];
-            foreach ($crowds as $item) {
-                $empi = $item->empi;
-                if (!isset($grouped[$empi])) {
-                    $grouped[$empi] = [];
+                //查询人群分类表里人群
+                $crowds  = BmpBaseLineService::instance()->getPatientCrowds(empis:$empis,selectType: 0);
+                Logger::LOW_CODE_LIST->debug('获取人群分类',[$crowds]);
+                $grouped = [];
+                foreach ($crowds as $item) {
+                    $empi = $item->empi;
+                    if (!isset($grouped[$empi])) {
+                        $grouped[$empi] = [];
+                    }
+                    $grouped[$empi][] = [
+                        'group_id'   => $item->group_id,
+                        'group_name' => $item->group_name,
+                    ];
                 }
-                $grouped[$empi][] = [
-                    'group_id'   => $item->group_id,
-                    'group_name' => $item->group_name,
-                ];
+
+                //$grouped 将患者的人群分类收集到一起
+                $data->each(function ($item) use ($grouped) {
+                    if (isset($grouped[$item->empi])) {
+                        $res           = (array)$grouped[$item->empi ?? ''];
+                        $item->_crowds = implode(
+                            ',',
+                            array_filter(array_column($res ?? [], 'group_name'))
+                        );
+                    }
+                });
             }
-
-            //$grouped 将患者的人群分类收集到一起
-            $data->each(function ($item) use ($grouped) {
-                if (isset($grouped[$item->empi])) {
-                    $res           = (array)$grouped[$item->empi ?? ''];
-                    $item->_crowds = implode(
-                        ',',
-                        array_filter(array_column($res ?? [], 'group_name'))
-                    );
-                }
-            });
 
             if ($export) {
                 $code = data_get($inputArgs, '0.code', '');

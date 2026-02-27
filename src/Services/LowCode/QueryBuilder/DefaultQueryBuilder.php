@@ -8,6 +8,7 @@ use BrightLiu\LowCode\Core\Abstracts\QueryEngineAbstract;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Services\BmoAIApiService;
 use BrightLiu\LowCode\Services\Contracts\ILowCodeQueryBuilder;
+use BrightLiu\LowCode\Services\CustomQueryEngineService;
 use BrightLiu\LowCode\Services\DataPermissionService;
 use BrightLiu\LowCode\Services\QueryEngineService;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
@@ -55,7 +56,7 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
             $filters = $this->mergeConfigPresetCondition($filters);
 
             // 构建基本的关联查询
-            $this->relationQueryEngine($filters);
+            $filters = $this->relationQueryEngine($filters);
 
             // 应用过滤条件
             if (!empty($filters)) {
@@ -68,7 +69,7 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
             // 应用排序规则
             $this->applyOrderBy();
 
-            return $this->queryEngine;
+            return CustomQueryEngineService::of($this->queryEngine);
         } catch (\Throwable $e) {
             Logger::LOW_CODE_LIST->error(
                 '低代码列表查询异常-buildQueryConditions',
@@ -160,7 +161,7 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
     /**
      * 构建基本的关联查询
      */
-    public function relationQueryEngine(array $filters): void
+    public function relationQueryEngine(array $filters): array
     {
         // 宽表 表名
         $widthTable = config('low-code.bmo-baseline.database.crowd-psn-wdth-table', '');
@@ -172,7 +173,9 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
         $this->queryEngine->useTable($crowdTable . ' as t3')
             ->innerJoin($widthTable . ' as t1', 't3.empi', '=', 't1.empi')
             ->leftJoin($this->bizSceneTable . ' as t2', 't3.empi', '=', 't2.empi')
-            ->select(['t2.*', 't1.*']);
+            ->select(['t1.empi']);
+
+        return $filters;
     }
 
     /**

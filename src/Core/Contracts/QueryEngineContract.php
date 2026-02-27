@@ -3,7 +3,7 @@
 namespace  BrightLiu\LowCode\Core\Contracts;
 
 use Illuminate\Support\Collection;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 
 /**
  * Interface QueryEngineContract
@@ -55,9 +55,11 @@ interface QueryEngineContract
     public function getCountResult(): int|string;
 
     /**
-     * @return LengthAwarePaginator
+     * @param bool $isSimplePaginate
+     *
+     * @return Paginator
      */
-    public function getPaginateResult(): LengthAwarePaginator;
+    public function getPaginateResult(bool $isSimplePaginate = false): Paginator;
 
     /**
      * @param string $column

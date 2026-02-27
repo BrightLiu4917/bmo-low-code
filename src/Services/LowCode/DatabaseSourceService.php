@@ -13,6 +13,7 @@ use Gupo\BetterLaravel\Exceptions\ServiceException;
 use BrightLiu\LowCode\Models\Traits\DiseaseRelation;
 use BrightLiu\LowCode\Core\DbConnectionManager;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use BrightLiu\LowCode\Enums\Foundation\BlinkCacheable;
 
 /**
  * 数据库源
@@ -113,8 +114,10 @@ final class DatabaseSourceService extends LowCodeBaseService
 
     public function getDataByDiseaseCode(string $diseaseCode = '')
     {
-        return DatabaseSource::query()->where(
-            'disease_code', $diseaseCode
-        )->value('code');
+        return BlinkCacheable::MODEL_DATABASESOURCE->remember(
+            key: (string) $diseaseCode,
+            ttl: 60 * 60,
+            callback: fn () => DatabaseSource::query()->where('disease_code', $diseaseCode)->value('code')
+        );
     }
 }
