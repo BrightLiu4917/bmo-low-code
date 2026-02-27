@@ -241,8 +241,6 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
         // 数据权限条件
         $dataPermissionCode = $this->config['data_permission_code'] ?? '';
 
-        $dataPermissionCode = 'region_and_referral';
-
         Logger::DATA_PERMISSION_ERROR->debug(
             'low-code-list-service-data-permission',
             ['data_permission_code' => $dataPermissionCode]

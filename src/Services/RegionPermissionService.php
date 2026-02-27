@@ -25,11 +25,11 @@ class RegionPermissionService extends LowCodeBaseService
     public static function manageAreaFieldMap(): array
     {
         return [
-            'prv'  => 'curr_addr_prv_cd',
-            'cty'  => 'curr_addr_cty_cd',
-            'cnty' => 'curr_addr_cnty_cd',
-            'twn'  => 'curr_addr_twn_cd',
-            'vlg'  => 'curr_addr_vlg_cd',
+            'prv'  => 't1.curr_addr_prv_cd',
+            'cty'  => 't1.curr_addr_cty_cd',
+            'cnty' => 't1.curr_addr_cnty_cd',
+            'twn'  => 't1.curr_addr_twn_cd',
+            'vlg'  => 't1.curr_addr_vlg_cd',
         ];
     }
 

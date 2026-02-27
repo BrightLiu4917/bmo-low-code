@@ -112,6 +112,8 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
      */
     protected function checkHasWidthTableFilter(array $filters): bool
     {
+        return true;
+
         foreach (Arr::dot($filters) as $key => $value) {
             if (
                 str_contains((string) $value, 't1.')
