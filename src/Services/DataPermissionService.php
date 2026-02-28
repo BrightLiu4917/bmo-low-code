@@ -65,7 +65,7 @@ class DataPermissionService extends LowCodeBaseService
     {
         $permissions = self::getAllPermission();
 
-        if ($permissions === null) {
+        if ($permissions === null || $permissions->isEmpty()) {
             return $this->defaultPermissionData();
         }
 
@@ -248,21 +248,6 @@ class DataPermissionService extends LowCodeBaseService
                     ]
                 ]
             ];
-        } else {
-            $permission = [
-                'group:or',
-                $permission,
-                [
-                    [
-                        'raw',
-                        sprintf(
-                            '%s in (%s)',
-                            't1.ehr_health_rcd_rcd_mng_org_cd',
-                            implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
-                        ),
-                    ]
-                ]
-            ];
         }
 
         return $permission;
@@ -293,21 +278,6 @@ class DataPermissionService extends LowCodeBaseService
                         ),
                     ],
                 ],
-                [
-                    [
-                        'raw',
-                        sprintf(
-                            '%s in (%s)',
-                            't1.ehr_health_rcd_rcd_mng_org_cd',
-                            implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
-                        ),
-                    ]
-                ]
-            ];
-        } else {
-            $permission = [
-                'group:or',
-                $permission,
                 [
                     [
                         'raw',

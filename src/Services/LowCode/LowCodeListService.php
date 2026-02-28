@@ -177,7 +177,9 @@ class LowCodeListService extends LowCodeBaseService
                     $bizSceneTable
                 );
 
-                if ($builtQuery instanceof CustomQueryEngineService) {
+                if (false === $builtQuery) {
+                    return $export ? [] : CustomLengthAwarePaginator::resolve([]);
+                } else if ($builtQuery instanceof CustomQueryEngineService) {
                     $builtQuery->setQueryOptions($queryEngine, $value, $config, $bizSceneTable);
                 }
 
@@ -261,6 +263,11 @@ class LowCodeListService extends LowCodeBaseService
                     $bizSceneTable,
                     isQueryCount: true
                 );
+
+                if (false === $builtQuery) {
+                    return 0;
+                }
+
                 return $builtQuery->setCache($setCacheTtl)->getCountResult();
             }
         } catch (QueryEngineException $e) {

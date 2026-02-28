@@ -105,7 +105,7 @@ class DiseaseAuthenticate
 
         // 当未开启数据权限时，不做额外处理
         $dataPermissionManageAreaArr = [];
-        if (empty($bmoAccountDataPermission)) {
+        if (!empty($bmoAccountDataPermission)) {
             $dataPermissionManageAreaArr = data_get($bmoAccountDataPermission, 'manage_area_arr',[]);
 
             $dataPermissionManageAreaArr = match (true) {

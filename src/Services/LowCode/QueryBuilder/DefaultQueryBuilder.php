@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Services\LowCode\QueryBuilder;
 
+use BrightLiu\LowCode\Context\OrgContext;
 use BrightLiu\LowCode\Core\Abstracts\QueryEngineAbstract;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Services\BmoAIApiService;
@@ -41,7 +42,7 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
         array $config,
         string $bizSceneTable,
         bool $isQueryCount = false
-    ): QueryEngineAbstract {
+    ): bool|QueryEngineAbstract {
         $this->queryEngine = $queryEngine;
         $this->queryParams = $queryParams;
         $this->config = $config;
@@ -81,6 +82,8 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
                 ]
             );
         }
+
+        return false;
     }
 
     /**
@@ -264,7 +267,18 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
      */
     public function attachDataPermissionCondition(): void
     {
+        if (!config('low-code.data-permission-enabled', true)) {
+            return;
+        }
+
         if (!empty($dataPermissionCondition = $this->resolveDataPermissionCondition())) {
+            if (
+                empty(OrgContext::instance()->getDataPermissionManageAreaArr())
+                && empty(OrgContext::instance()->getDataPermissionManageOrgArr())
+            ) {
+                throw new \Exception('暂无数据权限');
+            }
+
             $this->queryEngine->whereMixed($dataPermissionCondition);
         }
     }
