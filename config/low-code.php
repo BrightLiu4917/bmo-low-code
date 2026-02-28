@@ -48,6 +48,9 @@ return [
                 // 人群分类表 一般都是 user_group
                 'crowd-group-table'=>env('DB_MEDICAL_CROWD_GROUP_TABLE','user_group'),
 
+                // 患者关注表
+                'crowd-follow-table' => env('DB_MEDICAL_CROWD_FOLLOW_TABLE', 'org_patient_follow'),
+
                 'default' => [
                     'driver' => 'mysql',
                     'host' => env('DB_MEDICAL_PLATFORM_HOST', '127.0.0.1'),

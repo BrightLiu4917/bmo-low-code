@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Services\LowCode\QueryBuilder;
 
+use BrightLiu\LowCode\Context\AdminContext;
 use BrightLiu\LowCode\Enums\Foundation\BlinkCacheable;
 use BrightLiu\LowCode\Services\Contracts\ILowCodeQueryBuilder;
 use BrightLiu\LowCode\Services\QueryEngineService;
 use Illuminate\Support\Arr;
+use Illuminate\Database\Query\Builder;
 
 /**
  * 针对mysql优化查询逻辑
@@ -36,6 +38,10 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
      */
     protected function checkHasBizSceneFilter(array $filters): bool
     {
+        if ($this->hasCustomSearchAction('search:managed_patients')) {
+            return true;
+        }
+
         if (!$this->isQueryCount) {
             return $this->hasBizScene;
         }
@@ -116,6 +122,10 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
      */
     protected function checkHasWidthTableFilter(array $filters): bool
     {
+        if ($this->hasCustomSearchAction('search:assigned_patients')) {
+            return true;
+        }
+
         if (!$this->isQueryCount) {
             return $this->hasWidthTable;
         }
@@ -266,5 +276,37 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
         }
 
         $this->queryEngine->multiOrderBy($orderBys);
+    }
+
+
+
+    /**
+     * 处理自定义搜索动作
+     */
+    protected function handleCustomSearchActions(array $searchActions, array $filters): void
+    {
+        // TODO: 写法待完善
+        // PS: 目前这里只能对t2表(场景表)进行查询条件，因为别的表可能在relationQueryEngine中没有被关联，后续可以根据实际情况进行调整
+
+        if (in_array('search:managed_patients', $searchActions, true)) {
+            $this->queryEngine->whereField(AdminContext::instance()->getAdminId(), 't2.manage_doctor_code');
+        }
+
+        if (in_array('search:assigned_patients', $searchActions, true)) {
+            $this->queryEngine->whereField(AdminContext::instance()->getAdminId(), 't1.assign_manage_doctor_code');
+        }
+
+        if (in_array('search:follow_patients', $searchActions, true)) {
+            $followTable = config('low-code.bmo-baseline.database.crowd-follow-table', '');
+
+            $this->queryEngine->getQueryBuilder()
+                ->whereExists(fn (Builder $query) => $query->from($followTable, 't20')
+                    ->selectRaw('1')
+                    ->whereRaw('t20.empi = t2.empi')
+                    ->where('follower', AdminContext::instance()->getAdminId())
+                    ->where('status', 1)
+                    ->where('is_deleted', 0)
+                );
+        }
     }
 }
