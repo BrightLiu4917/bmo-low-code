@@ -29,6 +29,21 @@ final class LowCodeCombiService extends BaseService
                     $item['filters'] = array_merge($item['filters'] ?? [], [['crowd_id', '=', $exploded['crowd_id']]]);
                 }
 
+                // 过滤掉无效条件
+                if (!empty($item['filters']) && is_array($item['filters'])) {
+                    $item['filters'] = array_values(
+                        array_filter(
+                            $item['filters'],
+                            fn ($itemFilter) => !(
+                                is_array($itemFilter)
+                                && count($itemFilter) >= 3
+                                && in_array((string) $itemFilter[1], ['like', '=', '<>', 'in'])
+                                && ($itemFilter[2] === '' ||  $itemFilter[2] === null)
+                            )
+                        )
+                    );
+                }
+
                 return $item;
             })
             ->toArray();
