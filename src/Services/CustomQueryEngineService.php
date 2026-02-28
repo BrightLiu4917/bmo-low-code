@@ -40,7 +40,7 @@ class CustomQueryEngineService extends QueryEngineService
 
     /**
      * 获取分页查询结果
-     * PS：重写父类方法，使用自定义分页逻辑
+     * PS：重写父类方法，使用自定义分页逻辑。拆解分页列表查询、分页count查询，分别做优化。
      *
      * @param bool $isSimplePaginate 是否使用简单分页
      *

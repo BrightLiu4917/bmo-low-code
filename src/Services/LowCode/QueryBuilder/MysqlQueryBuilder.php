@@ -36,6 +36,10 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
      */
     protected function checkHasBizSceneFilter(array $filters): bool
     {
+        if (!$this->isQueryCount) {
+            return $this->hasBizScene;
+        }
+
         foreach (Arr::dot($filters) as $key => $value) {
             if (
                 str_contains((string) $value, 't2.')
@@ -112,7 +116,14 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
      */
     protected function checkHasWidthTableFilter(array $filters): bool
     {
-        return true;
+        if (!$this->isQueryCount) {
+            return $this->hasWidthTable;
+        }
+
+        // 开启数据权限时强制需要
+        if (config('low-code.data-permission-enabled', true)) {
+            return true;
+        }
 
         foreach (Arr::dot($filters) as $key => $value) {
             if (
@@ -160,20 +171,12 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
         $bizSceneTable = $this->bizSceneTable;
 
         // 是否需要关联场景表
-        $hasBizScene = true;
-
-        // 是否关联人群分类表
-        $hasCrowdType = true;
+        $hasBizScene = $this->checkHasBizSceneFilter($filters);
 
         // 是否关联宽表
-        $hasWidthTable = true;
+        $hasWidthTable = $this->checkHasWidthTableFilter($filters);
 
-        if ($this->isQueryCount) {
-            $hasBizScene = $this->checkHasBizSceneFilter($filters);
-
-            $hasWidthTable = $this->checkHasWidthTableFilter($filters);
-        }
-
+        // 是否关联人群分类表
         // 人群分类表的关联比较特殊，一般情况下人群分类的select_type=9时，可以不需要关联
         $hasCrowdType = $this->checkHasCrowdTypeFilter($filters);
 
@@ -204,6 +207,9 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
         } elseif ($hasWidthTable) {
             $this->queryEngine->useTable($widthTable . ' as t1')
                 ->select(['t1.empi']);
+        } else {
+            $this->queryEngine->useTable($bizSceneTable . ' as t2')
+                ->select(['t2.empi']);
         }
 
         // 不需要关联人群分类表时，移除相关条件
@@ -239,10 +245,10 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
 
         $orderBys = array_merge($inputOrderBy, $defaultOrderBy);
 
-        // 根据连表情况调整排序字段前缀
+        // 为了有效的利用索引，根据连表情况调整排序字段前缀
         $recommendTbEmpi = match (true) {
-            $this->hasBizScene => 't2.empi',
             $this->hasWidthTable => 't1.empi',
+            $this->hasBizScene => 't2.empi',
             $this->hasCrowdType => 't3.empi',
             default => ''
         };
