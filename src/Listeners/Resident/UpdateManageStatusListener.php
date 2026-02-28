@@ -20,7 +20,7 @@ class UpdateManageStatusListener
 
         $event->initContext();
 
-        $attributes = $this->fetchAttributes($event);
+        $attributes = $this->fetchAttributes($event, $resident);
 
         if (empty($attributes = array_filter($attributes))) {
             return;
@@ -29,12 +29,12 @@ class UpdateManageStatusListener
         ResidentArchiveService::make()->updateInfo($event->userId, $attributes);
     }
 
-    protected function fetchAttributes($event): array
+    protected function fetchAttributes($event, array $resident): array
     {
         $attributes = [];
 
         // 仅管理时，更新纳管状态
-        if ($this->isManage($event)) {
+        if ($this->isManage($event, $resident)) {
             $attributes['manage_org_code'] = $event->arcCode;
             $attributes['manage_doctor_name'] = $event->operatorName;
             $attributes['manage_doctor_code'] = $event->operatorId;
@@ -50,8 +50,10 @@ class UpdateManageStatusListener
     /**
      * 判断是否为纳管
      */
-    protected function isManage($event): bool
+    protected function isManage($event, array $resident): bool
     {
-        return 2 == $event->manageStatus;
+        return 2 == $event->manageStatus
+        // 某些情况下没有=2(评估中状态)
+        || (empty($resident['manage_status']) && in_array($event->manageStatus, [3, 4]));
     }
 }
