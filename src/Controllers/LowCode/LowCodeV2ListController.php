@@ -26,6 +26,7 @@ use BrightLiu\LowCode\Services\LowCode\LowCodeListService;
 use BrightLiu\LowCode\Services\CrowdKitService;
 use BrightLiu\LowCode\Services\LowCode\LowCodeCombiService;
 use BrightLiu\LowCode\Services\LowCode\AdminPreferenceService;
+use BrightLiu\LowCode\Services\LowCode\ColumnAppender\AppenderManager;
 use BrightLiu\LowCode\Traits\Context\WithOrgContext;
 
 /**
@@ -264,24 +265,34 @@ final class LowCodeV2ListController extends BaseController
         Request $request,
         CrowdKitService $srv,
     ): JsonResponse {
-        $data = $srv->getOptionalColumns();
+        $data = $srv->getOptionalColumns()->toArray();
 
-        // TODO：写法待完善
-        // 预设人群分类模块
-        $data->push(
-            [
-                'id'      => 'preset',
-                'name'    => '人群信息',
-                'columns' => [
-                    [
-                        'id'     => 'preset_crowds',
-                        'name'   => '人群分类',
-                        'type'   => 'array',
-                        'column' => '_crowds',
-                    ],
-                ],
-            ],
-        );
+        // 获取追加列的元数据
+        try {
+            $appenderColumns = AppenderManager::collectMetadata();
+            $existingGroupNames = array_column($data, 'name');
+            foreach ($appenderColumns as $appenderColumn) {
+                $name = $appenderColumn['name'] ?? null;
+                $key = array_search($name, $existingGroupNames, true);
+
+                if ($key !== false && isset($appenderColumn['columns'])) {
+                    $data[$key]['columns'] = array_merge(
+                        $data[$key]['columns'] ?? [],
+                        $appenderColumn['columns']
+                    );
+                } else {
+                    $data[] = $appenderColumn;
+                    $existingGroupNames[] = $name;
+                }
+            }
+        } catch (\Throwable $e) {
+            Logger::LOW_CODE_LIST->error('fetch-appender-metadata-error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ]);
+        }
 
         return $this->responseData(['items' => $data]);
     }

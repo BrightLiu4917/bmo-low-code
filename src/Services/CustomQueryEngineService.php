@@ -6,6 +6,7 @@ namespace BrightLiu\LowCode\Services;
 
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Exceptions\QueryEngineException;
+use BrightLiu\LowCode\Services\LowCode\ColumnAppender\AppenderManager;
 use BrightLiu\LowCode\Services\LowCode\LowCodeListService;
 use Gupo\BetterLaravel\Database\CustomLengthAwarePaginator;
 use Gupo\BetterLaravel\Database\CustomPaginator;
@@ -82,7 +83,7 @@ class CustomQueryEngineService extends QueryEngineService
 
             // 附加额外信息
             try {
-                $items = $this->attachCrowdGroup($items);
+                $items = AppenderManager::make()->handle($queryEngine, $items);
             } catch (\Throwable $e) {
                 Logger::LOW_CODE_LIST->error('list-query-error', [
                     'error' => $e->getMessage(),
@@ -140,49 +141,6 @@ class CustomQueryEngineService extends QueryEngineService
 
         // 保持empis排序
         return $items->sortBy(fn ($item) => array_search($item->empi, $empis))->values();
-    }
-
-    /**
-     * 附加人群分类信息
-     */
-    protected function attachCrowdGroup(Collection $items): Collection
-    {
-        if (empty($items)) {
-            return $items;
-        }
-
-        if (empty($empis = $items->pluck('empi')->unique()->toArray())) {
-            return $items;
-        }
-
-        $queryEngine = clone $this->customQueryOptions['query_engine'];
-
-        $featureCrowdTable = config('low-code.bmo-baseline.database.crowd-type-table', 'feature_crowd_type');
-        $userGroupTable = config('low-code.bmo-baseline.database.crowd-group-table', 'user_group');
-
-        // 按empi连表查询人群分类信息(一个人可能属于多个人群分类)
-        $crowdGroups = $queryEngine->useTable($featureCrowdTable . ' as t1')
-            ->innerJoin($userGroupTable . ' as t2', 't2.id', '=', 't1.group_id')
-            ->getQueryBuilder()
-            ->whereIn('t1.empi', $empis)
-            ->where('t2.is_deleted', 0)
-            ->select(['t1.empi', 't2.group_name', 't2.select_type'])
-            ->get()
-            ->groupBy('empi');
-
-        return $items->map(function ($item) use ($crowdGroups) {
-            if (isset($crowdGroups[$item->empi])) {
-                $userCrowdGroups = collect($crowdGroups[$item->empi] ?? null);
-                $item->_crowds = $userCrowdGroups
-                    // select_type=9为基线人群，排除再外
-                    ->where('select_type', '<>', 9)
-                    ->pluck('group_name')
-                    ->unique()
-                    ->join(',');
-            }
-
-            return $item;
-        });
     }
 
     public static function of(QueryEngineService $source): self
