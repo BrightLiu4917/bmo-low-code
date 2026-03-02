@@ -8,8 +8,8 @@ use BrightLiu\LowCode\Context\AdminContext;
 use BrightLiu\LowCode\Enums\Foundation\BlinkCacheable;
 use BrightLiu\LowCode\Services\Contracts\ILowCodeQueryBuilder;
 use BrightLiu\LowCode\Services\QueryEngineService;
-use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Arr;
 
 /**
  * 针对mysql优化查询逻辑
@@ -256,12 +256,8 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
         $orderBys = array_merge($inputOrderBy, $defaultOrderBy);
 
         // 为了有效的利用索引，根据连表情况调整排序字段前缀
-        $recommendTbEmpi = match (true) {
-            $this->hasWidthTable => 't1.empi',
-            $this->hasBizScene => 't2.empi',
-            $this->hasCrowdType => 't3.empi',
-            default => ''
-        };
+        $recommendTbEmpi = $this->recommendTbEmpi();
+
         if (!empty($recommendTbEmpi)) {
             $orderBys = array_map(
                 function ($item) use ($recommendTbEmpi) {
@@ -278,7 +274,15 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
         $this->queryEngine->multiOrderBy($orderBys);
     }
 
-
+    protected function recommendTbEmpi(string $default = ''): string
+    {
+        return match (true) {
+            $this->hasWidthTable => 't1.empi',
+            $this->hasBizScene => 't2.empi',
+            $this->hasCrowdType => 't3.empi',
+            default => $default
+        };
+    }
 
     /**
      * 处理自定义搜索动作
