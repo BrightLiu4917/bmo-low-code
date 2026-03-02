@@ -10,6 +10,7 @@ use BrightLiu\LowCode\Services\Contracts\ILowCodeQueryBuilder;
 use BrightLiu\LowCode\Services\QueryEngineService;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 /**
  * 针对mysql优化查询逻辑
@@ -39,6 +40,20 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
     protected function checkHasBizSceneFilter(array $filters): bool
     {
         if ($this->hasCustomSearchAction('search:managed_patients')) {
+            return true;
+        }
+
+        if (
+            in_array(
+                config('low-code.custom-query.builder', ''),
+                [
+                    ExcludeExitedMysqlQueryBuilder::class,
+                    ExcludeExitedQueryBuilder::class,
+                    'exclude_exited',
+                    'exclude_exited_mysql',
+                ]
+            )
+        ) {
             return true;
         }
 
@@ -126,10 +141,6 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
             return true;
         }
 
-        if (!$this->isQueryCount) {
-            return $this->hasWidthTable;
-        }
-
         // 开启数据权限时强制需要
         if (config('low-code.data-permission-enabled', true)) {
             return true;
@@ -192,34 +203,34 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
 
         // TODO: 写法待完善
         if ($hasBizScene && $hasCrowdType && $hasWidthTable) {
-            $this->queryEngine->useTable($crowdTypeTable . ' as t3')
-                ->innerJoin($widthTable . ' as t1', 't3.empi', '=', 't1.empi')
-                ->innerJoin($bizSceneTable . ' as t2', 't1.empi', '=', 't2.empi')
-                ->select([$this->recommendQueryEmpi('t2.empi')]);
+            $this->queryEngine->useTable($this->recommendIndex($crowdTypeTable, 't3'))
+                ->innerJoin($this->recommendIndex($widthTable, 't1'), 't3.empi', '=', 't1.empi')
+                ->innerJoin($this->recommendIndex($bizSceneTable, 't2'), 't1.empi', '=', 't2.empi')
+                ->select([$this->recommendSortEmpi('t2.empi')]);
         } elseif ($hasBizScene && $hasCrowdType) {
-            $this->queryEngine->useTable($bizSceneTable . ' as t2')
-                ->innerJoin($crowdTypeTable . ' as t3', 't2.empi', '=', 't3.empi')
-                ->select([$this->recommendQueryEmpi('t2.empi')]);
+            $this->queryEngine->useTable($this->recommendIndex($bizSceneTable, 't2'))
+                ->innerJoin($this->recommendIndex($crowdTypeTable, 't3'), 't2.empi', '=', 't3.empi')
+                ->select([$this->recommendSortEmpi('t2.empi')]);
         } elseif ($hasBizScene && $hasWidthTable) {
-            $this->queryEngine->useTable($bizSceneTable . ' as t2')
-                ->innerJoin($widthTable . ' as t1', 't2.empi', '=', 't1.empi')
-                ->select([$this->recommendQueryEmpi('t2.empi')]);
+            $this->queryEngine->useTable($this->recommendIndex($bizSceneTable, 't2'))
+                ->innerJoin($this->recommendIndex($widthTable, 't1'), 't2.empi', '=', 't1.empi')
+                ->select([$this->recommendSortEmpi('t2.empi')]);
         } elseif ($hasCrowdType && $hasWidthTable) {
-            $this->queryEngine->useTable($widthTable . ' as t1')
-                ->innerJoin($crowdTypeTable . ' as t3', 't1.empi', '=', 't3.empi')
-                ->select([[$this->recommendQueryEmpi('t2.empi')]]);
+            $this->queryEngine->useTable($this->recommendIndex($widthTable, 't1'))
+                ->innerJoin($this->recommendIndex($crowdTypeTable, 't3'), 't1.empi', '=', 't3.empi')
+                ->select([$this->recommendSortEmpi('t2.empi')]);
         } elseif ($hasCrowdType) {
             $this->queryEngine->useTable($crowdTypeTable . ' as t3')
-                ->select([[$this->recommendQueryEmpi('t2.empi')]]);
+                ->select([$this->recommendSortEmpi('t2.empi')]);
         } elseif ($hasBizScene) {
             $this->queryEngine->useTable($bizSceneTable . ' as t2')
-                ->select([$this->recommendQueryEmpi('t2.empi')]);
+                ->select([$this->recommendSortEmpi('t2.empi')]);
         } elseif ($hasWidthTable) {
             $this->queryEngine->useTable($widthTable . ' as t1')
-                ->select([[$this->recommendQueryEmpi('t2.empi')]]);
+                ->select([$this->recommendSortEmpi('t2.empi')]);
         } else {
             $this->queryEngine->useTable($bizSceneTable . ' as t2')
-                ->select([$this->recommendQueryEmpi('t2.empi')]);
+                ->select([$this->recommendSortEmpi('t2.empi')]);
         }
 
         // 不需要关联人群分类表时，移除相关条件
@@ -272,6 +283,19 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
 
     protected function recommendSortEmpi(string $default = ''): string
     {
+        // 针对索引优化
+        // TODO: 写法待完善
+        $searchKey = join(Arr::flatten($this->filters));
+        if ($this->hasWidthTable && str_contains($searchKey, 't1.rsdnt_nm')) {
+            return 't1.empi';
+        }
+        if ($this->hasBizScene && str_contains($searchKey, 't2.manage_status')) {
+            return 't2.empi';
+        }
+        if ($this->hasWidthTable && str_contains($searchKey, 't1.assign_manage_doctor_code')) {
+            return 't1.empi';
+        }
+
         return match (true) {
             $this->hasBizScene => 't2.empi',
             $this->hasWidthTable => 't1.empi',
@@ -280,13 +304,33 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
         };
     }
 
-    protected function recommendQueryEmpi(string $default = ''): string
+    protected function recommendJoinEmpi(string $default = ''): string
     {
         return match (true) {
-            $this->hasWidthTable => 't1.empi',
-            $this->hasBizScene => 't2.empi',
             $this->hasCrowdType => 't3.empi',
+            $this->hasBizScene => 't2.empi',
+            $this->hasWidthTable => 't1.empi',
             default => $default
+        };
+    }
+
+    protected function recommendIndex(string $table, string $alias = 't1'): mixed
+    {
+        $searchKey = join(Arr::flatten($this->filters));
+
+        $indexPlaceholder = '';
+
+        // 针对索引优化
+        // TODO: 写法待完善
+        if ($table == config('low-code.bmo-baseline.database.crowd-psn-wdth-table', '')) {
+            if ($this->hasWidthTable && str_contains($searchKey, 't1.assign_manage_doctor_code')) {
+                $indexPlaceholder = 'idx_empi_assign';
+            }
+        }
+
+        return match (true) {
+            !empty($indexPlaceholder) => DB::raw(sprintf('%s as %s force index(%s)', $table, $alias, $indexPlaceholder)),
+            default => sprintf('%s as %s', $table, $alias),
         };
     }
 

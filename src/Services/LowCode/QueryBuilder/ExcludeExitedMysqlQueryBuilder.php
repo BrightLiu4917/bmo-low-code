@@ -7,7 +7,6 @@ namespace BrightLiu\LowCode\Services\LowCode\QueryBuilder;
 use BrightLiu\LowCode\Services\Contracts\ILowCodeQueryBuilder;
 use BrightLiu\LowCode\Traits\Context\WithDiseaseContext;
 use BrightLiu\LowCode\Traits\Context\WithOrgContext;
-use Illuminate\Support\Facades\DB;
 
 class ExcludeExitedMysqlQueryBuilder extends MysqlQueryBuilder implements ILowCodeQueryBuilder
 {
@@ -20,7 +19,7 @@ class ExcludeExitedMysqlQueryBuilder extends MysqlQueryBuilder implements ILowCo
     {
         $filters = parent::relationQueryEngine($filters);
 
-        $recommendEmpi = $this->recommendQueryEmpi('t1.empi');
+        $recommendEmpi = $this->recommendJoinEmpi('t1.empi');
 
         // 排除已出组患者
         $this->queryEngine->getQueryBuilder()->whereNotIn($recommendEmpi, function ($query) {

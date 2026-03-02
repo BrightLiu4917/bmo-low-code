@@ -23,6 +23,8 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
 
     protected array $queryParams;
 
+    protected array $filters = [];
+
     protected array $config;
 
     protected string $bizSceneTable;
@@ -61,9 +63,11 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
             // 解析出自定义搜索动作
             ['actions' => $searchActions, 'filters' => $filters] = $this->resolveCustomSearchActions($filters);
             $this->setCustomSearchActions($searchActions);
+            $this->setFilters($filters);
 
             // 构建基本的关联查询
             $filters = $this->relationQueryEngine($filters);
+            $this->setFilters($filters);
 
             // 应用过滤条件
             if (!empty($filters)) {
@@ -341,6 +345,16 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
     public function getCustomSearchActions(): array
     {
         return $this->customSearchActions;
+    }
+
+    public function setFilters(array $filters): void
+    {
+        $this->filters = $filters;
+    }
+
+    public function getFilters(): array
+    {
+        return $this->filters;
     }
 
     public function hasCustomSearchAction(string|array $action): bool

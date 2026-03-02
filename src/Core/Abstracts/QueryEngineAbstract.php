@@ -684,7 +684,7 @@ abstract class QueryEngineAbstract implements QueryEngineContract
      * @return self
      */
     public function join(
-        string $table,
+        $table,
         string $first,
         string $operator = '=',
         string $second = null,
@@ -1075,7 +1075,7 @@ abstract class QueryEngineAbstract implements QueryEngineContract
      * 添加 INNER JOIN 关系
      */
     public function innerJoin(
-        string $table,
+        $table,
         string $first,
         string $operator = '=',
         string $second = null
