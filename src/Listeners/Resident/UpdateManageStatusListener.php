@@ -52,8 +52,12 @@ class UpdateManageStatusListener
      */
     protected function isManage($event, array $resident): bool
     {
+        $isManageStatus = [3, 4];
+
         return 2 == $event->manageStatus
         // 某些情况下没有=2(评估中状态)
-        || (empty($resident['manage_status']) && in_array($event->manageStatus, [3, 4]));
+        || (empty($resident['manage_status']) && in_array($event->manageStatus, $isManageStatus))
+        // 从终止状态变更为纳管中
+        || (in_array($resident['manage_status'], [6, 9]) && in_array($event->manageStatus, $isManageStatus));
     }
 }
