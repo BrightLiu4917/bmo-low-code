@@ -148,5 +148,17 @@ return [
                 'permission_key' => 'multiple_field',
             ],
         ]
-    ]
+    ],
+
+    // API请求日志
+    'api_access_log' => [
+        // 日志记录驱动，database(api_access_logs)、file
+        'driver' => env('API_ACCESS_LOG_DRIVER', 'file'),
+
+        // 开启记录
+        'enabled' => (bool) env('API_ACCESS_LOG_ENABLED', false),
+
+        // 保留天数
+        'days' => (int) env('API_ACCESS_LOG_DAYS', 30),
+    ],
 ];

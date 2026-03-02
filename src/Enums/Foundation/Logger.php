@@ -80,4 +80,7 @@ enum Logger: string
 
     // 居民服务
     case RESIDENT_SERVICE = 'resident-service';
+
+    // 接口访问日志(innerapi)
+    case API_ACCESS_LOG = 'api-access-log';
 }
