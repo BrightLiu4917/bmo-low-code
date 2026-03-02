@@ -285,7 +285,7 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
         if (!empty($dataPermissionCondition = $this->resolveDataPermissionCondition())) {
             if (
                 empty(OrgContext::instance()->getDataPermissionManageAreaArr())
-                && empty(OrgContext::instance()->getDataPermissionManageOrgArr())
+                && empty(OrgContext::instance()->getDataPermissionManageOrgArr(true))
             ) {
                 throw new \Exception('暂无数据权限');
             }

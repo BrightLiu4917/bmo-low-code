@@ -133,8 +133,17 @@ final class OrgContext
     }
 
 
-    public function getDataPermissionManageOrgArr(): array
+    public function getDataPermissionManageOrgArr(bool $merged = false): array
     {
+        // 合并所属机构(为了兼容只设置所属机构没设置管辖机构的情况)
+        if ($merged) {
+            return array_values(
+                array_unique(
+                    array_merge($this->dataPermissionManageOrgArr, [$this->getAffiliatedOrgCode()])
+                )
+            );
+        }
+
         return $this->dataPermissionManageOrgArr;
     }
 

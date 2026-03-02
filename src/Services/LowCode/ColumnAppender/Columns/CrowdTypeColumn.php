@@ -6,10 +6,13 @@ namespace BrightLiu\LowCode\Services\LowCode\ColumnAppender\Columns;
 
 use BrightLiu\LowCode\Services\LowCode\ColumnAppender\IColumn;
 use BrightLiu\LowCode\Services\QueryEngineService;
+use BrightLiu\LowCode\Traits\Context\WithOrgContext;
 use Illuminate\Support\Collection;
 
 class CrowdTypeColumn extends BasicColumn implements IColumn
 {
+    use WithOrgContext;
+
     public function preload(QueryEngineService $queryEngine, Collection $items): mixed
     {
         if (empty($empis = $items->pluck('empi')->unique()->toArray())) {
@@ -23,6 +26,7 @@ class CrowdTypeColumn extends BasicColumn implements IColumn
         return $queryEngine->useTable($featureCrowdTable . ' as t1')
             ->innerJoin($userGroupTable . ' as t2', 't2.id', '=', 't1.group_id')
             ->getQueryBuilder()
+            ->where('t2.org_code', $this->getAffiliatedOrgCode())
             ->whereIn('t1.empi', $empis)
             ->where('t2.is_deleted', 0)
             ->select(['t1.empi', 't2.group_name', 't2.select_type'])

@@ -46,10 +46,10 @@ trait WithOrgContext
     }
 
 
-    public function getDataPermissionManageOrgArr(): array
+    public function getDataPermissionManageOrgArr(bool $merged = false): array
     {
         if (empty($this->dataPermissionManageOrgArr)) {
-            $this->dataPermissionManageOrgArr = OrgContext::instance()->getDataPermissionManageOrgArr();
+            $this->dataPermissionManageOrgArr = OrgContext::instance()->getDataPermissionManageOrgArr($merged);
         }
 
         return $this->dataPermissionManageOrgArr;

@@ -25,7 +25,7 @@ class ExcludeExitedQueryBuilder extends DefaultQueryBuilder implements ILowCodeQ
             $query->select(DB::raw(1))
                 ->from('org_patient_out as t10')
                 ->where('t10.patient_id', DB::raw('t2.empi'))
-                ->whereIn('t10.org_code', $this->getDataPermissionManageOrgArr())
+                ->whereIn('t10.org_code', $this->getDataPermissionManageOrgArr(true))
                 ->where('t10.disease_code', $this->getDiseaseCode())
                 ->where('t10.scene_code', $this->getSceneCode())
                 ->where('t10.is_deleted', 0);
