@@ -305,7 +305,7 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
 
         // 转换filters为统一的字符串格式便于检查
         $stringifiedFilters = array_map(
-            fn ($item) => is_array($item) ? join($item) : $item,
+            fn ($item) => is_array($item) ? join(Arr::flatten($item)) : $item,
             $filters
         );
 
