@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace BrightLiu\LowCode\Services;
 
-
+use BrightLiu\LowCode\Enums\Foundation\Cacheable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
@@ -47,18 +47,22 @@ class BmoAuthApiService extends LowCodeBaseService
             throw new \RuntimeException('BMO服务配置错误');
         }
 
-        $response = Http::timeout(10)->asJson()->retry(2, 500) // 重试2次，间隔500毫秒
+        $response = Cacheable::USER_CENTER_TOKEN->remember(
+            $token . ':' . $arcCode,
+            15 * 60,
+            fn () => Http::timeout(10)->asJson()->retry(2, 500) // 重试2次，间隔500毫秒
+                ->withHeaders(
+                    [
+                        'AppId'         => $appId,
+                        'AppSecret'     => $appSecret,
+                        'Authorization' => $token,
+                    ]
+                )->get(
+                    $this->baseUri.'/innerapi/get-user-by-token',
+                    ['arc_code' => $arcCode]
+                )->json()
+        );
 
-            ->withHeaders(
-                [
-                    'AppId'         => $appId,
-                    'AppSecret'     => $appSecret,
-                    'Authorization' => $token,
-                ]
-            )->get(
-                $this->baseUri.'/innerapi/get-user-by-token',
-                ['arc_code' => $arcCode]
-            )->json();
         Logger::BMO_AUTH_DEBUG->info('获取用户中心数据', [
             'token_prefix' => substr($token, 0, 8).'...',
             'arc_code'     => $arcCode,
@@ -79,17 +83,20 @@ class BmoAuthApiService extends LowCodeBaseService
             throw new \RuntimeException('BMO服务配置错误');
         }
 
-        $response = Http::timeout(10)->asJson()->retry(2, 500) // 重试2次，间隔500毫秒
-
-        ->withHeaders(
-            [
-                'AppId'         => $appId,
-                'AppSecret'     => $appSecret,
-            ]
-        )->get(
-            $this->baseUri.'/innerapi/arc/data-permission',
-            ['arc_code' => $arcCode, 'user_id' => $userId]
-        )->json();
+        $response = Cacheable::USER_CENTER_PERMISSIONS->remember(
+            $userId . ':' . $arcCode,
+            15 * 60,
+            fn () => Http::timeout(10)->asJson()->retry(2, 500) // 重试2次，间隔500毫秒
+                ->withHeaders(
+                    [
+                        'AppId'         => $appId,
+                        'AppSecret'     => $appSecret,
+                    ]
+                )->get(
+                    $this->baseUri.'/innerapi/arc/data-permission',
+                    ['arc_code' => $arcCode, 'user_id' => $userId]
+                )->json()
+        );
         Logger::BMO_AUTH_DEBUG->info('获取该用户的权限', [
             'user_id' => $userId,
             'arc_code' => $arcCode,

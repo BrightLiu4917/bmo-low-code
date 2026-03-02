@@ -83,7 +83,9 @@ class CacheManager
      */
     public function client(): Repository
     {
-        return empty($this->tag) ? Cache::store() : Cache::tags($this->tag);
+        $supportTags = Cache::getStore() instanceof \Illuminate\Cache\TaggableStore;
+
+        return empty($this->tag) || !$supportTags ? Cache::store() : Cache::tags($this->tag);
     }
 
     /**

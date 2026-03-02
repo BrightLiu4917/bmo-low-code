@@ -18,6 +18,9 @@ enum Cacheable: string
     // 用户中心-org_code
     case USER_CENTER_ORG_CODE = 'uc:org_code';
 
+    // 用户中心-数据权限
+    case USER_CENTER_PERMISSIONS = 'uc:permissions';
+
 
     /* --------------------------------------------------------------- */
 
