@@ -181,55 +181,51 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
         $bizSceneTable = $this->bizSceneTable;
 
         // 是否需要关联场景表
-        $hasBizScene = $this->checkHasBizSceneFilter($filters);
+        $this->hasBizScene = $hasBizScene = $this->checkHasBizSceneFilter($filters);
 
         // 是否关联宽表
-        $hasWidthTable = $this->checkHasWidthTableFilter($filters);
+        $this->hasWidthTable = $hasWidthTable = $this->checkHasWidthTableFilter($filters);
 
         // 是否关联人群分类表
         // 人群分类表的关联比较特殊，一般情况下人群分类的select_type=9时，可以不需要关联
-        $hasCrowdType = $this->checkHasCrowdTypeFilter($filters);
+        $this->hasCrowdType = $hasCrowdType = $this->checkHasCrowdTypeFilter($filters);
 
         // TODO: 写法待完善
         if ($hasBizScene && $hasCrowdType && $hasWidthTable) {
             $this->queryEngine->useTable($crowdTypeTable . ' as t3')
                 ->innerJoin($widthTable . ' as t1', 't3.empi', '=', 't1.empi')
                 ->innerJoin($bizSceneTable . ' as t2', 't1.empi', '=', 't2.empi')
-                ->select(['t2.empi']);
+                ->select([$this->recommendQueryEmpi('t2.empi')]);
         } elseif ($hasBizScene && $hasCrowdType) {
             $this->queryEngine->useTable($bizSceneTable . ' as t2')
                 ->innerJoin($crowdTypeTable . ' as t3', 't2.empi', '=', 't3.empi')
-                ->select(['t2.empi']);
+                ->select([$this->recommendQueryEmpi('t2.empi')]);
         } elseif ($hasBizScene && $hasWidthTable) {
             $this->queryEngine->useTable($bizSceneTable . ' as t2')
                 ->innerJoin($widthTable . ' as t1', 't2.empi', '=', 't1.empi')
-                ->select(['t2.empi']);
+                ->select([$this->recommendQueryEmpi('t2.empi')]);
         } elseif ($hasCrowdType && $hasWidthTable) {
             $this->queryEngine->useTable($widthTable . ' as t1')
                 ->innerJoin($crowdTypeTable . ' as t3', 't1.empi', '=', 't3.empi')
-                ->select(['t1.empi']);
+                ->select([[$this->recommendQueryEmpi('t2.empi')]]);
         } elseif ($hasCrowdType) {
             $this->queryEngine->useTable($crowdTypeTable . ' as t3')
-                ->select(['t3.empi']);
+                ->select([[$this->recommendQueryEmpi('t2.empi')]]);
         } elseif ($hasBizScene) {
             $this->queryEngine->useTable($bizSceneTable . ' as t2')
-                ->select(['t2.empi']);
+                ->select([$this->recommendQueryEmpi('t2.empi')]);
         } elseif ($hasWidthTable) {
             $this->queryEngine->useTable($widthTable . ' as t1')
-                ->select(['t1.empi']);
+                ->select([[$this->recommendQueryEmpi('t2.empi')]]);
         } else {
             $this->queryEngine->useTable($bizSceneTable . ' as t2')
-                ->select(['t2.empi']);
+                ->select([$this->recommendQueryEmpi('t2.empi')]);
         }
 
         // 不需要关联人群分类表时，移除相关条件
         if (!$hasCrowdType) {
             $filters = $this->removeGroupIdFilter($filters);
         }
-
-        $this->hasBizScene = $hasBizScene;
-        $this->hasCrowdType = $hasCrowdType;
-        $this->hasWidthTable = $hasWidthTable;
 
         return $filters;
     }
@@ -256,13 +252,13 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
         $orderBys = array_merge($inputOrderBy, $defaultOrderBy);
 
         // 为了有效的利用索引，根据连表情况调整排序字段前缀
-        $recommendTbEmpi = $this->recommendTbEmpi();
+        $recommendEmpi = $this->recommendSortEmpi();
 
-        if (!empty($recommendTbEmpi)) {
+        if (!empty($recommendEmpi)) {
             $orderBys = array_map(
-                function ($item) use ($recommendTbEmpi) {
+                function ($item) use ($recommendEmpi) {
                     if (!empty($item[0]) && preg_match('/t\d\.empi/', (string) $item[0])) {
-                        $item[0] = $recommendTbEmpi;
+                        $item[0] = $recommendEmpi;
                     }
 
                     return $item;
@@ -274,7 +270,17 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
         $this->queryEngine->multiOrderBy($orderBys);
     }
 
-    protected function recommendTbEmpi(string $default = ''): string
+    protected function recommendSortEmpi(string $default = ''): string
+    {
+        return match (true) {
+            $this->hasBizScene => 't2.empi',
+            $this->hasWidthTable => 't1.empi',
+            $this->hasCrowdType => 't3.empi',
+            default => $default
+        };
+    }
+
+    protected function recommendQueryEmpi(string $default = ''): string
     {
         return match (true) {
             $this->hasWidthTable => 't1.empi',

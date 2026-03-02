@@ -20,13 +20,12 @@ class ExcludeExitedMysqlQueryBuilder extends MysqlQueryBuilder implements ILowCo
     {
         $filters = parent::relationQueryEngine($filters);
 
-        $recommendTbEmpi = $this->recommendTbEmpi('t2.empi');
+        $recommendEmpi = $this->recommendQueryEmpi('t1.empi');
 
         // 排除已出组患者
-        $this->queryEngine->getQueryBuilder()->whereNotExists(function ($query) use ($recommendTbEmpi) {
-            $query->select(DB::raw(1))
+        $this->queryEngine->getQueryBuilder()->whereNotIn($recommendEmpi, function ($query) {
+            $query->select('patient_id')
                 ->from('org_patient_out as t10')
-                ->where('t10.patient_id', DB::raw($recommendTbEmpi))
                 ->whereIn('t10.org_code', $this->getDataPermissionManageOrgArr(true))
                 ->where('t10.disease_code', $this->getDiseaseCode())
                 ->where('t10.scene_code', $this->getSceneCode())
