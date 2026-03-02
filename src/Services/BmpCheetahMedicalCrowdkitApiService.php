@@ -43,7 +43,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                 'disease_code' => $this->getDiseaseCode(),
                 'scene_code' => $this->getSceneCode()
             ])
-            
+
             ->json();
         return $data['data'] ?? [];
     }
@@ -101,7 +101,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                          'disease_code' => $this->getDiseaseCode(),
                          'scene_code' => $this->getSceneCode()
                      ])
-                     
+
                      ->json();
         return $data['data'] ?? [];
     }
@@ -137,27 +137,34 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
             );
         }
 
+        $data = [
+            'personal_batch_list' => array_map(
+                fn ($attributes) => [
+                    'col_values' => array_values(Arr::map(
+                        $attributes,
+                        fn ($value, $key) => ['col_name' => $key, 'col_value' => $value]
+                    )),
+                ],
+                $patients
+            ),
+            'data_source' => 1,
+            'org_code' => $this->getOrgCode(),
+            'sys_code' => $this->getSystemCode(),
+            'disease_code' => $this->getDiseaseCode(),
+            'scene_code' => $this->getSceneCode()
+        ];
+
+        Logger::RESIDENT_SERVICE->debug('创建患者', [
+            'uri' => 'innerapi/personal-crowd/create',
+            'data' => $data,
+        ]);
+
         Http::asJson()
             ->retry(3)
             ->timeout(15)
             ->post(
                 $this->baseUriVia() . 'innerapi/personal-crowd/create',
-                [
-                    'personal_batch_list' => array_map(
-                        fn ($attributes) => [
-                            'col_values' => array_values(Arr::map(
-                                $attributes,
-                                fn ($value, $key) => ['col_name' => $key, 'col_value' => $value]
-                            )),
-                        ],
-                        $patients
-                    ),
-                    'data_source' => 1,
-                    'org_code' => $this->getOrgCode(),
-                    'sys_code' => $this->getSystemCode(),
-                    'disease_code' => $this->getDiseaseCode(),
-                    'scene_code' => $this->getSceneCode()
-                ]
+                $data
             )
             ->json();
     }
@@ -175,22 +182,29 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
             return;
         }
 
+        $data = [
+            'empi' => $empi,
+            'col_values' => array_values(Arr::map(
+                $attributes,
+                fn ($value, $key) => ['col_name' => $key, 'col_value' => $value]
+            )),
+            'data_source' => 1,
+            'org_code' => $this->getOrgCode(),
+            'sys_code' => $this->getSystemCode(),
+            'disease_code' => $this->getDiseaseCode(),
+            'scene_code' => $this->getSceneCode()
+        ];
+
+        Logger::RESIDENT_SERVICE->info('更新患者', [
+            'uri' => 'innerapi/personal-crowd/update',
+            'data' => $data,
+        ]);
+
         Http::asJson()
             ->retry(3)
             ->timeout(15)
-            ->post($this->baseUriVia().'innerapi/personal-archive/create',[
-                'empi' => $empi,
-                'col_values' => array_values(Arr::map(
-                    $attributes,
-                    fn ($value, $key) => ['col_name' => $key, 'col_value' => $value]
-                )),
-                'data_source' => 1,
-                'org_code' => $this->getOrgCode(),
-                'sys_code' => $this->getSystemCode(),
-                'disease_code' => $this->getDiseaseCode(),
-                'scene_code' => $this->getSceneCode()
-            ])
-            
+            ->post($this->baseUriVia().'innerapi/personal-archive/create', $data)
+
             ->json();
     }
 
@@ -208,7 +222,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
                        'disease_code' => $this->getDiseaseCode(),
                        'scene_code' => $this->getSceneCode()
                    ])
-                   
+
                    ->json();
         return $data['data'] ?? [];
     }
