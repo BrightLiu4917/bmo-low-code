@@ -23,6 +23,10 @@ abstract class BasicColumn implements IColumn
         return $items->map(function ($item) use ($columnName, $sources) {
             $item->{$columnName} = $this->handleItem($item, $sources);
 
+            if (method_exists($this, 'handleItemVariant')) {
+                $item->{$columnName . '.variant'} = $this->handleItemVariant($item, $item->{$columnName});
+            }
+
             return $item;
         });
     }

@@ -7,6 +7,7 @@ namespace BrightLiu\LowCode\Services\LowCode\ColumnAppender;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Services\LowCode\ColumnAppender\Columns\CrowdTypeColumn;
 use BrightLiu\LowCode\Services\LowCode\ColumnAppender\Columns\FollowStatusColumn;
+use BrightLiu\LowCode\Services\LowCode\ColumnAppender\Columns\PatientTagsColumn;
 use BrightLiu\LowCode\Services\QueryEngineService;
 use BrightLiu\LowCode\Traits\InstanceMake;
 use Illuminate\Support\Collection;
@@ -24,6 +25,7 @@ class AppenderManager
     protected static array $appender = [
         CrowdTypeColumn::class,
         FollowStatusColumn::class,
+        PatientTagsColumn::class,
     ];
 
     public function handle(QueryEngineService $queryEngine, Collection $items): Collection

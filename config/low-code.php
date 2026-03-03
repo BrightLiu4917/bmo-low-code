@@ -19,6 +19,10 @@ return [
         'enabled' => env('BLC_CUSTOM_QUERY_ENABLED', false),
 
         'builder' => env('BLC_CUSTOM_QUERY_BUILDER', DefaultQueryBuilder::class),
+
+        'options' => [
+            'force_index' => env('BLC_CUSTOM_QUERY_FORCE_INDEX', false),
+        ]
     ],
 
     "cache-model" => [
@@ -50,6 +54,9 @@ return [
 
                 // 患者关注表
                 'crowd-follow-table' => env('DB_MEDICAL_CROWD_FOLLOW_TABLE', 'org_patient_follow'),
+
+                // 患者标签表
+                'crowd-patient-tag-table' => env('DB_MEDICAL_CROWD_PATIENT_TAG_TABLE', 'org_patient_tag'),
 
                 'default' => [
                     'driver' => 'mysql',

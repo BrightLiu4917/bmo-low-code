@@ -316,15 +316,17 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
 
     protected function recommendIndex(string $table, string $alias = 't1'): mixed
     {
-        $searchKey = join(Arr::flatten($this->filters));
-
         $indexPlaceholder = '';
 
-        // 针对索引优化
-        // TODO: 写法待完善
-        if ($table == config('low-code.bmo-baseline.database.crowd-psn-wdth-table', '')) {
-            if ($this->hasWidthTable && str_contains($searchKey, 't1.assign_manage_doctor_code')) {
-                $indexPlaceholder = 'idx_empi_assign';
+        if (config('low-code.custom-query.options.force_index', false)) {
+            $searchKey = join(Arr::flatten($this->filters));
+
+            // 针对索引优化
+            // TODO: 写法待完善
+            if ($table == config('low-code.bmo-baseline.database.crowd-psn-wdth-table', '')) {
+                if ($this->hasWidthTable && str_contains($searchKey, 't1.assign_manage_doctor_code')) {
+                    $indexPlaceholder = 'idx_empi_assign';
+                }
             }
         }
 
@@ -340,17 +342,16 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
     protected function handleCustomSearchActions(array $searchActions, array $filters): void
     {
         // TODO: 写法待完善
-        // PS: 目前这里只能对t2表(场景表)进行查询条件，因为别的表可能在relationQueryEngine中没有被关联，后续可以根据实际情况进行调整
 
-        if (in_array('search:managed_patients', $searchActions, true)) {
+        if ($this->hasCustomSearchAction('search:managed_patients')) {
             $this->queryEngine->whereField(AdminContext::instance()->getAdminId(), 't2.manage_doctor_code');
         }
 
-        if (in_array('search:assigned_patients', $searchActions, true)) {
+        if ($this->hasCustomSearchAction('search:assigned_patients')) {
             $this->queryEngine->whereField(AdminContext::instance()->getAdminId(), 't1.assign_manage_doctor_code');
         }
 
-        if (in_array('search:follow_patients', $searchActions, true)) {
+        if ($this->hasCustomSearchAction('search:follow_patients')) {
             $followTable = config('low-code.bmo-baseline.database.crowd-follow-table', '');
 
             $this->queryEngine->getQueryBuilder()
@@ -361,6 +362,22 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
                     ->where('status', 1)
                     ->where('is_deleted', 0)
                 );
+        }
+
+        if ($this->hasCustomSearchAction('search:patient_tags')) {
+            $patientTagTable = config('low-code.bmo-baseline.database.crowd-patient-tag-table', '');
+
+            $tagIds = $this->getCustomSearchActionParams('search:patient_tags');
+
+            if (!empty($tagIds)) {
+                $this->queryEngine->getQueryBuilder()
+                    ->whereExists(fn (Builder $query) => $query->from($patientTagTable, 't30')
+                        ->selectRaw('1')
+                        ->whereRaw('t30.empi COLLATE utf8mb4_unicode_ci = t2.empi')
+                        ->whereIn('tag_id', $tagIds)
+                        ->where('is_deleted', 0)
+                    );
+            }
         }
     }
 }

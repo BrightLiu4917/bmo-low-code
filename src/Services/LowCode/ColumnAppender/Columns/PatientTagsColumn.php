@@ -9,7 +9,7 @@ use BrightLiu\LowCode\Services\QueryEngineService;
 use BrightLiu\LowCode\Traits\Context\WithContext;
 use Illuminate\Support\Collection;
 
-class FollowStatusColumn extends BasicColumn implements IColumn
+class PatientTagsColumn extends BasicColumn implements IColumn
 {
     use WithContext;
 
@@ -19,33 +19,42 @@ class FollowStatusColumn extends BasicColumn implements IColumn
             return $items;
         }
 
-        $followTable = config('low-code.bmo-baseline.database.crowd-follow-table', '');
+        $patientTagTable = config('low-code.bmo-baseline.database.crowd-patient-tag-table', '');
 
-        // 按empi连表查询人群分类信息(一个人可能属于多个人群分类)
-        return $queryEngine->useTable($followTable)
+        return $queryEngine->useTable($patientTagTable)
             ->getQueryBuilder()
             ->whereIn('empi', $empis)
             ->where('is_deleted', 0)
             ->where('scene_code', $this->getSceneCode())
             ->where('org_code', $this->getAffiliatedOrgCode())
-            ->where('follower', $this->getAdminId())
-            ->where('status', 1)
-            ->pluck('empi');
+            ->get(['empi', 'tag_name', 'tag_id'])
+            ->groupBy('empi');
     }
 
     public function handleItem($item, $sources): mixed
     {
-        return $sources->contains($item->empi ?? '') ? 1 : 0;
+        if (!isset($sources[$item->empi])) {
+            return null;
+        }
+
+        return collect($sources[$item->empi] ?? null)->map(fn ($item) => [
+            'label' => $item->tag_name,
+            'value' => $item->tag_id,
+        ])->toArray();
     }
 
     public function handleItemVariant($item, $value): mixed
     {
-        return $value ? '已关注' : '未关注';
+        if (empty($value)) {
+            return null;
+        }
+
+        return implode(',', array_column($value, 'label'));
     }
 
     public static function columnName(): string
     {
-        return '_follow_status';
+        return '_patient_tags';
     }
 
     public static function metadata(): array
@@ -53,10 +62,10 @@ class FollowStatusColumn extends BasicColumn implements IColumn
         return [
             'group_id' => 'preset',
             'group_name' => '人群信息',
-            'id' => 'preset_follow_status',
-            'name' => '关注状态',
+            'id' => 'preset_patient_tags',
+            'name' => '患者标签',
             'type' => 'array',
-            'column' => '_follow_status',
+            'column' => '_patient_tags',
         ];
     }
 }

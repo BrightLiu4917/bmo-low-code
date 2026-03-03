@@ -11,6 +11,7 @@ use BrightLiu\LowCode\Services\BmoAIApiService;
 use BrightLiu\LowCode\Services\Contracts\ILowCodeQueryBuilder;
 use BrightLiu\LowCode\Services\CustomQueryEngineService;
 use BrightLiu\LowCode\Services\DataPermissionService;
+use BrightLiu\LowCode\Services\LowCode\QueryBuilder\Traits\CustomSearchAction;
 use BrightLiu\LowCode\Services\QueryEngineService;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
 use Gupo\BetterLaravel\Service\BaseService;
@@ -19,6 +20,8 @@ use Illuminate\Support\Arr;
 
 class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
 {
+    use CustomSearchAction;
+
     protected QueryEngineAbstract $queryEngine;
 
     protected array $queryParams;
@@ -298,55 +301,6 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
         }
     }
 
-    /**
-     * 解析出自定义搜索动作，并从过滤条件中移除相关条件
-     */
-    protected function resolveCustomSearchActions(array $filters): array
-    {
-        $prefix = '_c.';
-        $customActions = [];
-        $cleanedFilters = [];
-
-        // 转换filters为统一的字符串格式便于检查
-        $stringifiedFilters = array_map(
-            fn ($item) => is_array($item) ? join(Arr::flatten($item)) : $item,
-            $filters
-        );
-
-        // 遍历原始filters，分离自定义搜索动作和普通条件
-        foreach ($filters as $index => $item) {
-            $stringItem = $stringifiedFilters[$index];
-
-            // 检查是否为自定义搜索动作条件
-            if (!empty($stringItem) && is_string($stringItem) && str_starts_with($stringItem, $prefix)) {
-                // 解析自定义搜索动作
-                preg_match('/^' . preg_quote($prefix, '/') . '(.*?)\=(.*?)$/', $stringItem, $matches);
-
-                if (!empty($matches[1]) && !empty($matches[2])) {
-                    $customActions[] = sprintf('%s:%s', $matches[1], $matches[2]);
-                }
-            } else {
-                // 保留非自定义搜索动作的条件
-                $cleanedFilters[] = $item;
-            }
-        }
-
-        return [
-            'actions' => $customActions,
-            'filters' => $cleanedFilters,
-        ];
-    }
-
-    public function setCustomSearchActions(array $actions): void
-    {
-        $this->customSearchActions = $actions;
-    }
-
-    public function getCustomSearchActions(): array
-    {
-        return $this->customSearchActions;
-    }
-
     public function setFilters(array $filters): void
     {
         $this->filters = $filters;
@@ -355,27 +309,5 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
     public function getFilters(): array
     {
         return $this->filters;
-    }
-
-    public function hasCustomSearchAction(string|array $action): bool
-    {
-        $actions = $this->getCustomSearchActions();
-
-        if (is_string($action)) {
-            return in_array($action, $actions, true);
-        }
-
-        if (is_array($action)) {
-            return count(array_intersect($action, $actions)) > 0;
-        }
-
-        return false;
-    }
-
-    /**
-     * 处理自定义搜索动作
-     */
-    protected function handleCustomSearchActions(array $searchActions, array $filters): void
-    {
     }
 }
