@@ -374,7 +374,7 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
                     ->whereExists(fn (Builder $query) => $query->from($patientTagTable, 't30')
                         ->selectRaw('1')
                         ->whereRaw('t30.empi COLLATE utf8mb4_unicode_ci = t2.empi')
-                        ->whereIn('tag_id', $tagIds)
+                        ->whereIn('tag_id', (array) $tagIds)
                         ->where('is_deleted', 0)
                     );
             }
