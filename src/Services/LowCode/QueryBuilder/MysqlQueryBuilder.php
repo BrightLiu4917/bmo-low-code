@@ -39,7 +39,7 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
      */
     protected function checkHasBizSceneFilter(array $filters): bool
     {
-        if ($this->hasCustomSearchAction('search:managed_patients')) {
+        if ($this->hasCustomSearchAction(['search:managed_patients', 'search:assigned_patients', 'search:follow_patients'])) {
             return true;
         }
 
@@ -137,10 +137,6 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
      */
     protected function checkHasWidthTableFilter(array $filters): bool
     {
-        if ($this->hasCustomSearchAction('search:assigned_patients')) {
-            return true;
-        }
-
         // 开启数据权限时强制需要
         if (config('low-code.data-permission-enabled', true)) {
             return true;
@@ -292,8 +288,8 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
         if ($this->hasBizScene && str_contains($searchKey, 't2.manage_status')) {
             return 't2.empi';
         }
-        if ($this->hasWidthTable && str_contains($searchKey, 't1.assign_manage_doctor_code')) {
-            return 't1.empi';
+        if ($this->hasWidthTable && str_contains($searchKey, 't2.assign_manage_doctor_code')) {
+            return 't2.empi';
         }
 
         return match (true) {
@@ -324,7 +320,7 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
             // 针对索引优化
             // TODO: 写法待完善
             if ($table == config('low-code.bmo-baseline.database.crowd-psn-wdth-table', '')) {
-                if ($this->hasWidthTable && str_contains($searchKey, 't1.assign_manage_doctor_code')) {
+                if ($this->hasWidthTable && str_contains($searchKey, 't2.assign_manage_doctor_code')) {
                     $indexPlaceholder = 'idx_empi_assign';
                 }
             }
@@ -348,7 +344,7 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
         }
 
         if ($this->hasCustomSearchAction('search:assigned_patients')) {
-            $this->queryEngine->whereField(AdminContext::instance()->getAdminId(), 't1.assign_manage_doctor_code');
+            $this->queryEngine->whereField(AdminContext::instance()->getAdminId(), 't2.assign_manage_doctor_code');
         }
 
         if ($this->hasCustomSearchAction('search:follow_patients')) {

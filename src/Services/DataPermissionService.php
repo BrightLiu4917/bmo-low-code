@@ -219,7 +219,7 @@ class DataPermissionService extends LowCodeBaseService
      */
     private function handleRegionTransferred(array $permissionConfig): array
     {
-        $targetOrgCodeField = 't1.target_org_code';
+        $targetOrgCodeField = 't2.target_org_code';
 
         $permission = RegionPermissionService::instance()->formatPermission();
 
@@ -258,7 +258,7 @@ class DataPermissionService extends LowCodeBaseService
      */
     private function handleOrgTransferred(array $permissionConfig): array
     {
-        $targetOrgCodeField = 't1.target_org_code';
+        $targetOrgCodeField = 't2.target_org_code';
 
         $permissionKey = $permissionConfig['permission_key'] ?? '';
 
