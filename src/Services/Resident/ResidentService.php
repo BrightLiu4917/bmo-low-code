@@ -18,6 +18,7 @@ use BrightLiu\LowCode\Tools\BetterArr;
 use Closure;
 use BrightLiu\LowCode\Events\Resident\ResidentInfoUpdated;
 use BrightLiu\LowCode\Traits\Context\WithAdminContext;
+use BrightLiu\LowCode\Services\LowCode\Tools\EmpiFullFilterTools;
 
 /**
  * 居民相关
@@ -96,11 +97,12 @@ class ResidentService extends BaseService
 
         $sceneTable = $connection->getConfig('table');
 
-        $result = $connection
+        $builder = $connection
             ->table($psnTable, 't1')
             ->leftJoin("{$sceneTable} as t2", 't1.empi', '=', 't2.empi')
-            ->where($query)
-            ->first($columns);
+            ->where($query);
+
+        $result = (new EmpiFullFilterTools)($builder, ['t1.empi', 't2.empi'])->first($columns);
 
         return !empty($result) ? BetterArr::toArray($result) : null;
     }
@@ -129,11 +131,12 @@ class ResidentService extends BaseService
 
         $sceneTable = $connection->getConfig('table');
 
-        $result = $connection
+        $builder = $connection
             ->table($psnTable, 't1')
             ->leftJoin("{$sceneTable} as t2", 't1.empi', '=', 't2.empi')
-            ->where($query)
-            ->get($columns);
+            ->where($query);
+
+        $result = (new EmpiFullFilterTools)($builder, ['t1.empi', 't2.empi'])->get($columns);
 
         return !empty($result) ? BetterArr::toArray($result) : null;
     }

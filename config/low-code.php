@@ -168,4 +168,10 @@ return [
         // 保留天数
         'days' => (int) env('API_ACCESS_LOG_DAYS', 30),
     ],
+
+    // 优化相关
+    'optimization' => [
+        // 优化empi查询效率(控制EmpiFullFilterTools开启状态)
+        'empi_full_search_enabled' => env('BLC_OPT_EMPI_FULL_SEARCH_ENABLED', false),
+    ]
 ];

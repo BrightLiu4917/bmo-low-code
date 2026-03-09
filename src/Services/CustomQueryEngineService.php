@@ -8,6 +8,7 @@ use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Exceptions\QueryEngineException;
 use BrightLiu\LowCode\Services\LowCode\ColumnAppender\AppenderManager;
 use BrightLiu\LowCode\Services\LowCode\LowCodeListService;
+use BrightLiu\LowCode\Services\LowCode\Tools\EmpiFullFilterTools;
 use Gupo\BetterLaravel\Database\CustomLengthAwarePaginator;
 use Gupo\BetterLaravel\Database\CustomPaginator;
 use Illuminate\Contracts\Pagination\Paginator as IPaginator;
@@ -136,6 +137,7 @@ class CustomQueryEngineService extends QueryEngineService
             ->innerJoin($bizSceneTable . ' as t2', 't2.empi', '=', 't1.empi')
             ->getQueryBuilder()
             ->whereIn('t1.empi', $empis)
+            ->where(fn ($query) => (new EmpiFullFilterTools)($query, ['t1.empi', 't2.empi'], $empis))
             ->select(['t2.*', 't1.*'])
             ->get();
 
