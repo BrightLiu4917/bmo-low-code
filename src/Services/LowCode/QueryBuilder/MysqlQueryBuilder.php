@@ -39,7 +39,7 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
      */
     protected function checkHasBizSceneFilter(array $filters): bool
     {
-        if ($this->hasCustomSearchAction(['search:managed_patients', 'search:assigned_patients', 'search:follow_patients'])) {
+        if ($this->hasCustomSearchAction(['search:managed_patients', 'search:assigned_patients', 'search:follow_patients', 'assigned_and_follow_patients'])) {
             return true;
         }
 
@@ -351,6 +351,21 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
             $followTable = config('low-code.bmo-baseline.database.crowd-follow-table', '');
 
             $this->queryEngine->getQueryBuilder()
+                ->whereExists(fn (Builder $query) => $query->from($followTable, 't20')
+                    ->selectRaw('1')
+                    ->whereRaw('t20.empi = t2.empi')
+                    ->where('follower', AdminContext::instance()->getAdminId())
+                    ->where('status', 1)
+                    ->where('is_deleted', 0)
+                );
+        }
+
+        if ($this->hasCustomSearchAction('search:assigned_and_follow_patients')) {
+            $followTable = config('low-code.bmo-baseline.database.crowd-follow-table', '');
+
+            $this->queryEngine
+                ->whereField(AdminContext::instance()->getAdminId(), 't2.assign_manage_doctor_code')
+                ->getQueryBuilder()
                 ->whereExists(fn (Builder $query) => $query->from($followTable, 't20')
                     ->selectRaw('1')
                     ->whereRaw('t20.empi = t2.empi')
