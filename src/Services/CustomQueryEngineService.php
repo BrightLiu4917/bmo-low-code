@@ -45,12 +45,13 @@ class CustomQueryEngineService extends QueryEngineService
      * PS：重写父类方法，使用自定义分页逻辑。拆解分页列表查询、分页count查询，分别做优化。
      *
      * @param bool $isSimplePaginate 是否使用简单分页
+     * @param array $columns 查询列，默认查询宽表和场景表所有列（t1.*, t2.*）
      *
      * @return IPaginator 分页结果
      *
      * @throws QueryEngineException 如果分页查询异常
      */
-    public function getPaginateResult(bool $isSimplePaginate = false): IPaginator
+    public function getPaginateResult(bool $isSimplePaginate = false, array $columns = []): IPaginator
     {
         try {
             if ($this->printSql || request()?->input('print_sql')) {
@@ -80,7 +81,7 @@ class CustomQueryEngineService extends QueryEngineService
                 ->pluck('empi');
 
             // 根据empi获取完整数据列表
-            $items = $this->fetchItems($empis->toArray());
+            $items = $this->fetchItems($empis->toArray(), $columns);
 
             // 附加额外信息
             try {
@@ -120,11 +121,13 @@ class CustomQueryEngineService extends QueryEngineService
         }
     }
 
-    protected function fetchItems(array $empis): Collection
+    protected function fetchItems(array $empis, array $columns = []): Collection
     {
         if (empty($empis)) {
             return collect();
         }
+
+        $columns = $columns ?: ['t1.*', 't2.*'];
 
         $queryEngine = clone $this->customQueryOptions['query_engine'];
         $bizSceneTable = $this->customQueryOptions['biz_scene_table'];
@@ -138,7 +141,7 @@ class CustomQueryEngineService extends QueryEngineService
             ->getQueryBuilder()
             ->whereIn('t1.empi', $empis)
             ->where(fn ($query) => (new EmpiFullFilterTools)($query, ['t1.empi', 't2.empi'], $empis))
-            ->select(['t2.*', 't1.*'])
+            ->select($columns)
             ->get();
 
         // 保持empis排序

@@ -299,16 +299,21 @@ abstract class QueryEngineAbstract implements QueryEngineContract
      * 获取分页查询结果
      *
      * @param bool $isSimplePaginate 是否使用简单分页
+     * @param array $columns 查询列
      *
      * @return Paginator 分页结果
      * @throws QueryEngineException 如果分页查询异常
      */
-    public function getPaginateResult(bool $isSimplePaginate = false): Paginator
+    public function getPaginateResult(bool $isSimplePaginate = false, array $columns = []): Paginator
     {
         try {
             if ($this->printSql || request()?->input('print_sql')) {
                 //打印SQL语句
                 $this->queryBuilder->dd();
+            }
+
+            if (!empty($columns)) {
+                $this->queryBuilder->select($columns);
             }
 
             if ($isSimplePaginate) {

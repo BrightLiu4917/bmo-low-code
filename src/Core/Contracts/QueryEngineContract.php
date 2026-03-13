@@ -56,10 +56,11 @@ interface QueryEngineContract
 
     /**
      * @param bool $isSimplePaginate
+     * @param array $columns
      *
      * @return Paginator
      */
-    public function getPaginateResult(bool $isSimplePaginate = false): Paginator;
+    public function getPaginateResult(bool $isSimplePaginate = false, array $columns = []): Paginator;
 
     /**
      * @param string $column
