@@ -196,7 +196,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
 
                 $listData[] = [
                     ...$item,
-                    'code' => Uuid::generate(),
+                    'code' => ($item['code_prefix'] ?? '') . Uuid::generate(),
                     'disease_code' => $this->getDiseaseCode(),
                     'org_code' => $this->getOrgCode(),
 //                    'creator_id' => $this->getAdminId(),
