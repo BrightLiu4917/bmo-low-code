@@ -49,7 +49,7 @@ final class LowCodeV2ListController extends BaseController
     public function simpleList(Request $request): JsonResponse
     {
         $list = LowCodeList::query()
-//            ->byContextDisease()
+            ->byContextDisease()
             ->where(
                 'list_type',
                 '<>',
