@@ -193,10 +193,12 @@ final class InitOrgDiseaseService extends LowCodeBaseService
                     $templateMapping = $sceneTemplateMapping;
                 }
 
+                $codePrefix = $item['code_prefix'] ?? '';
+                unset($item['code_prefix']);
 
                 $listData[] = [
                     ...$item,
-                    'code' => ($item['code_prefix'] ?? '') . Uuid::generate(),
+                    'code' => $codePrefix . Uuid::generate(),
                     'disease_code' => $this->getDiseaseCode(),
                     'org_code' => $this->getOrgCode(),
 //                    'creator_id' => $this->getAdminId(),
