@@ -77,13 +77,13 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
                 $this->applyFilters($filters);
             }
 
-            // 附加数据权限条件
-            $this->attachDataPermissionCondition();
-
             // 处理自定义搜索动作
             if (!empty($searchActions)) {
                 $this->handleCustomSearchActions($searchActions, $filters);
             }
+
+            // 附加数据权限条件
+            $this->attachDataPermissionCondition();
 
             // 应用排序规则
             $this->applyOrderBy();

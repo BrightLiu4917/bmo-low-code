@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BrightLiu\LowCode\Services\LowCode\QueryBuilder;
 
 use BrightLiu\LowCode\Context\AdminContext;
+use BrightLiu\LowCode\Context\OrgContext;
 use BrightLiu\LowCode\Enums\Foundation\BlinkCacheable;
 use BrightLiu\LowCode\Services\Contracts\ILowCodeQueryBuilder;
 use BrightLiu\LowCode\Services\QueryEngineService;
@@ -388,6 +389,67 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
                         ->whereIn('tag_id', (array) $tagIds)
                         ->where('is_deleted', 0)
                     );
+            }
+        }
+    }
+
+    /**
+     * 附加数据权限条件
+     */
+    public function attachDataPermissionCondition(): void
+    {
+        if (!config('low-code.data-permission-enabled', true)) {
+            return;
+        }
+
+        if (!empty($dataPermissionCondition = $this->resolveDataPermissionCondition())) {
+            if (
+                empty(OrgContext::instance()->getDataPermissionManageAreaArr())
+                && empty(OrgContext::instance()->getDataPermissionManageOrgArr(true))
+            ) {
+                throw new \Exception('暂无数据权限');
+            }
+
+            // TODO：能用就行
+            if ($this->isQueryCount && 'group:or' == $dataPermissionCondition[0] && count($dataPermissionCondition) > 2) {
+                $dataPermissionCondition = array_splice($dataPermissionCondition, 1);
+
+                // 将每个or条件拆分为独立的查询
+                $subQueries = [];
+                foreach ($dataPermissionCondition as $condition) {
+                    $subQueryEngine = clone $this->queryEngine;
+
+                    $queryBuilder = clone $subQueryEngine->getQueryBuilder();
+
+                    $subQueryEngine->setQueryBuilder($queryBuilder);
+
+                    $subQueryEngine->whereMixed($condition);
+
+                    $subQueries[] = $subQueryEngine->getQueryBuilder();
+                }
+
+                // 用union all将子查询合并，并替换原有的查询构建器
+                $baseQuery = $this->queryEngine->getQueryBuilder()->cloneWithout(['orders', 'wheres', 'joins']);
+                $baseQuery->setBindings([]);
+
+                // 提取原查询中的select部分，判定select字段的表前缀，提取这个表前缀
+                if (count($baseQuery->columns) == 1 && preg_match('/^(t\d)?(\.\w+)$/', $baseQuery->columns[0], $matches)) {
+                    $selectPrefix = $matches[1] ?? '';
+                } else {
+                    $selectPrefix = 't2';
+                }
+
+                $baseQuery->from(array_reduce($subQueries, function ($carry, $subQuery) {
+                    if (is_null($carry)) {
+                        return $subQuery;
+                    }
+
+                    return $carry->union($subQuery);
+                }), $selectPrefix);
+
+                $this->queryEngine->setQueryBuilder($baseQuery);
+            } else {
+                $this->queryEngine->whereMixed($dataPermissionCondition);
             }
         }
     }

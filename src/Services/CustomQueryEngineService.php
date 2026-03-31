@@ -9,6 +9,7 @@ use BrightLiu\LowCode\Exceptions\QueryEngineException;
 use BrightLiu\LowCode\Services\LowCode\ColumnAppender\AppenderManager;
 use BrightLiu\LowCode\Services\LowCode\LowCodeListService;
 use BrightLiu\LowCode\Services\LowCode\Tools\EmpiFullFilterTools;
+use BrightLiu\LowCode\Support\Foundation\LowCodeCustomPaginator;
 use Gupo\BetterLaravel\Database\CustomLengthAwarePaginator;
 use Gupo\BetterLaravel\Database\CustomPaginator;
 use Illuminate\Contracts\Pagination\Paginator as IPaginator;
@@ -68,6 +69,9 @@ class CustomQueryEngineService extends QueryEngineService
 
             $paginator = CustomLengthAwarePaginator::resolve([]);
 
+            // 简单分页查询提前量用与判断是否有下一页
+            $isSimplePaginateAdvance = $isSimplePaginate ? 1 : 0;
+
             // 之前的查询结果只为获取empi(减少回表操作)
             $empis = $listSrv
                 ->buildQueryConditions(
@@ -77,7 +81,7 @@ class CustomQueryEngineService extends QueryEngineService
                     $bizSceneTable
                 )
                 ->getQueryBuilder()
-                ->forPage($paginator->currentPage(), $paginator->perPage())
+                ->forPage($paginator->currentPage(), $paginator->perPage() + $isSimplePaginateAdvance)
                 ->pluck('empi');
 
             // 根据empi获取完整数据列表
@@ -96,7 +100,7 @@ class CustomQueryEngineService extends QueryEngineService
             }
 
             if ($isSimplePaginate) {
-                return new CustomPaginator(
+                return new LowCodeCustomPaginator(
                     new Paginator($items, $paginator->perPage(), $paginator->currentPage()),
                 );
             } else {
