@@ -18,7 +18,7 @@ class OrgPermissionService extends LowCodeBaseService
 
     public function formatOrg():array
     {
-        return  $this->getDataPermissionManageOrgArr();
+        return  $this->getDataPermissionManageOrgArr(true);
             //$this->getManageOrgCode();
     }
 }

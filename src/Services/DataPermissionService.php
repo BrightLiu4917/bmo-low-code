@@ -223,7 +223,7 @@ class DataPermissionService extends LowCodeBaseService
 
         $permission = RegionPermissionService::instance()->formatPermission();
 
-        if (!empty($manageOrgArr = $this->getDataPermissionManageOrgArr())) {
+        if (!empty($manageOrgArr = $this->getDataPermissionManageOrgArr(true))) {
             $permission = [
                 'group:or',
                 $permission,
@@ -262,9 +262,9 @@ class DataPermissionService extends LowCodeBaseService
 
         $permissionKey = $permissionConfig['permission_key'] ?? '';
 
-        $permission = [$permissionKey, 'in', $this->handleOrgPermission($permissionConfig)];
+        $permission = [[$permissionKey, 'in', $this->handleOrgPermission($permissionConfig)]];
 
-        if (!empty($manageOrgArr = $this->getDataPermissionManageOrgArr())) {
+        if (!empty($manageOrgArr = $this->getDataPermissionManageOrgArr(true))) {
             $permission = [
                 'group:or',
                 $permission,
