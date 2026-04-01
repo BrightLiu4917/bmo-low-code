@@ -19,7 +19,7 @@ final class ResidentManagementController extends BaseController
      */
     public function pre(PreRequest $request): JsonResponse
     {
-        $userId = (string) $request->input('user_id');
+        $empi = (string) $request->input('empi');
 
         // TODO: 待实现
         $result['checked'] = true;
