@@ -194,7 +194,7 @@ final class LowCodeV2ListController extends BaseController
         try {
             // 获取人群分类信息：在新版中已通过更优的方式获取，这里做兜底兼容处理
             /** @see \BrightLiu\LowCode\Services\CustomQueryEngineService::attachCrowdGroup */
-            if (!empty($data) && $data->isNotEmpty() && !isset($data->first()->_crowds)) {
+            if (!empty($data) && $data->isNotEmpty() && !in_array('_crowds', array_keys((array) $data->first()))) {
                 // 追加人群分类信息
                 $empis = $data->pluck('empi')->toArray();
 
