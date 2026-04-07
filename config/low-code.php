@@ -173,5 +173,8 @@ return [
     'optimization' => [
         // 优化empi查询效率(控制EmpiFullFilterTools开启状态)
         'empi_full_search_enabled' => env('BLC_OPT_EMPI_FULL_SEARCH_ENABLED', false),
+
+        // 启用资源中心解析行政区域层级，失败时使用本地解析
+        'region_code_resolve_enabled' => env('BLC_OPT_REGION_CODE_RESOLVE_ENABLED', false),
     ]
 ];

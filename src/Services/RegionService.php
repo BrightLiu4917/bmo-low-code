@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Cache;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Core\DbConnectionManager;
 use BrightLiu\LowCode\Traits\Context\WithContext;
+use Throwable;
 
 /**
  * @Class
@@ -37,6 +38,27 @@ class RegionService extends LowCodeBaseService
         if (empty($codes)) {
             return $result;
         }
+
+        if (config('low-code.optimization.region_code_resolve_enabled', false)) {
+            try {
+                $codeLevelMapping = DtCapybaraServiceRcApiService::make()->getRegionCodeLevelMapping($codes);
+
+                $resolved = $result;
+                $levelCodeMapping = [ '1' => 'prv', '2' => 'cty', '3' => 'cnty', '4' => 'twn', '5' => 'vlg' ];
+                foreach ($codeLevelMapping as $level => $codes) {
+                    if (isset($levelCodeMapping[$level]) && isset($result[$levelCodeMapping[$level]])) {
+                        $resolved[$levelCodeMapping[$level]] = $codes;
+                    }
+                }
+
+                return $resolved;
+            } catch(Throwable $e) {
+                // 发生错误时不做任何处理，继续使用原有的循环逻辑
+                Logger::LARAVEL->error('资源中心解析行政区域层级失败，使用本地解析', ['error' => $e->getMessage()]);
+            }
+        }
+
+
         foreach ($codes as $code) {
             $level = Region::regionLevel($code);
             // 只有当regionLevel返回非空字符串时才添加

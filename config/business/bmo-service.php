@@ -41,4 +41,9 @@ return [
     'bmp_cheetah_medical_platform'  => [
         'uri' => env('BMP_CHEETAH_MEDICAL_PLATFORM_URI'),
     ],
+
+    // 资源中心
+    'dt_capybara_service_rc' => [
+        'uri' => env('BLC_API_SERVICE_RC_URI'),
+    ]
 ];

@@ -49,4 +49,7 @@ enum Cacheable: string
     case RESOURCE_FILE_URL = 'r:file_url';
 
     /* --------------------------------------------------------------- */
+
+    // 行政区域编码与层级映射
+    case REGION_CODE_LEVEL_MAPPING = 'lc:region_code_level_mapping';
 }
