@@ -34,14 +34,18 @@ final class DtCapybaraServiceRcApiService extends LowCodeBaseService
             ->make($regionCode)
             ->remember(
                 60 * 60 * 6,
-                fn () => Http::asJson()
-                    ->retry(2)
-                    ->timeout(5)
-                    ->post(
-                        $this->baseUriVia().'innerapi/areaInfo/code-level',
-                        ['code_list' => Arr::wrap($regionCode)]
-                    )
-                    ->json()
+                fn () => Arr::get(
+                    Http::asJson()
+                        ->retry(2)
+                        ->timeout(5)
+                        ->post(
+                            $this->baseUriVia().'innerapi/areaInfo/code-level',
+                            ['code_list' => Arr::wrap($regionCode)]
+                        )
+                        ->json(),
+                    'data',
+                    []
+                )
             );
     }
 }
