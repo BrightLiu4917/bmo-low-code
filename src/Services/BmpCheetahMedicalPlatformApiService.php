@@ -177,4 +177,19 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
         }
         return [$result,'',''];
     }
+
+    /**
+     * 获取 共享资源的机构列表
+     */
+    public function getShareResourceOrgCodes(string $orgCode): array
+    {
+        $respData = Http::asJson()->timeout(3)->post($this->baseUriVia() . '/innerapi/settings/shareResourceOrgCodes',
+            [
+                'org_code' => $orgCode,
+                'disease_code' => $this->getDiseaseCode(),
+            ]
+        )->json();
+
+        return (array) data_get($respData, 'data', []);
+    }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Services\LowCode\ColumnAppender\Columns;
 
+use BrightLiu\LowCode\Enums\Foundation\Logger;
+use BrightLiu\LowCode\Services\BmpCheetahMedicalPlatformApiService;
 use BrightLiu\LowCode\Services\LowCode\ColumnAppender\IColumn;
 use BrightLiu\LowCode\Services\QueryEngineService;
 use BrightLiu\LowCode\Traits\Context\WithOrgContext;
@@ -26,7 +28,7 @@ class CrowdTypeColumn extends BasicColumn implements IColumn
         return $queryEngine->useTable($featureCrowdTable . ' as t1')
             ->innerJoin($userGroupTable . ' as t2', 't2.id', '=', 't1.group_id')
             ->getQueryBuilder()
-            ->where('t2.org_code', $this->getAffiliatedOrgCode())
+            ->whereIn('t2.org_code', $this->fetchQueryOrgCodes())
             ->whereIn('t1.empi', $empis)
             ->where('t2.is_deleted', 0)
             ->select(['t1.empi', 't2.group_name', 't2.select_type'])
@@ -63,5 +65,32 @@ class CrowdTypeColumn extends BasicColumn implements IColumn
             'type' => 'array',
             'column' => '_crowds',
         ];
+    }
+
+    /**
+     * 获取用于查询人群分类的机构code
+     * PS: 当开启共享机构获取患者的所需人群分类功能时，除了当前机构外，还会获取共享机构的code进行查询
+     */
+    protected function fetchQueryOrgCodes(): array
+    {
+        $orgCodes = [$this->getAffiliatedOrgCode()];
+
+        // 支持从共享机构获取患者的所需人群分类
+        try {
+            if (config('low-code.crowd-group-from-share-org-enabled', false)) {
+                $shareOrgCodes = BmpCheetahMedicalPlatformApiService::instance()->getShareResourceOrgCodes(
+                    $this->getAffiliatedOrgCode()
+                );
+
+                $orgCodes = array_values(array_unique(array_filter(array_merge($orgCodes, $shareOrgCodes))));
+            }
+        } catch (\Throwable $e) {
+            Logger::LARAVEL->error('获取共享机构code失败，无法从共享机构获取患者的所需人群分类', [
+                'affiliated_org_code' => $this->getAffiliatedOrgCode(),
+                'error_message' => $e->getMessage(),
+            ]);
+        }
+
+        return $orgCodes;
     }
 }

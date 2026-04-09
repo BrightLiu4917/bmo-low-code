@@ -122,6 +122,9 @@ return [
     //使用什么字段作为区域权限条件 默认 region_code
     'use-region-code'=> env('USE_REGION_CODE','4602'),
 
+    // 从共享机构获取患者的所需人群分类
+    'crowd-group-from-share-org-enabled' => env('CROWD_GROUP_FROM_SHARE_ORG_ENABLED', false),
+
     //设置区域缓存时间
     'region-cache-ttl'=>env('REGION_CACHE_TTL',60),
 
