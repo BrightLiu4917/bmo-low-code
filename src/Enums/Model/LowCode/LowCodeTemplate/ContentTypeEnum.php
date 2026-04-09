@@ -28,8 +28,11 @@ final class ContentTypeEnum extends BaseEnum
     public const PART_TYPE_BUTTON = 3;
 
     #[Message('顶部按钮')]
-    public const PART_TYPE_TOP_BUTTON = 3;
+    public const PART_TYPE_TOP_BUTTON = 4;
 
     #[Message('查询字段集合')]
     public const PART_TYPE_FIELD = 5;
+
+    #[Message('批量操作')]
+    public const PART_TYPE_BATCH_OPERATION  = 6;
 }

@@ -196,7 +196,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
                 $codePrefix = $item['code_prefix'] ?? '';
                 unset($item['code_prefix']);
 
-                $listData[] = [
+                $listItem = [
                     ...$item,
                     'code' => $codePrefix . Uuid::generate(),
                     'disease_code' => $this->getDiseaseCode(),
@@ -213,6 +213,13 @@ final class InitOrgDiseaseService extends LowCodeBaseService
                     'preset_condition_json' => json_encode($item['preset_condition_json'] ?? [], JSON_UNESCAPED_UNICODE),
                     'default_order_by_json' => json_encode($item['default_order_by_json'] ?? [], JSON_UNESCAPED_UNICODE),
                 ];
+
+                // 低版本low_code_list表可能缺少template_code_selection字段，兼容处理
+                if (!empty($templateMapping['selection'])) {
+                    $listItem['template_code_selection'] = $templateMapping['selection']['code'] ?? '';
+                }
+
+                $listData[] = $listItem;
             }
         }
 

@@ -30,20 +30,7 @@ class TemplatePartCacheManager
                     "low_code_list_with_parts:{$code}", self::$ttl,
                     function() use ($code) {
                         // 获取列表主表配置
-                        $list = LowCodeList::query()->where('code', $code)
-                            ->select(
-                                ['id', 'code', 'admin_name', 'admin_weight',
-                                 'family_doctor_weight', 'mobile_doctor_weight',
-                                 'append_field_json', 'remove_field_json',
-                                 'append_column_json', 'remove_column_json',
-                                 'append_filter_json', 'remove_filter_json',
-                                 'append_button_json', 'remove_button_json',
-                                 'append_top_button_json',
-                                 'remove_top_button_json',
-                                 'template_code_column', 'template_code_filter',
-                                 'template_code_button',
-                                 'template_code_top_button',]
-                            )->first();
+                        $list = LowCodeList::query()->where('code', $code)->first();
 
                         if (!$list) {
                             return null;
@@ -52,7 +39,8 @@ class TemplatePartCacheManager
                             ['column'     => $list->template_code_column,
                              'filter'     => $list->template_code_filter,
                              'button'     => $list->template_code_button,
-                             'top_button' => $list->template_code_top_button,]
+                             'top_button' => $list->template_code_top_button,
+                             'selection'  => $list->template_code_selection ?? [],]
                         )->filter();
 
                         $parts = $templateCodes->mapWithKeys(

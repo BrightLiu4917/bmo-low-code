@@ -36,6 +36,7 @@ class CreateLowCodeListsTable extends Migration
                 $table->string('template_code_field', 64)->default('')->comment('模板-查询字段');
                 $table->string('template_code_button', 64)->default('')->comment('模板-操作按钮');
                 $table->string('template_code_top_button', 64)->default('')->comment('模板-顶部操作按钮');
+                $table->string('template_code_selection', 64)->default('')->comment('模板-批量操作');
 
                 // JSON 字段
                 $table->json('route_group')->nullable()->comment('前端路由组');
