@@ -142,12 +142,14 @@ final class LowCodeV2ListController extends BaseController
         $data  = [];
         $codes = $request->input('codes', null);
 
+        $filters = (array) $request->input('filters', []);
+
         $listSrv = LowCodeListService::make();
 
         // TODO: 按人群患者查询时，需要携带条件
         foreach ($codes as $key => $code) {
             $data[$key]['crowd_type_total_count'] = $listSrv->queryCount(
-                [['code' => $code]]
+                [['code' => $code, 'filters' => $filters ]]
             );
             $data[$key]['crowd_type_code']        = $code;
         }

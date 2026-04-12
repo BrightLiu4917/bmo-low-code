@@ -86,12 +86,12 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
         // 提取条件中的group_id条件值
         // TODO: 目前仅支持简单的条件提取，复杂条件（如嵌套、OR等）可能无法正确提取，待完善
         foreach ($filters as $item) {
-            if (str_contains((string) $item[0], 't3.group_id') && '=' == $item[1]) {
-                $value = (string) $item[2] ?? '';
+            if (str_contains((string) $item[0], 't3.group_id') && in_array((string) $item[1], ['=', 'in'])) {
+                $value = $item[2] ?? '';
                 if (is_array($value)) {
                     $groupIds = array_merge($groupIds, $value);
                 } else {
-                    $groupIds[] = $value;
+                    $groupIds[] = (string) $value;
                 }
             }
         }
@@ -433,7 +433,7 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
                 $baseQuery->setBindings([]);
 
                 // 提取原查询中的select部分，判定select字段的表前缀，提取这个表前缀
-                if (count($baseQuery->columns) == 1 && preg_match('/^(t\d)?(\.\w+)$/', $baseQuery->columns[0], $matches)) {
+                if (1 == count($baseQuery->columns) && preg_match('/^(t\d)?(\.\w+)$/', $baseQuery->columns[0], $matches)) {
                     $selectPrefix = $matches[1] ?? '';
                 } else {
                     $selectPrefix = 't2';

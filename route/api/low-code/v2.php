@@ -1,5 +1,6 @@
 <?php
 
+use BrightLiu\LowCode\Controllers\LowCode\LowCodeCrowdLayerController;
 use Illuminate\Support\Facades\Route;
 use BrightLiu\LowCode\Controllers\LowCode\LowCodePersonalizeModuleController;
 use BrightLiu\LowCode\Controllers\LowCode\LowCodeV2ListController;
@@ -35,5 +36,12 @@ Route::group([
         Route::get('optional-columns', [LowCodeV2ListController::class, 'optionalColumns'])->comment('低代码-列表:可选列');
         Route::get('get-column-preference', [LowCodeV2ListController::class, 'getColumnPreference'])->comment('低代码-列表:获取列偏好设置');
         Route::post('update-column-preference', [LowCodeV2ListController::class, 'updateColumnPreference'])->comment('低代码-列表:更新列偏好设置');
+    });
+
+    // 人群分层
+    Route::prefix('v2/low-code/crowd-layer')->group(function () {
+        Route::get('list', [LowCodeCrowdLayerController::class, 'list'])->comment('低代码-人群分层:列表');
+        Route::post('save', [LowCodeCrowdLayerController::class, 'save'])->comment('低代码-人群分层:保存');
+        Route::post('statistics', [LowCodeCrowdLayerController::class, 'statistics'])->comment('低代码-人群分层:统计');
     });
 });

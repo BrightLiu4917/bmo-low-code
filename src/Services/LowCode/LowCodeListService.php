@@ -159,10 +159,13 @@ class LowCodeListService extends LowCodeBaseService
                 $inputArgs
             );
 
-            $listCodes = collect($inputArgs)->pluck('code')->toArray();
+            $listCodes = collect($inputArgs)->pluck('code')->filter()->values()->toArray();
 
             // 1.获取列表
-            $list = $this->getLowCodeListByCodes($listCodes);
+            $list = collect();
+            if (!empty($listCodes)) {
+                $list = $this->getLowCodeListByCodes($listCodes);
+            }
 
             $queryEngine   = QueryEngineService::instance()->autoClient();
             $bizSceneTable = $queryEngine->table ?? '';
@@ -245,13 +248,18 @@ class LowCodeListService extends LowCodeBaseService
                 $inputArgs
             );
 
-            $listCodes = collect($inputArgs)->pluck('code')->toArray();
+            $listCodes = collect($inputArgs)->pluck('code')->filter()->values()->toArray();
 
             // 1.获取列表
-            $list = $this->getLowCodeListByCodes($listCodes);
+            $list = collect();
+            if (!empty($listCodes)) {
+                $list = $this->getLowCodeListByCodes($listCodes);
+            }
 
             $queryEngine   = QueryEngineService::instance()->autoClient();
             $bizSceneTable = $queryEngine->table ?? '';
+
+            // TODO: 不清除为什么需要foreach，后续优化
             foreach ($inputArgs as $value) {
                 $listCode = $value['code'] ?? '';
                 $config   = $list[$listCode] ?? [];
@@ -346,8 +354,7 @@ class LowCodeListService extends LowCodeBaseService
                 fn ($key) => isset($filters[$key][0]) && 'crowd_id' === $filters[$key][0]
             );
             if (!empty($conditionOfCrowd = $filters[$crowdIdIndex] ?? null)) {
-                unset($filters[$crowdIdIndex]);
-                $filters[] = ['t3.group_id', '=', $conditionOfCrowd[2]];
+                $filters[$crowdIdIndex] = ['t3.group_id', $conditionOfCrowd[1] ?? '=', $conditionOfCrowd[2]];
             }
 
             // 查询前置准备

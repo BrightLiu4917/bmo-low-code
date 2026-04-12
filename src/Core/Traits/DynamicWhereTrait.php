@@ -15,14 +15,14 @@ trait DynamicWhereTrait
     public function whereMixed(array $conditions,
         string $defaultBoolean = 'and',
     ): self {
-        
+
         //映射错误 or 对应的表没创建
         if (!empty($conditions) && is_null($this->queryBuilder)){
             throw new ServiceException('queryBuilder实例为null 请检查“场景编码”映射database_sources表中数据是否存在正确');
         }
 
         // 处理嵌套的条件组，例如 ['group:or', [[['raw', [...]],...], [['raw', [...]],...]]
-        if (!empty($conditions) && is_string($conditions[0]) && preg_match('/^group:(and|or)$/i', $conditions[0], $matches)) {
+        if (!empty($conditions) && is_string($conditions[0] ?? null) && preg_match('/^group:(and|or)$/i', $conditions[0], $matches)) {
             $operationSymbol = $matches[1];
             return $this->whereGroupMixed(array_slice($conditions, 1), $operationSymbol);
         }
