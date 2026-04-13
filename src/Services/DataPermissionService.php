@@ -246,6 +246,16 @@ class DataPermissionService extends LowCodeBaseService
                             implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
                         ),
                     ]
+                ],
+                [
+                    [
+                        'raw',
+                        sprintf(
+                            '%s in (%s)',
+                            't2.assign_manage_org_code',
+                            implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
+                        ),
+                    ]
                 ]
             ];
         }
@@ -284,6 +294,16 @@ class DataPermissionService extends LowCodeBaseService
                         sprintf(
                             '%s in (%s)',
                             't1.ehr_health_rcd_rcd_mng_org_cd',
+                            implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
+                        ),
+                    ]
+                ],
+                [
+                    [
+                        'raw',
+                        sprintf(
+                            '%s in (%s)',
+                            't2.assign_manage_org_code',
                             implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
                         ),
                     ]
