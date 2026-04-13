@@ -117,6 +117,37 @@ class LowCodeListService extends LowCodeBaseService
         return TemplatePartCacheManager::getListWithParts($code);
     }
 
+    public function getFinalColumnKeys(string $listCode = ''): ?array
+    {
+        if ('' === $listCode) {
+            return [];
+        }
+
+        try {
+            $preData = $this->pre($listCode);
+            $columnConfig = data_get($preData, 'pre_config.column', []);
+            $columnConfig = AdminPreferenceService::make()->handleColumnConfig(
+                listCode: $listCode,
+                columnConfig: is_array($columnConfig) ? $columnConfig : []
+            );
+
+            return array_values(array_unique(array_filter(array_map(
+                fn ($item) => is_array($item) ? (string) ($item['key'] ?? '') : '',
+                $columnConfig
+            ))));
+        } catch (\Throwable $e) {
+            Logger::LOW_CODE_LIST->error('resolve-list-column-keys-error', [
+                'list_code' => $listCode,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ]);
+
+            return null;
+        }
+    }
+
     /**
      * @param  array  $listCodes
      *

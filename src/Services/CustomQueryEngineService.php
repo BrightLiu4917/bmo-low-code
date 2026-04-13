@@ -11,7 +11,6 @@ use BrightLiu\LowCode\Services\LowCode\LowCodeListService;
 use BrightLiu\LowCode\Services\LowCode\Tools\EmpiFullFilterTools;
 use BrightLiu\LowCode\Support\Foundation\LowCodeCustomPaginator;
 use Gupo\BetterLaravel\Database\CustomLengthAwarePaginator;
-use Gupo\BetterLaravel\Database\CustomPaginator;
 use Illuminate\Contracts\Pagination\Paginator as IPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
@@ -89,7 +88,10 @@ class CustomQueryEngineService extends QueryEngineService
 
             // 附加额外信息
             try {
-                $items = AppenderManager::make()->handle($queryEngine, $items);
+                if ($items->isNotEmpty()) {
+                    $columnKeys = $listSrv->getFinalColumnKeys((string) ($queryParams['original_code'] ?? ''));
+                    $items = AppenderManager::make()->handle($queryEngine, $items, $columnKeys);
+                }
             } catch (\Throwable $e) {
                 Logger::LOW_CODE_LIST->error('list-query-error', [
                     'error' => $e->getMessage(),

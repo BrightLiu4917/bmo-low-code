@@ -28,9 +28,9 @@ class AppenderManager
         PatientTagsColumn::class,
     ];
 
-    public function handle(QueryEngineService $queryEngine, Collection $items): Collection
+    public function handle(QueryEngineService $queryEngine, Collection $items, ?array $columnKeys = null): Collection
     {
-        foreach (self::$appender as $appender) {
+        foreach (self::resolveAppenders($columnKeys) as $appender) {
             try {
                 $items = (new $appender())(clone $queryEngine, $items);
             } catch (\Throwable $e) {
@@ -79,5 +79,38 @@ class AppenderManager
             ],
             $metadata
         );
+    }
+
+    /**
+     * @return array<class-string<IColumn>>
+     */
+    protected static function resolveAppenders(?array $columnKeys = null): array
+    {
+        if (null === $columnKeys) {
+            return self::$appender;
+        }
+
+        if ([] === $columnKeys) {
+            return [];
+        }
+
+        $columnKeys = array_values(array_unique(array_filter($columnKeys, fn ($item) => is_string($item) && '' !== $item)));
+
+        if ([] === $columnKeys) {
+            return [];
+        }
+
+        return array_values(array_filter(self::$appender, function (string $appender) use ($columnKeys) {
+            try {
+                $metadata = method_exists($appender, 'metadata') ? $appender::metadata() : [];
+                $columnName = $metadata['column'] ?? $appender::columnName();
+
+                return in_array($columnName, $columnKeys, true);
+            } catch (\Throwable $e) {
+                Logger::LOW_CODE_APPENDER->error(sprintf('%s resolve 异常', $appender), ['exception' => $e->getMessage()]);
+
+                return false;
+            }
+        }));
     }
 }

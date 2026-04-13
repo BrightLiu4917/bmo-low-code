@@ -17,6 +17,7 @@ final class LowCodeCombiService extends BaseService
             if (!empty($item['code']) && str_contains($item['code'], '#')) {
                 [0 => $exploded] = $this->resolveCombiCodeMapping($item['code']);
 
+                $item['original_code'] = $item['code'];
                 $item['code'] = $exploded['code'];
 
                 $item['filters'] = array_merge($item['filters'] ?? [], [['crowd_id', '=', $exploded['crowd_id']]]);
