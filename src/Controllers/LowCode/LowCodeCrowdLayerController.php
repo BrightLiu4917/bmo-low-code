@@ -103,7 +103,13 @@ final class LowCodeCrowdLayerController extends BaseController
                     ->keyBy('id');
             }
 
-            $result = array_map(function ($layerId) use ($srv, $layers, $moduleCrowdId) {
+            // TODO: 待完善，暂时先获取low_code_list中的data_permission_code作为，人群分层查询的权限条件
+            $customLowCodeConfig = [];
+            if (!empty($defaultDataPermissionCode = LowCodeListService::make()->getDefaultDataPermissionCodeByLowCodeList())) {
+                $customLowCodeConfig['data_permission_code'] = $defaultDataPermissionCode;
+            }
+
+            $result = array_map(function ($layerId) use ($srv, $layers, $moduleCrowdId, $customLowCodeConfig) {
                 $layer = $layers->get($layerId);
 
                 $filters = [];
@@ -124,7 +130,7 @@ final class LowCodeCrowdLayerController extends BaseController
 
                 $count = 0;
                 if (!($layerId > 0 && empty($layer))) {
-                    $count = $srv->queryCount([['filters' => $filters]]);
+                    $count = $srv->queryCount([['filters' => $filters]], customConfig: $customLowCodeConfig);
                 }
 
                 return [

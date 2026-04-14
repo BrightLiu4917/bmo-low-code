@@ -271,7 +271,7 @@ class LowCodeListService extends LowCodeBaseService
      * @return void
      * @throws \Gupo\BetterLaravel\Exceptions\ServiceException
      */
-    public function queryCount(array $inputArgs = [], int $setCacheTtl = 10)
+    public function queryCount(array $inputArgs = [], int $setCacheTtl = 10, array $customConfig = [])
     {
         try {
             // 解析code(code中可能携带中台的人群ID)
@@ -293,7 +293,7 @@ class LowCodeListService extends LowCodeBaseService
             // TODO: 不清除为什么需要foreach，后续优化
             foreach ($inputArgs as $value) {
                 $listCode = $value['code'] ?? '';
-                $config   = $list[$listCode] ?? [];
+                $config   = array_merge($list[$listCode] ?? [], $customConfig);
 
                 //3. 构建查询条件组
                 $builtQuery = $this->buildQueryConditions(
@@ -459,5 +459,30 @@ class LowCodeListService extends LowCodeBaseService
                 ]
             );
         }
+    }
+
+    /**
+     * 将low_code_list中的data_permission_code作为默认的数据权限条件
+     * PS：目前仅在LowCodeCrowdLayerController::statistics中使用
+     */
+    public function getDefaultDataPermissionCodeByLowCodeList(): string
+    {
+        $firstList = LowCodeList::query()
+            ->byContextOrg()
+            ->byContextDisease()
+            ->where('list_type', '<>', ListTypeEnum::GENERAL)
+            ->where('admin_name', '全部')
+            ->first(['data_permission_code']);
+
+        if (empty($firstList)) {
+            $firstList = LowCodeList::query()
+                ->byContextOrg()
+                ->byContextDisease()
+                ->where('list_type', '<>', ListTypeEnum::GENERAL)
+                ->orderByDesc('id')
+                ->first(['data_permission_code']);
+        }
+
+        return (string) ($firstList->data_permission_code ?? '');
     }
 }
