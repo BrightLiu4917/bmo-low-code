@@ -81,20 +81,7 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
      */
     protected function checkHasCrowdTypeFilter(array $filters): bool
     {
-        $groupIds = [];
-
-        // 提取条件中的group_id条件值
-        // TODO: 目前仅支持简单的条件提取，复杂条件（如嵌套、OR等）可能无法正确提取，待完善
-        foreach ($filters as $item) {
-            if (str_contains((string) $item[0], 't3.group_id') && in_array((string) $item[1], ['=', 'in'])) {
-                $value = $item[2] ?? '';
-                if (is_array($value)) {
-                    $groupIds = array_merge($groupIds, $value);
-                } else {
-                    $groupIds[] = (string) $value;
-                }
-            }
-        }
+        $groupIds = $this->extractCrowdGroupIds($filters);
 
         // 获取人群分类表中的分类类型，判断是否需要关联人群分类表
         if (!empty($groupIds = array_values(array_unique(array_filter($groupIds))))) {
@@ -243,7 +230,124 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
      */
     public function applyFilters(array $filters): void
     {
-        $this->queryEngine->whereMixed($filters);
+        $this->queryEngine->whereMixed($this->transformCrowdIntersectionFilters($filters));
+    }
+
+    /**
+     * 提取简单条件中的 crowd group_id。
+     */
+    protected function extractCrowdGroupIds(array $filters): array
+    {
+        $groupIds = [];
+
+        // TODO: 目前仅支持简单的条件提取，复杂条件（如嵌套、OR等）可能无法正确提取，待完善
+        foreach ($filters as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $normalizedCondition = $this->normalizeSimpleCondition($item);
+            if (empty($normalizedCondition)) {
+                continue;
+            }
+
+            ['column' => $column, 'operator' => $operator, 'value' => $value] = $normalizedCondition;
+
+            if (str_contains($column, 't3.group_id') && in_array($operator, ['=', 'in'], true)) {
+                $groupIds = array_merge($groupIds, is_array($value) ? $value : [(string) $value]);
+                continue;
+            }
+
+            if ('t3.group_id' === $column && 'in' === $operator && is_array($value)) {
+                $groupIds = array_merge($groupIds, $value);
+            }
+        }
+
+        return array_values(array_unique(array_filter(
+            array_map(static fn ($groupId) => (string) $groupId, $groupIds),
+            static fn (string $groupId) => '' !== $groupId
+        )));
+    }
+
+    /**
+     * 将 t3.group_id in 条件改写为 empi 子查询。
+     */
+    protected function transformCrowdIntersectionFilters(array $filters): array
+    {
+        foreach ($filters as $key => $filter) {
+            if (!is_array($filter)) {
+                continue;
+            }
+
+            $normalizedCondition = $this->normalizeSimpleCondition($filter);
+            if (empty($normalizedCondition)) {
+                continue;
+            }
+
+            ['boolean' => $boolean, 'column' => $column, 'operator' => $operator, 'value' => $value] = $normalizedCondition;
+
+            if ('t3.group_id' !== $column || 'in' !== $operator || !is_array($value)) {
+                continue;
+            }
+
+            $groupIds = array_values(array_unique(array_filter(
+                array_map(static fn ($groupId) => (string) $groupId, $value),
+                static fn (string $groupId) => '' !== $groupId
+            )));
+            if (empty($groupIds)) {
+                continue;
+            }
+
+            $outerEmpi = $this->recommendJoinEmpi('t2.empi');
+            $crowdTypeTable = config('low-code.bmo-baseline.database.crowd-type-table', 'feature_user_detail');
+
+            $crowdIntersectionCondition = function (Builder $query) use ($outerEmpi, $crowdTypeTable, $groupIds) {
+                foreach (array_values($groupIds) as $index => $groupId) {
+                    $alias = 't' . (100 + $index);
+
+                    $query->whereExists(function (Builder $subQuery) use ($crowdTypeTable, $alias, $outerEmpi, $groupId) {
+                        $subQuery->from($crowdTypeTable . ' as ' . $alias)
+                            ->selectRaw('1')
+                            ->whereRaw($alias . '.empi = ' . $outerEmpi)
+                            ->where($alias . '.group_id', $groupId);
+                    });
+                }
+            };
+
+            $filters[$key] = 'or' === $boolean
+                ? ['or', $crowdIntersectionCondition]
+                : $crowdIntersectionCondition;
+        }
+
+        return $filters;
+    }
+
+    /**
+     * 规范简单条件格式，复杂结构返回 null。
+     */
+    protected function normalizeSimpleCondition(array $condition): ?array
+    {
+        $length = count($condition);
+
+        if (3 === $length) {
+            return [
+                'boolean' => 'and',
+                'column' => (string) ($condition[0] ?? ''),
+                'operator' => mb_strtolower((string) ($condition[1] ?? '')),
+                'value' => $condition[2] ?? null,
+            ];
+        }
+
+        if (4 === $length && in_array(mb_strtolower((string) ($condition[0] ?? '')), ['and', 'or'], true)) {
+            return [
+                'boolean' => mb_strtolower((string) $condition[0]),
+                'column' => (string) ($condition[1] ?? ''),
+                'operator' => mb_strtolower((string) ($condition[2] ?? '')),
+                'value' => $condition[3] ?? null,
+            ];
+        }
+
+        return null;
     }
 
     /**
