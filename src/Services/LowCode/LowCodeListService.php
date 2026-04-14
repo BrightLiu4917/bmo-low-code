@@ -124,7 +124,7 @@ class LowCodeListService extends LowCodeBaseService
         }
 
         try {
-            $preData = $this->pre($listCode);
+            $preData = $this->pre(LowCodeCombiService::instance()->resolveListCode($listCode));
             $columnConfig = data_get($preData, 'pre_config.column', []);
             $columnConfig = AdminPreferenceService::make()->handleColumnConfig(
                 listCode: $listCode,
