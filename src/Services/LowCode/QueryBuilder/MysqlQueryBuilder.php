@@ -523,7 +523,7 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
 
             // TODO：能用就行
             if ($this->isQueryCount && 'group:or' == $dataPermissionCondition[0] && count($dataPermissionCondition) > 2) {
-                $dataPermissionCondition = array_splice($dataPermissionCondition, 1);
+                $dataPermissionCondition = array_values(array_filter(array_splice($dataPermissionCondition, 1)));
 
                 // 将每个or条件拆分为独立的查询
                 $subQueries = [];
