@@ -40,6 +40,9 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
      */
     protected function checkHasBizSceneFilter(array $filters): bool
     {
+        // TODO: 目前存在患者的数据仅在宽表但不在场景表，所以宽表和场景表在所有情况下都必需关联
+        return true;
+
         if ($this->hasCustomSearchAction(['search:managed_patients', 'search:assigned_patients', 'search:follow_patients', 'assigned_and_follow_patients'])) {
             return true;
         }
@@ -125,6 +128,9 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
      */
     protected function checkHasWidthTableFilter(array $filters): bool
     {
+        // TODO: 目前存在患者的数据仅在宽表但不在场景表，所以宽表和场景表在所有情况下都必需关联
+        return true;
+
         // 开启数据权限时强制需要
         if (config('low-code.data-permission-enabled', true)) {
             return true;
@@ -188,7 +194,7 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
         // TODO: 写法待完善
         if ($hasBizScene && $hasCrowdType && $hasWidthTable) {
             $this->queryEngine->useTable($this->recommendIndex($crowdTypeTable, 't3'))
-                ->innerJoin($this->recommendIndex($widthTable, 't1'), 't3.empi', '=', 't1.empi')
+                ->rightJoin($this->recommendIndex($widthTable, 't1'), 't3.empi', '=', 't1.empi')
                 ->innerJoin($this->recommendIndex($bizSceneTable, 't2'), 't1.empi', '=', 't2.empi')
                 ->select([$this->recommendSortEmpi('t2.empi')]);
         } elseif ($hasBizScene && $hasCrowdType) {
@@ -197,11 +203,11 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
                 ->select([$this->recommendSortEmpi('t2.empi')]);
         } elseif ($hasBizScene && $hasWidthTable) {
             $this->queryEngine->useTable($this->recommendIndex($bizSceneTable, 't2'))
-                ->innerJoin($this->recommendIndex($widthTable, 't1'), 't2.empi', '=', 't1.empi')
+                ->rightJoin($this->recommendIndex($widthTable, 't1'), 't2.empi', '=', 't1.empi')
                 ->select([$this->recommendSortEmpi('t2.empi')]);
         } elseif ($hasCrowdType && $hasWidthTable) {
             $this->queryEngine->useTable($this->recommendIndex($widthTable, 't1'))
-                ->innerJoin($this->recommendIndex($crowdTypeTable, 't3'), 't1.empi', '=', 't3.empi')
+                ->leftJoin($this->recommendIndex($crowdTypeTable, 't3'), 't1.empi', '=', 't3.empi')
                 ->select([$this->recommendSortEmpi('t2.empi')]);
         } elseif ($hasCrowdType) {
             $this->queryEngine->useTable($crowdTypeTable . ' as t3')
