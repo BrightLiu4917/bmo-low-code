@@ -9,6 +9,7 @@ use BrightLiu\LowCode\Context\OrgContext;
 use BrightLiu\LowCode\Enums\Foundation\BlinkCacheable;
 use BrightLiu\LowCode\Services\Contracts\ILowCodeQueryBuilder;
 use BrightLiu\LowCode\Services\QueryEngineService;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -543,7 +544,16 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
                 $baseQuery->setBindings([]);
 
                 // 提取原查询中的select部分，判定select字段的表前缀，提取这个表前缀
-                if (1 == count($baseQuery->columns) && preg_match('/^(t\d)?(\.\w+)$/', $baseQuery->columns[0], $matches)) {
+                $selectColumn = $baseQuery->columns[0] ?? null;
+                if ($selectColumn instanceof Expression) {
+                    $selectColumn = $selectColumn->getValue(DB::connection()->getQueryGrammar());
+                }
+
+                if (
+                    1 == count($baseQuery->columns)
+                    && is_string($selectColumn)
+                    && preg_match('/^(t\d)?(\.\w+)$/', $selectColumn, $matches)
+                ) {
                     $selectPrefix = $matches[1] ?? '';
                 } else {
                     $selectPrefix = 't2';
