@@ -152,4 +152,9 @@ final class LowCodePersonalizeModuleService extends LowCodeBaseService
 
         return '';
     }
+
+    public function getModuleCrowdId(int $id): string
+    {
+        return (string) LowCodePersonalizeModule::query()->where('id', $id)->value('module_id');
+    }
 }

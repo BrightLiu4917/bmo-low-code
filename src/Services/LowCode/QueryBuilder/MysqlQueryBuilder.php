@@ -196,31 +196,31 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
             $this->queryEngine->useTable($this->recommendIndex($crowdTypeTable, 't3'))
                 ->rightJoin($this->recommendIndex($widthTable, 't1'), 't3.empi', '=', 't1.empi')
                 ->innerJoin($this->recommendIndex($bizSceneTable, 't2'), 't1.empi', '=', 't2.empi')
-                ->select([$this->recommendSortEmpi('t2.empi')]);
+                ->select([DB::raw(sprintf('DISTINCT(%s)', $this->recommendSortEmpi('t2.empi')))]);
         } elseif ($hasBizScene && $hasCrowdType) {
             $this->queryEngine->useTable($this->recommendIndex($bizSceneTable, 't2'))
                 ->innerJoin($this->recommendIndex($crowdTypeTable, 't3'), 't2.empi', '=', 't3.empi')
-                ->select([$this->recommendSortEmpi('t2.empi')]);
+                ->select([DB::raw(sprintf('DISTINCT(%s)', $this->recommendSortEmpi('t2.empi')))]);
         } elseif ($hasBizScene && $hasWidthTable) {
             $this->queryEngine->useTable($this->recommendIndex($bizSceneTable, 't2'))
                 ->rightJoin($this->recommendIndex($widthTable, 't1'), 't2.empi', '=', 't1.empi')
-                ->select([$this->recommendSortEmpi('t2.empi')]);
+                ->select([DB::raw(sprintf('DISTINCT(%s)', $this->recommendSortEmpi('t2.empi')))]);
         } elseif ($hasCrowdType && $hasWidthTable) {
             $this->queryEngine->useTable($this->recommendIndex($widthTable, 't1'))
                 ->leftJoin($this->recommendIndex($crowdTypeTable, 't3'), 't1.empi', '=', 't3.empi')
-                ->select([$this->recommendSortEmpi('t2.empi')]);
+                ->select([DB::raw(sprintf('DISTINCT(%s)', $this->recommendSortEmpi('t2.empi')))]);
         } elseif ($hasCrowdType) {
             $this->queryEngine->useTable($crowdTypeTable . ' as t3')
-                ->select([$this->recommendSortEmpi('t2.empi')]);
+                ->select([DB::raw(sprintf('DISTINCT(%s)', $this->recommendSortEmpi('t2.empi')))]);
         } elseif ($hasBizScene) {
             $this->queryEngine->useTable($bizSceneTable . ' as t2')
-                ->select([$this->recommendSortEmpi('t2.empi')]);
+                ->select([DB::raw(sprintf('DISTINCT(%s)', $this->recommendSortEmpi('t2.empi')))]);
         } elseif ($hasWidthTable) {
             $this->queryEngine->useTable($widthTable . ' as t1')
-                ->select([$this->recommendSortEmpi('t2.empi')]);
+                ->select([DB::raw(sprintf('DISTINCT(%s)', $this->recommendSortEmpi('t2.empi')))]);
         } else {
             $this->queryEngine->useTable($bizSceneTable . ' as t2')
-                ->select([$this->recommendSortEmpi('t2.empi')]);
+                ->select([DB::raw(sprintf('DISTINCT(%s)', $this->recommendSortEmpi('t2.empi')))]);
         }
 
         // 不需要关联人群分类表时，移除相关条件

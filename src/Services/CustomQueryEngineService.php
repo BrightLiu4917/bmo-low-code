@@ -12,10 +12,13 @@ use BrightLiu\LowCode\Services\LowCode\Tools\EmpiFullFilterTools;
 use BrightLiu\LowCode\Support\Foundation\LowCodeCustomPaginator;
 use Gupo\BetterLaravel\Database\CustomLengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator as IPaginator;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * 自定义基线表查询引擎
@@ -71,15 +74,17 @@ class CustomQueryEngineService extends QueryEngineService
             // 简单分页查询提前量用与判断是否有下一页
             $isSimplePaginateAdvance = $isSimplePaginate ? 1 : 0;
 
-            // 之前的查询结果只为获取empi(减少回表操作)
-            $empis = $listSrv
+            $empiQueryBuilder = $listSrv
                 ->buildQueryConditions(
                     clone $queryEngine,
                     $queryParams,
                     $config,
                     $bizSceneTable
                 )
-                ->getQueryBuilder()
+                ->getQueryBuilder();
+
+            // 之前的查询结果只为获取empi(减少回表操作)
+            $empis = $empiQueryBuilder
                 ->forPage($paginator->currentPage(), $paginator->perPage() + $isSimplePaginateAdvance)
                 ->pluck('empi');
 
@@ -106,6 +111,9 @@ class CustomQueryEngineService extends QueryEngineService
                     new Paginator($items, $paginator->perPage(), $paginator->currentPage()),
                 );
             } else {
+                // 利用之前的QueryBuilder获取empi字段名，用于在count时去重
+                $empiColumnForPluck = $this->resolveEmpiColumnForPluck($empiQueryBuilder, 't2.empi');
+
                 $total = $listSrv
                     ->buildQueryConditions(
                         clone $queryEngine,
@@ -115,7 +123,7 @@ class CustomQueryEngineService extends QueryEngineService
                         true
                     )
                     ->getQueryBuilder()
-                    ->count();
+                    ->count(DB::raw('distinct ' . $empiColumnForPluck));
 
                 return new CustomLengthAwarePaginator(
                     new LengthAwarePaginator($items, $total, $paginator->perPage(), $paginator->currentPage()),
@@ -143,7 +151,7 @@ class CustomQueryEngineService extends QueryEngineService
 
         // 构建基本的关联查询
         $items = $queryEngine->useTable($widthTable . ' as t1')
-            ->innerJoin($bizSceneTable . ' as t2', 't2.empi', '=', 't1.empi')
+            ->leftJoin($bizSceneTable . ' as t2', 't2.empi', '=', 't1.empi')
             ->getQueryBuilder()
             ->whereIn('t1.empi', $empis)
             ->where(fn ($query) => (new EmpiFullFilterTools)($query, ['t1.empi', 't2.empi'], $empis))
@@ -152,6 +160,57 @@ class CustomQueryEngineService extends QueryEngineService
 
         // 保持empis排序
         return $items->sortBy(fn ($item) => array_search($item->empi, $empis))->values();
+    }
+
+    /**
+     * 解析query中的empi字段(带表前缀的empi字段)
+     */
+    protected function resolveEmpiColumnForPluck($queryBuilder, string $default = 'empi'): string
+    {
+        try {
+            $baseQuery = method_exists($queryBuilder, 'getQuery') ? $queryBuilder->getQuery() : $queryBuilder;
+            $columns = $baseQuery->columns ?? [];
+
+            foreach ($columns as $column) {
+                if ($column instanceof Expression) {
+                    $column = (string) $column->getValue();
+                }
+
+                if (!is_string($column)) {
+                    continue;
+                }
+
+                $column = trim($column);
+
+                // select t1.empi as empi
+                if (preg_match('/^(.+?)\s+as\s+["`]?empi["`]?$/i', $column, $matches)) {
+                    $sourceColumn = trim($matches[1]);
+
+                    // select DISTINCT(t2.empi) as empi / DISTINCT t2.empi as empi
+                    if (preg_match('/^distinct\s*\(?\s*(`?[a-zA-Z0-9_]+`?\.`?empi`?)\s*\)?$/i', $sourceColumn, $distinctMatches)) {
+                        return trim($distinctMatches[1]);
+                    }
+
+                    if (str_contains($sourceColumn, '.')) {
+                        return $sourceColumn;
+                    }
+                }
+
+                // select DISTINCT(t2.empi) / DISTINCT t2.empi
+                if (preg_match('/^distinct\s*\(?\s*(`?[a-zA-Z0-9_]+`?\.`?empi`?)\s*\)?$/i', $column, $matches)) {
+                    return trim($matches[1]);
+                }
+
+                // select t1.empi
+                if (preg_match('/^`?[a-zA-Z0-9_]+`?\.`?empi`?$/i', $column)) {
+                    return $column;
+                }
+            }
+        } catch(Throwable $e) {
+            Log::error('解析empi字段异常：' . $e->getMessage());
+        }
+
+        return $default;
     }
 
     public static function of(QueryEngineService $source): self

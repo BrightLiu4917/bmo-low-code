@@ -9,6 +9,7 @@ use BrightLiu\LowCode\Requests\LowCode\LowCodeCrowdLayer\SaveRequest;
 use BrightLiu\LowCode\Resources\LowCode\LowCodeCrowdLayer\ListResource;
 use BrightLiu\LowCode\Services\LowCode\LowCodeCrowdLayerService;
 use BrightLiu\LowCode\Services\LowCode\LowCodeListService;
+use BrightLiu\LowCode\Services\LowCode\LowCodePersonalizeModuleService;
 use BrightLiu\LowCode\Traits\Context\WithOrgContext;
 use Gupo\BetterLaravel\Http\BaseController;
 use Illuminate\Http\JsonResponse;
@@ -78,6 +79,16 @@ final class LowCodeCrowdLayerController extends BaseController
     {
         $layerIds = (array) $request->input('layer_ids', []);
 
+        $moduleId = (string) $request->input('module_id', '');
+
+        $moduleType = (string) $request->input('module_type', 'personalize_module');
+
+        // 获取模块(自定义菜单)关联的人群id
+        $moduleCrowdId = 0;
+        if (!empty($moduleId)) {
+            $moduleCrowdId = LowCodePersonalizeModuleService::make()->getModuleCrowdId((int) $moduleId);
+        }
+
         $result = [];
         if (!empty($layerIds)) {
             $searchLayerIds = array_values(array_unique(array_filter($layerIds)));
@@ -92,14 +103,22 @@ final class LowCodeCrowdLayerController extends BaseController
                     ->keyBy('id');
             }
 
-            $result = array_map(function ($layerId) use ($srv, $layers) {
+            $result = array_map(function ($layerId) use ($srv, $layers, $moduleCrowdId) {
                 $layer = $layers->get($layerId);
 
                 $filters = [];
                 if (!empty($layer->crowd_id) && !empty($layer->personalizeModule)) {
                     $filters = array_merge(
+                        // 自定义菜单关联的人群ID
                         [['crowd_id', '=', $layer->personalizeModule->module_id]],
+
+                        // 人群分层关联的人群ID
                         $layer->preset_filters ?? []
+                    );
+                } else {
+                    $filters = array_merge(
+                        // 自定义菜单关联的人群ID
+                        !empty($moduleCrowdId) ? [['crowd_id', '=', $moduleCrowdId]] : [],
                     );
                 }
 
