@@ -24,7 +24,7 @@ abstract class BasicColumn implements IColumn
             $item->{$columnName} = $this->handleItem($item, $sources);
 
             if (method_exists($this, 'handleItemVariant')) {
-                $item->{$columnName . '.variant'} = $this->handleItemVariant($item, $item->{$columnName});
+                $item->{$columnName . '.variant'} = $this->handleItemVariant($item, $sources, $item->{$columnName});
             }
 
             return $item;

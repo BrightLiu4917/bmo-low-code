@@ -38,7 +38,7 @@ class FollowStatusColumn extends BasicColumn implements IColumn
         return $sources->contains($item->empi ?? '') ? 1 : 0;
     }
 
-    public function handleItemVariant($item, $value): mixed
+    public function handleItemVariant($item, $sources, $value): mixed
     {
         return $value ? '已关注' : '未关注';
     }

@@ -43,7 +43,7 @@ class PatientTagsColumn extends BasicColumn implements IColumn
         ])->toArray();
     }
 
-    public function handleItemVariant($item, $value): mixed
+    public function handleItemVariant($item, $sources, $value): mixed
     {
         if (empty($value)) {
             return null;
