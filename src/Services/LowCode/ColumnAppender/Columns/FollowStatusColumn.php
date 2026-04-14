@@ -28,6 +28,7 @@ class FollowStatusColumn extends BasicColumn implements IColumn
             ->where('is_deleted', 0)
             ->where('scene_code', $this->getSceneCode())
             ->where('org_code', $this->getAffiliatedOrgCode())
+            ->where('disease_code', $this->getDiseaseCode())
             ->where('follower', $this->getAdminId())
             ->where('status', 1)
             ->pluck('empi');

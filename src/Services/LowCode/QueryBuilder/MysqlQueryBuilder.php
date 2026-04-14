@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace BrightLiu\LowCode\Services\LowCode\QueryBuilder;
 
 use BrightLiu\LowCode\Context\AdminContext;
+use BrightLiu\LowCode\Context\DiseaseContext;
 use BrightLiu\LowCode\Context\OrgContext;
 use BrightLiu\LowCode\Enums\Foundation\BlinkCacheable;
 use BrightLiu\LowCode\Services\Contracts\ILowCodeQueryBuilder;
 use BrightLiu\LowCode\Services\QueryEngineService;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
@@ -459,6 +460,10 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
             $this->queryEngine->whereField(AdminContext::instance()->getAdminId(), 't2.assign_manage_doctor_code');
         }
 
+        $adminContext = AdminContext::instance();
+        $orgContext = OrgContext::instance();
+        $diseaseContext = DiseaseContext::instance();
+
         if ($this->hasCustomSearchAction('search:follow_patients')) {
             $followTable = config('low-code.bmo-baseline.database.crowd-follow-table', '');
 
@@ -466,7 +471,10 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
                 ->whereExists(fn (Builder $query) => $query->from($followTable, 't20')
                     ->selectRaw('1')
                     ->whereRaw('t20.empi = t2.empi')
-                    ->where('follower', AdminContext::instance()->getAdminId())
+                    ->where('follower', $adminContext->getAdminId())
+                    ->where('scene_code', $diseaseContext->getSceneCode())
+                    ->where('org_code', $orgContext->getAffiliatedOrgCode())
+                    ->where('disease_code', $diseaseContext->getDiseaseCode())
                     ->where('status', 1)
                     ->where('is_deleted', 0)
                 );
@@ -476,12 +484,15 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
             $followTable = config('low-code.bmo-baseline.database.crowd-follow-table', '');
 
             $this->queryEngine
-                ->whereField(AdminContext::instance()->getAdminId(), 't2.assign_manage_doctor_code')
+                ->whereField($adminContext->getAdminId(), 't2.assign_manage_doctor_code')
                 ->getQueryBuilder()
                 ->whereExists(fn (Builder $query) => $query->from($followTable, 't20')
                     ->selectRaw('1')
                     ->whereRaw('t20.empi = t2.empi')
-                    ->where('follower', AdminContext::instance()->getAdminId())
+                    ->where('follower', $adminContext->getAdminId())
+                    ->where('scene_code', $diseaseContext->getSceneCode())
+                    ->where('org_code', $orgContext->getAffiliatedOrgCode())
+                    ->where('disease_code', $diseaseContext->getDiseaseCode())
                     ->where('status', 1)
                     ->where('is_deleted', 0)
                 );
@@ -498,6 +509,9 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
                         ->selectRaw('1')
                         ->whereRaw('t30.empi COLLATE utf8mb4_unicode_ci = t2.empi')
                         ->whereIn('tag_id', (array) $tagIds)
+                        ->where('scene_code', $diseaseContext->getSceneCode())
+                        ->where('org_code', $orgContext->getAffiliatedOrgCode())
+                        ->where('disease_code', $diseaseContext->getDiseaseCode())
                         ->where('is_deleted', 0)
                     );
             }

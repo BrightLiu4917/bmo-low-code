@@ -26,6 +26,7 @@ class PatientTagsColumn extends BasicColumn implements IColumn
             ->whereIn('empi', $empis)
             ->where('is_deleted', 0)
             ->where('scene_code', $this->getSceneCode())
+            ->where('disease_code', $this->getDiseaseCode())
             ->where('org_code', $this->getAffiliatedOrgCode())
             ->get(['empi', 'tag_name', 'tag_id'])
             ->groupBy('empi');
