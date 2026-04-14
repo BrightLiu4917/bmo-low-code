@@ -43,6 +43,10 @@ return [
     'bmo-baseline' => [
             // 基线数据库
             'database'=>[
+                // 是否严格模式，开启后会对字段进行严格校验，关闭后会自动过滤掉不存在的字段，默认为true
+                // 用于控制DbConnectionManager
+                'strict-mode' => env('BLC_BASELINE_DATABASE_STRICT_MODE', false),
+
                 // 人群类型表 一般都是 feature_user_detail
                 'crowd-type-table'=> env('DB_BUSINESS_CENTER_CROWD_TYPE_TABLE','feature_user_detail'),
 

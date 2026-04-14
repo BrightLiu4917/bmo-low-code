@@ -79,6 +79,8 @@ final class DbConnectionManager
                 return array_merge($source->toArray(), $this->defaultConfig());
             });
 
+            $dbConfig['strict'] = config('low-code.bmo-baseline.database.strict-mode', true);
+
             return $this->connections[$code] = $this->createConnection($code, $dbConfig);
 
         } catch (ServiceException $e) {
