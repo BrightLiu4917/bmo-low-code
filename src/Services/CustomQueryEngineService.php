@@ -221,4 +221,20 @@ class CustomQueryEngineService extends QueryEngineService
 
         return $instance;
     }
+
+
+    /**
+     * 获取查询结果的数量
+     *
+     * @param bool $useCache 是否使用缓存
+     *
+     * @return int|string 查询结果的数量
+     */
+    public function getCountResult(bool $useCache = true): int|string
+    {
+        $empiColumnForPluck = $this->resolveEmpiColumnForPluck($this->queryBuilder);
+
+        return (int)$this->executeQuery(fn () => $this->queryBuilder->count(DB::raw('distinct ' . $empiColumnForPluck)),
+            [], $useCache, $this->randomKey(method: __FUNCTION__));
+    }
 }
