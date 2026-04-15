@@ -183,5 +183,11 @@ return [
 
         // 启用资源中心解析行政区域层级，失败时使用本地解析
         'region_code_resolve_enabled' => env('BLC_OPT_REGION_CODE_RESOLVE_ENABLED', false),
-    ]
+    ],
+
+    // 居民档案相关配置
+    'resident-archive' => [
+        // 监测指标是否可以从上游获取
+        'metric-from-upstream-enabled' => env('BLC_RESIDENT_ARCHIVE_METRIC_FROM_UPSTREAM_ENABLED', true),
+    ],
 ];

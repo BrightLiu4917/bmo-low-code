@@ -71,12 +71,14 @@ class ResidentMetricService extends BaseService
         string|Carbon|null $maxDate = null,
         int $limit = 0
     ): array {
-        // TODO: 可适当缓存
-        // 获取上游指标
-        $personalArchiveConfig = BmpCheetahMedicalCrowdkitApiService::make()->getPersonalArchiveConfig();
-        $personalArchiveFields = array_column($personalArchiveConfig['data'] ?? [], null, 'src_col_name');
+        $metricConfig = null;
+        if (config('low-code.resident-archive.metric-from-upstream-enabled', false)) {
+            // 获取上游指标
+            $personalArchiveConfig = BmpCheetahMedicalCrowdkitApiService::make()->getPersonalArchiveConfig();
+            $personalArchiveFields = array_column($personalArchiveConfig['data'] ?? [], null, 'src_col_name');
 
-        $metricConfig = $personalArchiveFields[$metricId] ?? null;
+            $metricConfig = $personalArchiveFields[$metricId] ?? null;
+        }
 
         return match (true) {
             // 存在指标配置时，为上游指标
