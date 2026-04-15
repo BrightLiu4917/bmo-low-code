@@ -56,7 +56,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
     public function getCrowds(int $selectType = 1): array
     {
         $args = [
-            'org_codes' => CrowdTypeColumn::getQueryCrowdTypeOrgCodes(),
+            'org_codes' => CrowdKitService::make()->getQueryCrowdTypeOrgCodes(),
             'arc_code'=> $this->getArcCode(),
             'sys_code' => $this->getSystemCode(),
             'disease_code' => $this->getDiseaseCode(),

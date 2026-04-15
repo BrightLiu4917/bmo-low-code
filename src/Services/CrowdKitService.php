@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Services;
 
-use Illuminate\Support\Collection;
-use BrightLiu\LowCode\Traits\Context\WithAuthContext;
+use BrightLiu\LowCode\Enums\Foundation\Logger;
+use BrightLiu\LowCode\Support\CrowdConnection;
+use BrightLiu\LowCode\Traits\Context\WithContext;
+use Gupo\BetterLaravel\Traits\WithRescue;
 use Illuminate\Support\Collection;
 
 /**
@@ -13,7 +15,7 @@ use Illuminate\Support\Collection;
  */
 final class CrowdKitService extends LowCodeBaseService
 {
-    use WithAuthContext;
+    use WithContext, WithRescue;
 
     /**
      * 人群分类缓存
@@ -40,7 +42,7 @@ final class CrowdKitService extends LowCodeBaseService
                 ...$group,
                 'org_col_groups' => array_values(array_filter(
                     $group['org_col_groups'] ?? [],
-                    fn (array $column) => (int) ($column['is_editable'] ?? 0) === 1
+                    fn (array $column) => 1 === (int) ($column['is_editable'] ?? 0)
                 )),
             ])
             ->all();
@@ -134,7 +136,7 @@ final class CrowdKitService extends LowCodeBaseService
      *
      * @param int $groupId 人群分类ID
      */
-    public function resolveGroupName(int $groupId, mixed $default = null,int $selectType = 0): mixed
+    public function resolveGroupName(int $groupId, mixed $default = null, int $selectType = 0): mixed
     {
         if (empty($groupId)) {
             return $default;
@@ -144,7 +146,7 @@ final class CrowdKitService extends LowCodeBaseService
             fn () => array_column(
                 array_filter(
                     BmpCheetahMedicalCrowdkitApiService::instance()->getCrowds(selectType: $selectType),
-                    fn ($item) => empty($item['select_type']) || $item['select_type'] != 9
+                    fn ($item) => empty($item['select_type']) || 9 != $item['select_type']
                 ),
                 'group_name',
                 'id'
@@ -153,5 +155,75 @@ final class CrowdKitService extends LowCodeBaseService
         );
 
         return $groupNameMapping[$groupId] ?? $default;
+    }
+
+    /**
+     * 获取用于查询人群分类的机构code
+     * PS: 当开启共享机构获取患者的所需人群分类功能时，除了当前机构外，还会获取共享机构的code进行查询
+     */
+    public function getQueryCrowdTypeOrgCodes(): array
+    {
+        $orgCodes = [$this->getAffiliatedOrgCode()];
+
+        // 支持从共享机构获取患者的所需人群分类
+        try {
+            if (config('low-code.crowd-group-from-share-org-enabled', false)) {
+                $shareOrgCodes = BmpCheetahMedicalPlatformApiService::instance()->getShareResourceOrgCodes(
+                    $this->getAffiliatedOrgCode()
+                );
+
+                $orgCodes = array_values(array_unique(array_filter(array_merge($orgCodes, $shareOrgCodes))));
+            }
+        } catch (\Throwable $e) {
+            Logger::LARAVEL->error('获取共享机构code失败，无法从共享机构获取患者的所需人群分类', [
+                'affiliated_org_code' => $this->getAffiliatedOrgCode(),
+                'error_message' => $e->getMessage(),
+            ]);
+        }
+
+        return $orgCodes;
+    }
+
+    public function getCrowdTypes(string $empi, bool $excludeBaseline = false): array
+    {
+        $featureCrowdTable = config('low-code.bmo-baseline.database.crowd-type-table', '');
+        $userGroupTable = config('low-code.bmo-baseline.database.crowd-group-table', 'user_group');
+
+        // 按empi连表查询人群分类信息(一个人可能属于多个人群分类)
+        return CrowdConnection::connection()
+            ->table($featureCrowdTable . ' as t1')
+            ->join($userGroupTable . ' as t2', 't2.id', '=', 't1.group_id')
+            ->whereIn('t2.org_code', $this->getQueryCrowdTypeOrgCodes())
+            ->where('t1.empi', $empi)
+            ->where('t2.is_deleted', 0)
+            ->select(['t1.empi', 't1.group_id', 't2.group_name', 't2.select_type'])
+            ->get()
+            ->when($excludeBaseline, fn (Collection $collection) => $collection->where('select_type', '<>', 9))
+            ->values()
+            ->toArray();
+    }
+
+    public function batchGetCrowdTypes(array $empis, bool $excludeBaseline = false): array
+    {
+        if (empty($empis)) {
+            return [];
+        }
+
+        $featureCrowdTable = config('low-code.bmo-baseline.database.crowd-type-table', '');
+        $userGroupTable = config('low-code.bmo-baseline.database.crowd-group-table', 'user_group');
+
+        // 按empi连表查询人群分类信息(一个人可能属于多个人群分类)
+        return CrowdConnection::connection()
+            ->table($featureCrowdTable . ' as t1')
+            ->join($userGroupTable . ' as t2', 't2.id', '=', 't1.group_id')
+            ->whereIn('t2.org_code', $this->getQueryCrowdTypeOrgCodes())
+            ->whereIn('t1.empi', $empis)
+            ->where('t2.is_deleted', 0)
+            ->select(['t1.empi', 't1.group_id', 't2.group_name', 't2.select_type'])
+            ->get()
+            ->when($excludeBaseline, fn (Collection $collection) => $collection->where('select_type', '<>', 9))
+            ->values()
+            ->groupBy('empi')
+            ->toArray();
     }
 }
