@@ -6,6 +6,7 @@ namespace BrightLiu\LowCode\Controllers\Resident;
 
 use BrightLiu\LowCode\Requests\Resident\ResidentArchive\ResidentArchiveRequest;
 use BrightLiu\LowCode\Resources\Resident\ResidentArchive\BasicInfoResource;
+use BrightLiu\LowCode\Resources\Resident\ResidentArchive\ColumnGroupResource;
 use BrightLiu\LowCode\Resources\Resident\ResidentArchive\InfoResource;
 use BrightLiu\LowCode\Services\CrowdKitService;
 use BrightLiu\LowCode\Services\Resident\FollowResidentService;
@@ -13,12 +14,23 @@ use BrightLiu\LowCode\Services\Resident\ResidentArchiveService;
 use BrightLiu\LowCode\Services\Resident\TestingResidentService;
 use Gupo\BetterLaravel\Http\BaseController;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 /**
  * 居民档案
  */
 class ResidentArchiveController extends BaseController
 {
+    /**
+     * 档案字段组
+     */
+    public function columnGroup(Request $request, CrowdKitService $kitSrv): JsonResponse
+    {
+        $data = $kitSrv->getEditableOptionalColumns();
+
+        return $this->responseData($data, ColumnGroupResource::class);
+    }
+
     /**
      * 获取健康档案信息
      */

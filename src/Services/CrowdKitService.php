@@ -6,6 +6,7 @@ namespace BrightLiu\LowCode\Services;
 
 use Illuminate\Support\Collection;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
+use Illuminate\Support\Collection;
 
 /**
  * 服务人群工具模块 处理相关
@@ -25,6 +26,24 @@ final class CrowdKitService extends LowCodeBaseService
     public function getOptionalColumns(): Collection
     {
         $columnGroup = BmpCheetahMedicalCrowdkitApiService::instance()->getPatientCrowdColGroup();
+
+        return $this->formatColumnGroup($columnGroup);
+    }
+
+    /**
+     * 获取可编辑的人群可选列
+     */
+    public function getEditableOptionalColumns(): Collection
+    {
+        $columnGroup = collect(BmpCheetahMedicalCrowdkitApiService::instance()->getPatientCrowdColGroup())
+            ->map(fn (array $group) => [
+                ...$group,
+                'org_col_groups' => array_values(array_filter(
+                    $group['org_col_groups'] ?? [],
+                    fn (array $column) => (int) ($column['is_editable'] ?? 0) === 1
+                )),
+            ])
+            ->all();
 
         return $this->formatColumnGroup($columnGroup);
     }
@@ -51,7 +70,9 @@ final class CrowdKitService extends LowCodeBaseService
      */
     public function formatColumns(array|Collection $columnGroup): Collection
     {
-        $priorityColumns = ['rsdnt_nm', 'id_crd_no', 'gdr_cd', 'slf_tel_no', 'bth_dt', 'curr_addr'];
+        $priorityColumns = ['rsdnt_nm', 'slf_tel_no', 'id_crd_no', 'gdr_cd',  'bth_dt', 'curr_addr'];
+
+        $requiredColumns = ['rsdnt_nm', 'slf_tel_no', 'id_crd_no', 'gdr_cd',  'bth_dt', 'curr_addr'];
 
         $fixedColumns = ['rsdnt_nm', 'id_crd_no'];
 
@@ -79,6 +100,9 @@ final class CrowdKitService extends LowCodeBaseService
 
                 return false !== $index ? $index - count($priorityColumns) : $sitem['column'];
             })
+
+            // 处理必填列
+            ->map(fn ($sitem) => [...$sitem, 'required' => in_array($sitem['column'], $requiredColumns) ? 1 : 0])
 
             ->values();
     }
