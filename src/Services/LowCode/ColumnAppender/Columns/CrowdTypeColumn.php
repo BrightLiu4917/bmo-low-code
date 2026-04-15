@@ -71,7 +71,7 @@ class CrowdTypeColumn extends BasicColumn implements IColumn
      * 获取用于查询人群分类的机构code
      * PS: 当开启共享机构获取患者的所需人群分类功能时，除了当前机构外，还会获取共享机构的code进行查询
      */
-    protected function fetchQueryOrgCodes(): array
+    public function fetchQueryOrgCodes(): array
     {
         $orgCodes = [$this->getAffiliatedOrgCode()];
 
@@ -92,5 +92,13 @@ class CrowdTypeColumn extends BasicColumn implements IColumn
         }
 
         return $orgCodes;
+    }
+
+    /**
+     * 获取用于查询人群分类的org_codes
+     */
+    public static function getQueryCrowdTypeOrgCodes(): array
+    {
+        return (new self)->fetchQueryOrgCodes();
     }
 }

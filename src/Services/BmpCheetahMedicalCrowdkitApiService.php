@@ -8,6 +8,7 @@ use Gupo\BetterLaravel\Exceptions\ServiceException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
+use BrightLiu\LowCode\Services\LowCode\ColumnAppender\Columns\CrowdTypeColumn;
 use BrightLiu\LowCode\Traits\Context\WithContext;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
 
@@ -55,7 +56,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
     public function getCrowds(int $selectType = 1): array
     {
         $args = [
-            'org_codes' => $this->getManageOrgCode(),
+            'org_codes' => CrowdTypeColumn::getQueryCrowdTypeOrgCodes(),
             'arc_code'=> $this->getArcCode(),
             'sys_code' => $this->getSystemCode(),
             'disease_code' => $this->getDiseaseCode(),
