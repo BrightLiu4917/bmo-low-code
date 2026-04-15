@@ -18,7 +18,7 @@ final class ManageStatusNotifyController extends BaseController
 {
     public function __invoke(Request $request): JsonResponse
     {
-        $orgId = (int) $request->input('org_id', 0);
+        $orgCode = (string) $request->input('org_code', $request->input('org_id', ''));
 
         $diseaseCode = (string) $request->input('disease_code', '');
 
@@ -38,12 +38,12 @@ final class ManageStatusNotifyController extends BaseController
             return $this->responseError(message: '参数错误');
         }
 
-        OrgContext::init((string) $orgId, $arcCode);
+        OrgContext::init((string) $orgCode, $arcCode);
 
         DiseaseContext::init($diseaseCode, $sceneCode);
 
         event(new ManageStatusChanged(
-            orgId: $orgId,
+            orgCode: $orgCode,
             diseaseCode: $diseaseCode,
             sceneCode: $sceneCode,
             userId: $userId,

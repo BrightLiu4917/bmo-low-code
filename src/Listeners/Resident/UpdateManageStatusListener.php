@@ -35,7 +35,7 @@ class UpdateManageStatusListener
 
         // 仅管理时，更新纳管状态
         if ($this->isManage($event, $resident)) {
-            $attributes['manage_org_code'] = $event->arcCode;
+            $attributes['manage_org_code'] = $event->orgCode;
             $attributes['manage_doctor_name'] = $event->operatorName;
             $attributes['manage_doctor_code'] = $event->operatorId;
             $attributes['manage_start_at'] = now()->format('Y-m-d H:i:s');

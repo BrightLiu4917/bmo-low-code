@@ -11,7 +11,7 @@ use BrightLiu\LowCode\Services\Resident\ResidentService;
 class ManageStatusChanged
 {
     public function __construct(
-        public readonly int $orgId,
+        public readonly string $orgCode,
         public readonly string $diseaseCode,
         public readonly string $sceneCode,
         public readonly string $userId,
@@ -27,7 +27,7 @@ class ManageStatusChanged
      */
     public function initContext(): void
     {
-        OrgContext::init((string) $this->orgId, $this->arcCode);
+        OrgContext::init($this->orgCode, $this->arcCode);
 
         DiseaseContext::init($this->diseaseCode, $this->sceneCode);
     }
@@ -35,7 +35,7 @@ class ManageStatusChanged
     public function toArray(): array
     {
         return [
-            'org_id' => $this->orgId,
+            'org_code' => $this->orgCode,
             'disease_code' => $this->diseaseCode,
             'scene_code' => $this->sceneCode,
             'user_id' => $this->userId,
