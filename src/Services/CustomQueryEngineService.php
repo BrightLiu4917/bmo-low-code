@@ -111,19 +111,18 @@ class CustomQueryEngineService extends QueryEngineService
                     new Paginator($items, $paginator->perPage(), $paginator->currentPage()),
                 );
             } else {
-                // 利用之前的QueryBuilder获取empi字段名，用于在count时去重
-                $empiColumnForPluck = $this->resolveEmpiColumnForPluck($empiQueryBuilder, 't2.empi');
+                $countQueryBuilder = $listSrv->buildQueryConditions(
+                    clone $queryEngine,
+                    $queryParams,
+                    $config,
+                    $bizSceneTable,
+                    true
+                )->getQueryBuilder();
 
-                $total = $listSrv
-                    ->buildQueryConditions(
-                        clone $queryEngine,
-                        $queryParams,
-                        $config,
-                        $bizSceneTable,
-                        true
-                    )
-                    ->getQueryBuilder()
-                    ->count(DB::raw('distinct ' . $empiColumnForPluck));
+                // 利用之前的QueryBuilder获取带表前缀(可能)的empi字段名，用于在count时去重
+                $empiColumnForPluck = $this->resolveEmpiColumnForPluck($countQueryBuilder, 't2.empi');
+
+                $total = $countQueryBuilder->count(DB::raw('distinct ' . $empiColumnForPluck));
 
                 return new CustomLengthAwarePaginator(
                     new LengthAwarePaginator($items, $total, $paginator->perPage(), $paginator->currentPage()),
@@ -169,6 +168,21 @@ class CustomQueryEngineService extends QueryEngineService
     {
         try {
             $baseQuery = method_exists($queryBuilder, 'getQuery') ? $queryBuilder->getQuery() : $queryBuilder;
+
+            // 只有一个表时（无JOIN），根据是否有表别名决定返回值
+            if (empty($baseQuery->joins)) {
+                $fromRaw = $baseQuery->from ?? null;
+                if ($fromRaw instanceof Expression) {
+                    $fromRaw = (string) $fromRaw->getValue();
+                }
+                $from = is_string($fromRaw) ? trim($fromRaw) : '';
+                if ($from !== '' && preg_match('/\s+as\s+(`?[a-zA-Z0-9_]+`?)$/i', $from, $matches)) {
+                    return trim($matches[1], '`') . '.empi';
+                }
+
+                return 'empi';
+            }
+
             $columns = $baseQuery->columns ?? [];
 
             foreach ($columns as $column) {
@@ -232,7 +246,7 @@ class CustomQueryEngineService extends QueryEngineService
      */
     public function getCountResult(bool $useCache = true): int|string
     {
-        $empiColumnForPluck = $this->resolveEmpiColumnForPluck($this->queryBuilder);
+        $empiColumnForPluck = $this->resolveEmpiColumnForPluck($this->queryBuilder, 't2.empi');
 
         return (int)$this->executeQuery(fn () => $this->queryBuilder->count(DB::raw('distinct ' . $empiColumnForPluck)),
             [], $useCache, $this->randomKey(method: __FUNCTION__));
