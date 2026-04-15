@@ -256,6 +256,16 @@ class DataPermissionService extends LowCodeBaseService
                             implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
                         ),
                     ]
+                ],
+                [
+                    [
+                        'raw',
+                        sprintf(
+                            '%s in (%s)',
+                            't2.manage_org_code',
+                            implode(',', array_map(fn ($item) => "\"{$item}\"", $manageOrgArr))
+                        ),
+                    ]
                 ]
             ];
         }
