@@ -55,25 +55,36 @@ final class CrowdKitService extends LowCodeBaseService
      */
     public function formatColumnGroup(array $data): Collection
     {
+        $priorityColumns = ['rsdnt_nm', 'slf_tel_no', 'id_crd_no', 'gdr_cd',  'bth_dt', 'curr_addr'];
+
         return collect($data)
             ->map(
                 fn ($item) => [
                     'id' => $item['group_id'],
                     'name' => $item['group_name'],
-                    'columns' => $this->formatColumns($item['org_col_groups']),
+                    'columns' => $this->formatColumns($item['org_col_groups'], $priorityColumns),
                 ]
             )
             ->filter(fn ($item) => !empty($item['columns']))
+
+            // 根据列的优先配置，对列所在的分组进行排序
+            ->sortBy(
+                fn ($item) => collect($item['columns'])
+                    ->map(function ($column) use ($priorityColumns) {
+                        $index = array_search($column['column'], $priorityColumns, true);
+
+                        return false !== $index ? $index : PHP_INT_MAX;
+                    })
+                    ->min()
+            )
             ->values();
     }
 
     /**
      * 格式化列集合
      */
-    public function formatColumns(array|Collection $columnGroup): Collection
+    public function formatColumns(array|Collection $columnGroup, array $priorityColumns = []): Collection
     {
-        $priorityColumns = ['rsdnt_nm', 'slf_tel_no', 'id_crd_no', 'gdr_cd',  'bth_dt', 'curr_addr'];
-
         $requiredColumns = ['rsdnt_nm', 'slf_tel_no', 'id_crd_no', 'gdr_cd',  'bth_dt', 'curr_addr'];
 
         $fixedColumns = ['rsdnt_nm', 'id_crd_no'];
