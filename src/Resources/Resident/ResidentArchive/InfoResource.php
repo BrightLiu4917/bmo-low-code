@@ -104,7 +104,7 @@ class InfoResource extends JsonResource
      */
     protected function fillable(): ?array
     {
-        return null;
+        return collect($this['columns'] ?? [])->where('_is_show', 1)->pluck('column')->toArray();
     }
 
     /**
@@ -120,7 +120,7 @@ class InfoResource extends JsonResource
      */
     public function readonly(): ?array
     {
-        return null;
+        return collect($this['columns'] ?? [])->where('_is_editable', '<>', 1)->pluck('column')->toArray();
     }
 
     /**

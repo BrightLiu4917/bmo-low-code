@@ -98,6 +98,10 @@ final class CrowdKitService extends LowCodeBaseService
                     'name' => $sitem['col_title'],
                     'type' => $sitem['data_type'],
                     'column' => str_replace('.', '_', $sitem['col_nm']),
+
+                    // 默认值为1，兼容老数据
+                    '_is_show' => $sitem['is_show'] ?? 1,
+                    '_is_editable' => $sitem['is_editable'] ?? 1,
                 ]
             )
 
