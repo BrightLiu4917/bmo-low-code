@@ -102,11 +102,7 @@ class ResidentMetricService extends BaseService
         int $limit = 0
     ): array {
         return CrowdConnection::table('personal_archive')
-            ->where('tenant_id', $this->getTenantId())
             ->where('col_name', $metricId)
-            ->where('disease_code', $this->getDiseaseCode())
-            ->where('sys_code', $this->getSystemCode())
-            ->where('org_code', $this->getOrgCode())
             ->where('empi', $empi)
             ->whereBetweenDate('fill_date', $minDate, $maxDate, forceFullDay: true)
             ->when($limit > 0, fn ($query) => $query->limit($limit))
