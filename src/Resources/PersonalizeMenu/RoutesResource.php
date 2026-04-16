@@ -22,6 +22,9 @@ final class RoutesResource extends JsonResource
         $metadata = $this->metadata ?? [];
 
         $metadata['meta']['personalize_module_id'] = $this->id;
+        $metadata['meta']['query'] = [
+            'group_id' => $this->module_id ?? 0
+        ];
 
         return $metadata;
     }
