@@ -11,8 +11,9 @@ use BrightLiu\LowCode\Tools\Clock;
 use BrightLiu\LowCode\Traits\Context\WithContext;
 use Carbon\Carbon;
 use Gupo\BetterLaravel\Service\BaseService;
-use Illuminate\Support\Facades\DB;
+use Gupo\DBQuery\DBQuery;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 /**
  * 居民监测指标相关
@@ -101,7 +102,16 @@ class ResidentMetricService extends BaseService
         string|Carbon|null $maxDate = null,
         int $limit = 0
     ): array {
-        return CrowdConnection::table('personal_archive')
+        $connection = null;
+
+        // 优先使用内置连接
+        if (!empty($baselineDbConfig = config('low-code.bmo-baseline.database.default'))) {
+            $connection = DBQuery::connection($baselineDbConfig)->getConnection()->table('personal_archive');
+        } else {
+            $connection = CrowdConnection::table('personal_archive');
+        }
+
+        return $connection
             ->where('col_name', $metricId)
             ->where('empi', $empi)
             ->whereBetweenDate('fill_date', $minDate, $maxDate, forceFullDay: true)
