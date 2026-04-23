@@ -7,11 +7,18 @@ namespace BrightLiu\LowCode\Resources\Resident\ResidentArchive;
 use BrightLiu\LowCode\Support\Attribute\Conversion;
 use BrightLiu\LowCode\Support\Attribute\Converters\Age;
 use BrightLiu\LowCode\Support\Attribute\Converters\BthDt;
+use BrightLiu\LowCode\Support\Attribute\Converters\DrnkRcdDrnkFlg;
+use BrightLiu\LowCode\Support\Attribute\Converters\EhrHealthRcdRcdOpnFlg;
+use BrightLiu\LowCode\Support\Attribute\Converters\EhrHealthRcdRcdSttsCd;
+use BrightLiu\LowCode\Support\Attribute\Converters\ExrcRcdExrcFrqCd;
 use BrightLiu\LowCode\Support\Attribute\Converters\GdrCd;
 use BrightLiu\LowCode\Support\Attribute\Converters\HeightArrHeight;
 use BrightLiu\LowCode\Support\Attribute\Converters\IdCrdNo;
+use BrightLiu\LowCode\Support\Attribute\Converters\IncprtIntoMngFlg;
 use BrightLiu\LowCode\Support\Attribute\Converters\NtnCd;
+use BrightLiu\LowCode\Support\Attribute\Converters\PsnLblPgncFlg;
 use BrightLiu\LowCode\Support\Attribute\Converters\SlfTelNo;
+use BrightLiu\LowCode\Support\Attribute\Converters\SmkRcdSmkCdtCd;
 use BrightLiu\LowCode\Support\Attribute\Converters\WeightArrWeight;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -95,6 +102,13 @@ class InfoResource extends JsonResource
             NtnCd::class,
             HeightArrHeight::class,
             WeightArrWeight::class,
+            DrnkRcdDrnkFlg::class,
+            EhrHealthRcdRcdOpnFlg::class,
+            EhrHealthRcdRcdSttsCd::class,
+            ExrcRcdExrcFrqCd::class,
+            IncprtIntoMngFlg::class,
+            PsnLblPgncFlg::class,
+            SmkRcdSmkCdtCd::class
         ]);
     }
 
