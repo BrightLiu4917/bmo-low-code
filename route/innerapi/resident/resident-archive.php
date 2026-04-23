@@ -15,4 +15,7 @@ Route::group(['prefix' => 'v2/resident', 'middleware' => [Middleware::AUTH_DISEA
 
     Route::post('resident-archive/update-info', [ResidentArchiveController::class, 'updateInfo'])
         ->comment('居民-居民档案:更新健康档案信息');
+
+    Route::get('resident-archive/column-group', [ResidentArchiveController::class, 'columnGroup'])
+        ->comment('居民-居民档案:档案字段组');
 });
