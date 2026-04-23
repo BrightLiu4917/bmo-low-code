@@ -36,7 +36,7 @@ class ResidentArchiveController extends BaseController
      */
     public function info(ResidentArchiveRequest $request, ResidentArchiveService $srv, CrowdKitService $kitSrv): JsonResponse
     {
-        $empi = (string) $request->input('empi');
+        $empi = (string) $request->input('empi', $request->input('user_id', ''));
 
         $columnGroup = $kitSrv->getOptionalColumns();
 
@@ -52,7 +52,7 @@ class ResidentArchiveController extends BaseController
      */
     public function updateInfo(ResidentArchiveRequest $request, ResidentArchiveService $srv): JsonResponse
     {
-        $empi = (string) $request->input('empi');
+        $empi = (string) $request->input('empi', $request->input('user_id', ''));
 
         $attributes = (array) $request->input('attributes', []);
 
@@ -66,7 +66,7 @@ class ResidentArchiveController extends BaseController
      */
     public function basicInfo(ResidentArchiveRequest $request, ResidentArchiveService $srv): JsonResponse
     {
-        $empi = (string) $request->input('empi');
+        $empi = (string) $request->input('empi', $request->input('user_id', ''));
 
         $data = $srv->getBasicInfo($empi);
 
