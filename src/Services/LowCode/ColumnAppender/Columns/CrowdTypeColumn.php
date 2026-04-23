@@ -32,9 +32,18 @@ class CrowdTypeColumn extends BasicColumn implements IColumn
         return collect($sources[$item->empi] ?? null)
              // select_type=9为基线人群，排除再外
             ->where('select_type', '<>', 9)
-            ->pluck('group_name')
             ->unique()
-            ->join(',');
+            ->map(fn ($item) => collect($item)->only(['group_id', 'group_name'])->toArray())
+            ->toArray();
+    }
+
+    public function handleItemVariant($item, $sources, $value): mixed
+    {
+        if (empty($value)) {
+            return null;
+        }
+
+        return implode(',', array_column($value, 'group_name'));
     }
 
     public static function columnName(): string
