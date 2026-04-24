@@ -94,7 +94,7 @@ class CustomQueryEngineService extends QueryEngineService
             // 附加额外信息
             try {
                 if ($items->isNotEmpty()) {
-                    $columnKeys = $listSrv->getFinalColumnKeys((string) ($queryParams['original_code'] ?? ''));
+                    $columnKeys = $listSrv->getFinalColumnKeys((string) ($queryParams['original_code'] ?? ($queryParams['code'] ?? '')));
                     $items = AppenderManager::make()->handle($queryEngine, $items, $columnKeys);
                 }
             } catch (\Throwable $e) {
