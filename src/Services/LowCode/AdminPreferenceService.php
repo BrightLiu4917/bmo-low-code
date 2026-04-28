@@ -37,6 +37,17 @@ final class AdminPreferenceService extends BaseService
                     $preference
                 );
             }
+
+            $columnConfig = array_map(
+                fn ($item) => [
+                    'title' => $item['title'],
+                    'key' => $item['key'],
+                    'sortable' => $item['sortable'] ?? false,
+                    'is_default_sort' => $item['is_default_sort'] ?? false,
+                    'default_sort_order' => $item['default_sort_order'] ?? 'desc',
+                ],
+                $preference
+            );
         } catch (\Throwable) {
         }
 
