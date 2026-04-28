@@ -129,6 +129,9 @@ return [
     // 从共享机构获取患者的所需人群分类
     'crowd-group-from-share-org-enabled' => env('CROWD_GROUP_FROM_SHARE_ORG_ENABLED', false),
 
+    // 指定可排序字段的数据类型，逗号分隔
+    'sortable-columns-types' => env('BLC_SORTABLE_COLUMNS_TYPES', 'date,time,datetime'),
+
     //设置区域缓存时间
     'region-cache-ttl'=>env('REGION_CACHE_TTL',60),
 

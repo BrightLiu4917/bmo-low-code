@@ -287,6 +287,24 @@ final class LowCodeV2ListController extends BaseController
                     $existingGroupNames[] = $name;
                 }
             }
+
+            /**
+             * 标识字段的可排序属性
+             * 目前仅日期、时间、日期时间类型的字段被标识为可排序，后续可根据需要扩展更多类型
+             */
+
+            $sortableTypes = explode_str_array(config('low-code.sortable-columns-types', 'date,time,datetime'));
+            $data = collect($data)->map(
+                fn ($item) => [
+                    ...$item,
+                    'columns' => collect($item['columns'] ?? [])->map(
+                        fn ($column) => [
+                            ...$column,
+                            'sortable' => in_array($column['type'] ?? '', $sortableTypes),
+                        ]
+                    )->toArray(),
+                ]
+            )->toArray();
         } catch (\Throwable $e) {
             Logger::LOW_CODE_LIST->error('fetch-appender-metadata-error', [
                 'error' => $e->getMessage(),
@@ -310,13 +328,13 @@ final class LowCodeV2ListController extends BaseController
             return $this->responseError('参数错误');
         }
 
-        $columns = AdminPreference::query()->where(
+        $originalColumns = AdminPreference::query()->where(
                 'scene',
                 SceneEnum::LIST_COLUMNS
             )->where('pkey', $listCode)->value('pvalue');
 
         // 缺省时，从low_code_part中解析获取
-        if (empty($columns)) {
+        if (empty($originalColumns)) {
             $listCode    = LowCodeCombiService::instance()->resolveListCode(
                 $listCode
             );
@@ -338,12 +356,20 @@ final class LowCodeV2ListController extends BaseController
             $columns = LowCodePart::query()->whereIn(
                     'code',
                     $partCodes->toArray()
-                )->where('content_type', 1)->pluck('content')->pluck('key');
-        } else {
-            $columns = array_column($columns, 'column');
+                )->where('content_type', 1)->pluck('content');
+
+            $originalColumns = $columns->map(fn ($item) => [
+                'name' => $item['title'] ?? '',
+                'column' => $item['key'] ?? '',
+                'sortable' => $item['sortable'] ?? false,
+                'is_default_sort' => $item['is_default_sort'] ?? false,
+                'default_sort_order' => $item['default_sort_order'] ?? 'desc',
+            ])->toArray();
         }
 
-        return $this->responseData(['items' => $columns]);
+        $columns = array_column($originalColumns, 'column');
+
+        return $this->responseData(['items' => $columns, 'original' => $originalColumns]);
     }
 
     /**
