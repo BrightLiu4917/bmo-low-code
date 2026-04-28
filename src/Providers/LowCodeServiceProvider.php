@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Route;
 use BrightLiu\LowCode\Console\Commands\PublishDataPermissionsCommand;
+use BrightLiu\LowCode\Console\Commands\RefreshAdminPreferenceCommand;
 
 class LowCodeServiceProvider extends ServiceProvider
 {
@@ -134,6 +135,7 @@ class LowCodeServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 PublishDataPermissionsCommand::class,
+                RefreshAdminPreferenceCommand::class,
             ]);
         }
     }

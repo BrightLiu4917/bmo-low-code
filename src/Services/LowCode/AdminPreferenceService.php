@@ -30,10 +30,24 @@ final class AdminPreferenceService extends BaseService
                     fn ($item) => $presetConfig[$item['column']] ?? [
                         'title' => $item['name'],
                         'key' => $item['column'],
+                        'sortable' => $item['sortable'] ?? false,
+                        'is_default_sort' => $item['is_default_sort'] ?? false,
+                        'default_sort_order' => $item['default_sort_order'] ?? 'desc',
                     ],
                     $preference
                 );
             }
+
+            $columnConfig = array_map(
+                fn ($item) => [
+                    'title' => $item['title'],
+                    'key' => $item['key'],
+                    'sortable' => $item['sortable'] ?? false,
+                    'is_default_sort' => $item['is_default_sort'] ?? false,
+                    'default_sort_order' => $item['default_sort_order'] ?? 'desc',
+                ],
+                $columnConfig
+            );
         } catch (\Throwable) {
         }
 

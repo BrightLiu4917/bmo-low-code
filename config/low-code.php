@@ -122,6 +122,9 @@ return [
     //使用什么字段作为区域权限条件 默认 region_code
     'use-region-code'=> env('USE_REGION_CODE','4602'),
 
+    // 指定可排序字段的数据类型，逗号分隔
+    'sortable-columns-types' => env('BLC_SORTABLE_COLUMNS_TYPES', 'date,time,datetime'),
+
     //设置区域缓存时间
     'region-cache-ttl'=>env('REGION_CACHE_TTL',60),
 
