@@ -365,6 +365,14 @@ final class LowCodeV2ListController extends BaseController
                 'is_default_sort' => $item['is_default_sort'] ?? false,
                 'default_sort_order' => $item['default_sort_order'] ?? 'desc',
             ])->toArray();
+        } else {
+            $originalColumns = array_map(fn ($item) => [
+                'name' => $item['name'] ?? '',
+                'column' => $item['column'] ?? '',
+                'sortable' => $item['sortable'] ?? false,
+                'is_default_sort' => $item['is_default_sort'] ?? false,
+                'default_sort_order' => $item['default_sort_order'] ?? 'desc',
+            ], $originalColumns);
         }
 
         $columns = array_column($originalColumns, 'column');
