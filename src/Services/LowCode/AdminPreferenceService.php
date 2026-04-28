@@ -46,7 +46,7 @@ final class AdminPreferenceService extends BaseService
                     'is_default_sort' => $item['is_default_sort'] ?? false,
                     'default_sort_order' => $item['default_sort_order'] ?? 'desc',
                 ],
-                $preference
+                $columnConfig
             );
         } catch (\Throwable) {
         }
