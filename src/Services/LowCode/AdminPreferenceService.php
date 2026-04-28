@@ -27,13 +27,13 @@ final class AdminPreferenceService extends BaseService
             // 优先使用用户偏好设置，结合预设配置中的自定义选项
             if (!empty($preference)) {
                 $columnConfig = array_map(
-                    fn ($item) => $presetConfig[$item['column']] ?? [
+                    fn ($item) => array_merge([
                         'title' => $item['name'],
                         'key' => $item['column'],
                         'sortable' => $item['sortable'] ?? false,
                         'is_default_sort' => $item['is_default_sort'] ?? false,
                         'default_sort_order' => $item['default_sort_order'] ?? 'desc',
-                    ],
+                    ], $presetConfig[$item['column']] ?? []),
                     $preference
                 );
             }
