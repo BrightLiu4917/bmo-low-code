@@ -77,10 +77,10 @@ class LowCodeServiceProvider extends ServiceProvider
         ], 'low-code-database-config');
 
         // 配置文件发布
-        $this->publishes('bmo-service-config', [
+        $this->publishes([
             __DIR__.
             '/../../config/business/bmo-service.php' => config_path('business/bmo-service.php'),
-        ]);
+        ], 'bmo-service-config');
 
         // 配置文件发布
         $this->publishes([
