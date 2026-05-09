@@ -82,6 +82,12 @@ class LowCodeServiceProvider extends ServiceProvider
             '/../../config/business/bmo-service.php' => config_path('business/bmo-service.php'),
         ], 'bmo-service-config');
 
+        // 配置文件发布
+        $this->publishes([
+            __DIR__.
+            '/../../config/business/region.php' => config_path('business/region.php'),
+        ], 'region-config');
+
 
         // 迁移文件发布
         $this->publishes([
