@@ -60,7 +60,7 @@ interface QueryEngineContract
      *
      * @return Paginator
      */
-    public function getPaginateResult(bool $isSimplePaginate = false, array $columns = []): Paginator;
+    public function getPaginateResult(bool $isSimplePaginate = false, array $columns = [], bool $forceAppender = false): Paginator;
 
     /**
      * @param string $column

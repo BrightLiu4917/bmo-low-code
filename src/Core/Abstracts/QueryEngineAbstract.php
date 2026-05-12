@@ -300,11 +300,12 @@ abstract class QueryEngineAbstract implements QueryEngineContract
      *
      * @param bool $isSimplePaginate 是否使用简单分页
      * @param array $columns 查询列
+     * @param bool $forceAppender 是否强制使用完整的Appender
      *
      * @return Paginator 分页结果
      * @throws QueryEngineException 如果分页查询异常
      */
-    public function getPaginateResult(bool $isSimplePaginate = false, array $columns = []): Paginator
+    public function getPaginateResult(bool $isSimplePaginate = false, array $columns = [], bool $forceAppender = false): Paginator
     {
         try {
             if ($this->printSql || request()?->input('print_sql')) {
