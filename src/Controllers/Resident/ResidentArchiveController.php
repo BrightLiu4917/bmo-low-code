@@ -26,7 +26,7 @@ class ResidentArchiveController extends BaseController
      */
     public function columnGroup(Request $request, CrowdKitService $kitSrv): JsonResponse
     {
-        $data = $kitSrv->getEditableOptionalColumns();
+        $data = $kitSrv->getEditableOptionalColumns(onlyShow: true);
 
         return $this->responseData($data, ColumnGroupResource::class);
     }

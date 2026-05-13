@@ -35,14 +35,16 @@ final class CrowdKitService extends LowCodeBaseService
     /**
      * 获取可编辑的人群可选列
      */
-    public function getEditableOptionalColumns(): Collection
+    public function getEditableOptionalColumns(bool $onlyShow = false): Collection
     {
         $columnGroup = collect(BmpCheetahMedicalCrowdkitApiService::instance()->getPatientCrowdColGroup())
             ->map(fn (array $group) => [
                 ...$group,
                 'org_col_groups' => array_values(array_filter(
                     $group['org_col_groups'] ?? [],
-                    fn (array $column) => 1 === (int) ($column['is_editable'] ?? 0)
+                    fn (array $column) => 1 === (int) ($column['is_editable'] ?? 0) && (
+                        !$onlyShow || (1 === (int) ($column['is_show'] ?? 0))
+                    )
                 )),
             ])
             ->all();
