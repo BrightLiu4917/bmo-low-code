@@ -13,9 +13,8 @@ class DrnkRcdDrnkFlg extends Converter
         $value = parent::variant();
 
         return match (intval($value)) {
-            1 => '从不吸烟',
-            2 => '过去吸，已戒烟',
-            3 => '吸烟',
+            0 => '否',
+            1 => '是',
             default => ''
         };
     }

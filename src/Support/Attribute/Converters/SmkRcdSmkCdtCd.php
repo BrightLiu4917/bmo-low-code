@@ -13,8 +13,9 @@ class SmkRcdSmkCdtCd extends Converter
         $value = parent::variant();
 
         return match (intval($value)) {
-            0 => '否',
-            1 => '是',
+            1 => '从不吸烟',
+            2 => '过去吸，已戒烟',
+            3 => '吸烟',
             default => ''
         };
     }
