@@ -53,7 +53,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
     /**
      * 获取人群分类
      */
-    public function getCrowds(int $selectType = 1): array
+    public function getCrowds(int $selectType = 1, int $isEnabled = -1): array
     {
         $args = [
             'org_codes' => CrowdKitService::make()->getQueryCrowdTypeOrgCodes(),
@@ -62,7 +62,12 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
             'disease_code' => $this->getDiseaseCode(),
             'scene_code' => $this->getSceneCode(),
             'tenant_id' => $this->getTenantId(),
+            'page_size' => 9999
         ];
+
+        if ($isEnabled >= 0) {
+            $args['status'] = $isEnabled;
+        }
 
         if ($selectType != 0 && is_numeric($selectType)){
             $args['select_type'] = $selectType;

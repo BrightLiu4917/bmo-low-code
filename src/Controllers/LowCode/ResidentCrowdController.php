@@ -22,7 +22,9 @@ final class ResidentCrowdController extends BaseController
         try {
             $selectType = (int) $request->input('select_type', 0);
 
-            $data = BmpCheetahMedicalCrowdkitApiService::make()->getCrowds($selectType);
+            $isEnabled = (int) $request->input('is_enabled', 1);
+
+            $data = BmpCheetahMedicalCrowdkitApiService::make()->getCrowds($selectType, $isEnabled);
         } catch (\Throwable $e) {
             Logger::LARAVEL->error($e);
             $data = [];
