@@ -183,7 +183,8 @@ class LowCodeListService extends LowCodeBaseService
         bool $export = false,
         bool $isSimplePaginate = false,
         array $columns = [],
-        bool $forceAppender = false
+        bool $forceAppender = false,
+        array $customAppenders = []
     ) {
         try {
             // 解析code(code中可能携带中台的人群ID)
@@ -223,7 +224,7 @@ class LowCodeListService extends LowCodeBaseService
                 if ($export) {
                     return $builtQuery->setCache($setCacheTtl)->getAllResult();
                 }
-                return $builtQuery->setCache($setCacheTtl)->getPaginateResult($isSimplePaginate, $columns, $forceAppender);
+                return $builtQuery->setCache($setCacheTtl)->getPaginateResult($isSimplePaginate, $columns, $forceAppender, $customAppenders);
             }
         } catch (QueryEngineException $e) {
             Logger::LOW_CODE_LIST->error('低代码列表查询异常', [

@@ -50,12 +50,13 @@ class CustomQueryEngineService extends QueryEngineService
      * @param bool $isSimplePaginate 是否使用简单分页
      * @param array $columns 查询列，默认查询宽表和场景表所有列（t1.*, t2.*）
      * @param bool $forceAppender 是否强制使用完整的Appender
+     * @param array $customAppenders 自定义追加器列表
      *
      * @return IPaginator 分页结果
      *
      * @throws QueryEngineException 如果分页查询异常
      */
-    public function getPaginateResult(bool $isSimplePaginate = false, array $columns = [], bool $forceAppender = false): IPaginator
+    public function getPaginateResult(bool $isSimplePaginate = false, array $columns = [], bool $forceAppender = false, array $customAppenders = []): IPaginator
     {
         try {
             if ($this->printSql || request()?->input('print_sql')) {
@@ -96,7 +97,7 @@ class CustomQueryEngineService extends QueryEngineService
             try {
                 if ($items->isNotEmpty()) {
                     $columnKeys = $forceAppender ? null : $listSrv->getFinalColumnKeys((string) ($queryParams['original_code'] ?? ($queryParams['code'] ?? '')));
-                    $items = AppenderManager::make()->handle($queryEngine, $items, $columnKeys);
+                    $items = AppenderManager::make()->handle($queryEngine, $items, $columnKeys, $customAppenders);
                 }
             } catch (\Throwable $e) {
                 Logger::LOW_CODE_LIST->error('list-query-error', [

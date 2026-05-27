@@ -28,9 +28,11 @@ class AppenderManager
         PatientTagsColumn::class,
     ];
 
-    public function handle(QueryEngineService $queryEngine, Collection $items, ?array $columnKeys = null): Collection
+    public function handle(QueryEngineService $queryEngine, Collection $items, ?array $columnKeys = null, array $customAppenders = []): Collection
     {
-        foreach (self::resolveAppenders($columnKeys) as $appender) {
+        $appenders = array_merge(self::resolveAppenders($columnKeys), $customAppenders);
+
+        foreach ($appenders as $appender) {
             try {
                 $items = (new $appender())(clone $queryEngine, $items);
             } catch (\Throwable $e) {
