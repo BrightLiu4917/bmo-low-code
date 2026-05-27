@@ -37,6 +37,21 @@ class CrowdTypeColumn extends BasicColumn implements IColumn
             ->join(',');
     }
 
+    public function handleItemVariant($item, $sources, $value): mixed
+    {
+        if (!isset($sources[$item->empi])) {
+            return null;
+        }
+
+        return collect($sources[$item->empi] ?? null)
+             // select_type=9为基线人群，排除再外
+            ->where('select_type', '<>', 9)
+            ->unique('group_name')
+            ->values()
+            ->map(fn ($sitem) => ['group_name' => $sitem->group_name ?? '', 'group_id' => $sitem->group_id ?? 0])
+            ->toArray();
+    }
+
     public static function columnName(): string
     {
         return '_crowds';
