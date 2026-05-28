@@ -114,6 +114,9 @@ return [
     // 是否启用数据权限(影响LowCodeQuery查询时的数据权限条件)
     'data-permission-enabled' => env('DATA_PERMISSION_ENABLED', true),
 
+    // 是否排除死亡患者(宽表 t1.dth_flg = 0 条件)
+    'died-patient-exclude-enabled' => env('LOW_CODE_DIED_PATIENT_EXCLUDE_ENABLED', false),
+
     //使用什么字段作为查询条件 默认 disease_code
     'low-code-set-use-table-field' => env('LOW_CODE_SET_USE_TABLE_FIELD','disease_code'),
 
