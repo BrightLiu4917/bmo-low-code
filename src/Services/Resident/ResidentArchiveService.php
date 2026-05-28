@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace BrightLiu\LowCode\Services\Resident;
 
 use BrightLiu\LowCode\Services\CrowdKitService;
+use BrightLiu\LowCode\Traits\Context\WithContext;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
 use Gupo\BetterLaravel\Service\BaseService;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * 居民档案相关
  */
 class ResidentArchiveService extends BaseService
 {
+    use WithContext;
+
     /**
      * 获取基础信息
      *
@@ -38,11 +42,57 @@ class ResidentArchiveService extends BaseService
         // 人群分类
         $crowdInfo = $kitSrv->rescue->getCrowdTypes($empi);
 
+        // 出组信息
+        $outGroupInfo = [
+            'status' => $this->resolveOutGroupStatus($empi)
+        ];
+
         return [
             'info' => $info,
             'following' => $following,
             'crowd_info' => $crowdInfo,
+            'out_group_info' => $outGroupInfo,
         ];
+    }
+
+    protected function resolveOutGroupStatus(string $empi): int
+    {
+        $baselineConfig = config('low-code.bmo-baseline.database.default');
+
+        if (!empty($baselineConfig)) {
+            $connectionName = 'lowcode:bmo-baseline';
+
+            if (!config()->has("database.connections.{$connectionName}")) {
+                config()->set("database.connections.{$connectionName}", $baselineConfig);
+            }
+
+            $query = DB::connection($connectionName)->table('org_patient_out');
+        } else {
+            $query = DB::table('org_patient_out');
+        }
+
+        $records = $query
+            ->where('patient_id', $empi)
+            ->where('disease_code', $this->getDiseaseCode())
+            ->where('scene_code', $this->getSceneCode())
+            ->where('is_deleted', 0)
+            ->get(['out_reason', 'org_code']);
+
+        $manageOrgCodes = $this->getDataPermissionManageOrgArr(true);
+
+        foreach ($records as $record) {
+            // 存在 out_reason = 101 的数据则表示已出组
+            if ((int) $record->out_reason === 101) {
+                return 1;
+            }
+
+            // 存在 out_reason != 101 且机构为当前数据权限内机构的出组记录，则表示已出组
+            if ((int) $record->out_reason !== 101 && in_array($record->org_code, $manageOrgCodes, true)) {
+                return 1;
+            }
+        }
+
+        return 0;
     }
 
     /**

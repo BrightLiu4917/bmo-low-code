@@ -63,6 +63,9 @@ class BasicInfoResource extends JsonResource
                 ->filter(fn ($crowd) => !empty($crowd['name']))
                 ->values()
                 ->toArray(),
+
+            // 出组状态
+            'out_group_status' => intval($this['out_group_info']['status'] ?? 0)
         ];
     }
 
