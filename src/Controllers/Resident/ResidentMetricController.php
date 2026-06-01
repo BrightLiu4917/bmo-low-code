@@ -12,6 +12,7 @@ use BrightLiu\LowCode\Resources\Resident\ResidentMetric\MonitorListResource;
 use BrightLiu\LowCode\Resources\Resident\ResidentMetric\MonitorTrendItemsResource;
 use BrightLiu\LowCode\Resources\Resident\ResidentMetric\OptionalResource;
 use BrightLiu\LowCode\Services\BmpCheetahMedicalCrowdkitApiService;
+use BrightLiu\LowCode\Services\BmpCheetahMedicalPlatformApiService;
 use BrightLiu\LowCode\Services\Resident\ResidentMetricService;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
 use BrightLiu\LowCode\Traits\Context\WithDiseaseContext;
@@ -50,25 +51,23 @@ class ResidentMetricController extends BaseController
     {
         $empi = (string) $request->input('empi', '');
 
+        $srv = ResidentMetricService::make();
+
         $data = ResidentMonitorMetric::query()
             ->byContextDisease()
             ->where('resident_empi', $empi)
             ->orderBy('id')
             ->get();
 
-        // 追加分组名称
-        if ($data->isNotEmpty()) {
-            $metricOptional = array_column(
-                rescue(fn () => BmpCheetahMedicalCrowdkitApiService::make()->getMetricOptional(), []),
-                null,
-                'field'
+        // TODO: 这样实现有缺陷，无法完全去除监测指标，始终会有
+        if ($data->isEmpty()) {
+            $archiveTrendConfig = rescue(
+                fn () => BmpCheetahMedicalPlatformApiService::make()->getArchiveTrendConfig(),
+                []
             );
-
-            if (!empty($metricOptional)) {
-                $data->each(function ($item) use ($metricOptional) {
-                    $item->offsetSet('group_name', $metricOptional[$item->metric_id]['col_group_name'] ?? '');
-                });
-            }
+            $data = $srv->buildMonitorListFromArchiveTrendConfig($archiveTrendConfig);
+        } else {
+            $srv->enrichMonitorListWithGroupName($data);
         }
 
         return $this->responseData([

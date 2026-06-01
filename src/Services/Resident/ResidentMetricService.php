@@ -12,6 +12,7 @@ use BrightLiu\LowCode\Traits\Context\WithContext;
 use Carbon\Carbon;
 use Gupo\BetterLaravel\Service\BaseService;
 use Gupo\DBQuery\DBQuery;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -21,6 +22,101 @@ use Illuminate\Support\Facades\DB;
 class ResidentMetricService extends BaseService
 {
     use WithContext;
+
+    /**
+     * 根据档案趋势默认配置（仅指标 ID）构建监测指标列表
+     */
+    public function buildMonitorListFromArchiveTrendConfig(array $archiveTrendConfig): Collection
+    {
+        $metricIds = $this->resolveArchiveTrendMetricIds($archiveTrendConfig);
+        if (empty($metricIds)) {
+            return collect();
+        }
+
+        $metricOptional = $this->getMetricOptionalMap();
+
+        return collect($metricIds)->map(function (string $metricId) use ($metricOptional) {
+            $optional = $metricOptional[$metricId] ?? [];
+            $metricTitle = (string) ($optional['field_name'] ?? '');
+
+            if ('' === $metricTitle) {
+                return null;
+            }
+
+            $item = new ResidentMonitorMetric([
+                'metric_id' => $metricId,
+                'metric_title' => $metricTitle,
+            ]);
+            $item->offsetSet('group_name', (string) ($optional['col_group_name'] ?? ''));
+
+            return $item;
+        })->filter()->values();
+    }
+
+    /**
+     * 为监测指标列表追加分组名称
+     */
+    public function enrichMonitorListWithGroupName(Collection $data): void
+    {
+        $metricOptional = $this->getMetricOptionalMap();
+        if (empty($metricOptional)) {
+            return;
+        }
+
+        $data->each(function ($item) use ($metricOptional) {
+            $item->offsetSet('group_name', $metricOptional[$item->metric_id]['col_group_name'] ?? '');
+        });
+    }
+
+    /**
+     * 解析档案趋势配置中的指标 ID 列表
+     */
+    public function resolveArchiveTrendMetricIds(array $archiveTrendConfig): array
+    {
+        if (isset($archiveTrendConfig['metric_ids']) && is_array($archiveTrendConfig['metric_ids'])) {
+            return $this->normalizeMetricIds($archiveTrendConfig['metric_ids']);
+        }
+
+        return $this->normalizeMetricIds($archiveTrendConfig);
+    }
+
+    /**
+     * @return array<string, array>
+     */
+    private function getMetricOptionalMap(): array
+    {
+        return array_column(
+            rescue(fn () => BmpCheetahMedicalCrowdkitApiService::make()->getMetricOptional(), []),
+            null,
+            'field'
+        );
+    }
+
+    /**
+     * @param array<int|string, mixed> $items
+     *
+     * @return array<int, string>
+     */
+    private function normalizeMetricIds(array $items): array
+    {
+        $ids = [];
+        foreach ($items as $item) {
+            if (is_string($item) && '' !== $item) {
+                $ids[] = $item;
+
+                continue;
+            }
+            if (!is_array($item)) {
+                continue;
+            }
+            $id = $item['metric_id'] ?? $item['field'] ?? $item['indicator_id'] ?? null;
+            if (is_string($id) && '' !== $id) {
+                $ids[] = $id;
+            }
+        }
+
+        return array_values(array_unique($ids));
+    }
 
     /**
      * 保存监测指标

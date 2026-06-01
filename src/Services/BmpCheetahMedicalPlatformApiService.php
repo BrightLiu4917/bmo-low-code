@@ -192,4 +192,19 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
 
         return (array) data_get($respData, 'data', []);
     }
+
+    /**
+     * 获取 默认患者档案指标趋势配置
+     */
+    public function getArchiveTrendConfig(): array
+    {
+        $respData = Http::asJson()->timeout(3)->post($this->baseUriVia() . '/innerapi/settings/getArchiveTrendConfig',
+            [
+                'scene_code' => $this->getSceneCode(),
+                'disease_code' => $this->getDiseaseCode(),
+            ]
+        )->json();
+
+        return (array) data_get($respData, 'data', []);
+    }
 }
