@@ -62,7 +62,7 @@ class Converted
 
     public function getUnit(mixed $default = null): mixed
     {
-        return $this->unit ?? $default;
+        return $this->unit ?? ($this->metadata['unit'] ?? $default);
     }
 
     public function getInformation(mixed $default = null): mixed

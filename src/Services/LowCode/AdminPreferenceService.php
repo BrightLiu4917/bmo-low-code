@@ -6,14 +6,17 @@ namespace BrightLiu\LowCode\Services\LowCode;
 
 use BrightLiu\LowCode\Enums\Model\AdminPreference\SceneEnum;
 use BrightLiu\LowCode\Models\AdminPreference;
+use BrightLiu\LowCode\Services\PatientColumnContext;
 use Gupo\BetterLaravel\Service\BaseService;
 
 final class AdminPreferenceService extends BaseService
 {
     /**
      * 处理 列表列配置，结合用户偏好设置.
+     *
+     * @param bool $enrich 是否附加字段元信息和枚举映射（默认 false）
      */
-    public function handleColumnConfig(string $listCode, array $columnConfig): array
+    public function handleColumnConfig(string $listCode, array $columnConfig, bool $enrich = false): array
     {
         try {
             $preference = AdminPreference::query()
@@ -51,6 +54,40 @@ final class AdminPreferenceService extends BaseService
         } catch (\Throwable) {
         }
 
+        // 列富化：附加 metadata + enum
+        if ($enrich) {
+            $columnConfig = $this->enrichColumnConfig($columnConfig);
+        }
+
         return $columnConfig;
+    }
+
+    /**
+     * 列富化 — 为每列附加字段元信息和枚举映射
+     *
+     * 从 PatientColumnContext 批量预取数据，逐列附加 metadata 和 enum。
+     * 异常时降级返回原始列配置。
+     */
+    public function enrichColumnConfig(array $columnConfig): array
+    {
+        try {
+            if (empty($columnConfig)) {
+                return $columnConfig;
+            }
+
+            $columnKeys = array_column($columnConfig, 'key');
+            PatientColumnContext::preload($columnKeys);
+
+            return array_map(function (array $column): array {
+                $key = $column['key'] ?? '';
+
+                return array_merge($column, [
+                    'metadata' => PatientColumnContext::getMeta($key),
+                    'enum' => PatientColumnContext::getEnumMappingValue($key),
+                ]);
+            }, $columnConfig);
+        } catch (\Throwable $e) {
+            return $columnConfig;
+        }
     }
 }

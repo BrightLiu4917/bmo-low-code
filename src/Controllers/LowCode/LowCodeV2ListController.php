@@ -27,6 +27,7 @@ use BrightLiu\LowCode\Services\CrowdKitService;
 use BrightLiu\LowCode\Services\LowCode\LowCodeCombiService;
 use BrightLiu\LowCode\Services\LowCode\AdminPreferenceService;
 use BrightLiu\LowCode\Services\LowCode\ColumnAppender\AppenderManager;
+use BrightLiu\LowCode\Services\PatientColumnContext;
 use BrightLiu\LowCode\Traits\Context\WithOrgContext;
 
 /**
@@ -171,7 +172,8 @@ final class LowCodeV2ListController extends BaseController
             $data['pre_config']['column'] = AdminPreferenceService::make()
                 ->handleColumnConfig(
                     listCode: $code,
-                    columnConfig: $data['pre_config']['column'] ?? []
+                    columnConfig: $data['pre_config']['column'] ?? [],
+                    enrich: true
                 );
         } catch (\Throwable $e) {
         }
@@ -257,6 +259,21 @@ final class LowCodeV2ListController extends BaseController
                 'export_data' => $export ?? false,
             ]);
         }
+
+        // 预取展示列枚举映射，供 QueryResource 使用
+        try {
+            $listCode = data_get($inputArgs, '0.code', '');
+            if (!empty($listCode)) {
+                $displayedColumnKeys = LowCodeListService::instance()->getFinalColumnKeys($listCode) ?? [];
+
+                if ($displayedColumnKeys) {
+                    PatientColumnContext::preload($displayedColumnKeys);
+                }
+            }
+        } catch (\Throwable $e) {
+            // 降级：不预取枚举，QueryResource 走降级路径
+        }
+
         return $this->responseData($data, class_map(QuerySource::class));
     }
 

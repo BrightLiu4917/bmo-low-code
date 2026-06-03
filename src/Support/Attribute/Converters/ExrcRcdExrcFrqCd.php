@@ -12,12 +12,11 @@ class ExrcRcdExrcFrqCd extends Converter
     {
         $value = parent::variant();
 
-        return match (intval($value)) {
+        return $this->resolveEnumVariant(intval($value), [
             3 => '偶尔',
             31 => '是',
             32 => '少于1次/月',
             4 => '不运动',
-            default => ''
-        };
+        ], '');
     }
 }

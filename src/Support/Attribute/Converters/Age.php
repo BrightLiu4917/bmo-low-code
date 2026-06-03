@@ -9,6 +9,14 @@ use BrightLiu\LowCode\Tools\Human;
 
 class Age extends Converter
 {
+    /**
+     * 计算字段，非实际数据库字段，不参与 API 字段元信息获取
+     */
+    public static function fetchFieldMeta(): bool
+    {
+        return false;
+    }
+
     public function value(): mixed
     {
         $value = parent::value();

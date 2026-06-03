@@ -8,7 +8,15 @@ use BrightLiu\LowCode\Support\Attribute\Foundation\Converter;
 
 class CurrAddr extends Converter
 {
-    public function metadata(): array
+    /**
+     * 组合地址字段，非实际数据库字段，不参与 API 字段元信息获取
+     */
+    public static function fetchFieldMeta(): bool
+    {
+        return false;
+    }
+
+    protected function extraMetadata(): array
     {
         return [
             'curr_addr_cnty_cd' => $this->getAttributeValue('curr_addr_cnty_cd'),

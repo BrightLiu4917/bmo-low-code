@@ -9,6 +9,7 @@ use BrightLiu\LowCode\Resources\Resident\ResidentArchive\BasicInfoResource;
 use BrightLiu\LowCode\Resources\Resident\ResidentArchive\ColumnGroupResource;
 use BrightLiu\LowCode\Resources\Resident\ResidentArchive\InfoResource;
 use BrightLiu\LowCode\Services\CrowdKitService;
+use BrightLiu\LowCode\Services\PatientColumnContext;
 use BrightLiu\LowCode\Services\Resident\FollowResidentService;
 use BrightLiu\LowCode\Services\Resident\ResidentArchiveService;
 use BrightLiu\LowCode\Services\Resident\TestingResidentService;
@@ -43,6 +44,17 @@ class ResidentArchiveController extends BaseController
         $attributes = $srv->getInfo($empi);
 
         $data = $kitSrv->combineColumnGroup($columnGroup, $attributes);
+
+        // 预取字段枚举和元信息，供 InfoResource 使用
+        try {
+            $fieldKeys = $data->flatMap(fn($group) => collect($group['columns'] ?? [])->pluck('column'))
+                ->filter()->unique()->values()->toArray();
+
+            if ($fieldKeys) {
+                PatientColumnContext::preload($fieldKeys);
+            }
+        } catch (\Throwable $e) {
+        }
 
         return $this->responseData($data, class_map(InfoResource::class));
     }

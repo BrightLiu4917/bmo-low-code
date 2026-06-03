@@ -359,4 +359,56 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
             ->post('/innerapi/personal-archive-config/list')
             ->json();
     }
+
+    /**
+     * 批量获取字段枚举映射
+     *
+     * @param array $fieldKeys 字段 key 列表
+     * @return array ['gdr_cd' => ['1'=>'男','2'=>'女'], ...]
+     */
+    public function getPatientFieldEnumList(array $fieldKeys): array
+    {
+        if (empty($fieldKeys)) {
+            return [];
+        }
+
+        try {
+            $data = Http::asJson()
+                ->baseUrl($this->baseUriVia())
+                ->retry(3)
+                ->timeout(15)
+                ->post('/innerapi/patient-field-enum/list-by-field-keys', $fieldKeys)
+                ->json();
+
+            return $data['data'] ?? [];
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * 批量获取字段元信息
+     *
+     * @param array $fieldKeys 字段 key 列表
+     * @return array ['gdr_cd' => ['data_type'=>'INT',...], ...]
+     */
+    public function getPatientFieldMetaList(array $fieldKeys): array
+    {
+        if (empty($fieldKeys)) {
+            return [];
+        }
+
+        try {
+            $data = Http::asJson()
+                ->baseUrl($this->baseUriVia())
+                ->retry(3)
+                ->timeout(15)
+                ->post('/innerapi/patient-field-meta/list-by-field-keys', $fieldKeys)
+                ->json();
+
+            return $data['data'] ?? [];
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
 }

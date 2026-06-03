@@ -196,4 +196,10 @@ return [
         // 监测指标是否可以从上游获取
         'metric-from-upstream-enabled' => env('BLC_RESIDENT_ARCHIVE_METRIC_FROM_UPSTREAM_ENABLED', true),
     ],
+
+    // 患者字段枚举&元信息配置
+    'patient-column' => [
+        'cache-enabled' => env('BLC_PATIENT_COLUMN_CACHE_ENABLED', false),
+        'cache-ttl' => env('BLC_PATIENT_COLUMN_CACHE_TTL', 600),
+    ],
 ];

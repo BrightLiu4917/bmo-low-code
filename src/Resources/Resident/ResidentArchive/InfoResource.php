@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Resources\Resident\ResidentArchive;
 
+use BrightLiu\LowCode\Services\PatientColumnContext;
 use BrightLiu\LowCode\Support\Attribute\Conversion;
 use BrightLiu\LowCode\Support\Attribute\Converters\Age;
 use BrightLiu\LowCode\Support\Attribute\Converters\BthDt;
@@ -86,6 +87,7 @@ class InfoResource extends JsonResource
                     'unit' => $convertData->getUnit(''),
                     'readonly' => $isReadonly,
                     'metadata' => $convertData->getMetadata([]),
+                    'enum' => PatientColumnContext::getEnumMappingValue($column['column'] ?? ''),
                 ]);
             }),
         ];

@@ -12,11 +12,10 @@ class GdrCd extends Converter
     {
         $value = parent::variant();
 
-        return match (intval($value)) {
+        return $this->resolveEnumVariant(intval($value), [
             9 => '未知',
             2 => '女',
             1 => '男',
-            default => ''
-        };
+        ], '');
     }
 }

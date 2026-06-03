@@ -12,12 +12,15 @@ class PatientSource extends Converter
     {
         $value = parent::variant();
 
-        return !empty($value) ? transform($value, fn ($value) => match (intval($value)) {
+        if (empty($value)) {
+            return '';
+        }
+
+        return $this->resolveEnumVariant(intval($value), [
             1 => '后台建档',
             2 => '数据采集',
             3 => '院外义诊',
             4 => '居民注册',
-            default => '--',
-        }, '') : '';
+        ], '--');
     }
 }

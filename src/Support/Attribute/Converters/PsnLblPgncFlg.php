@@ -12,10 +12,9 @@ class PsnLblPgncFlg extends Converter
     {
         $value = parent::variant();
 
-        return match (intval($value)) {
+        return $this->resolveEnumVariant(intval($value), [
             0 => '否',
             1 => '是',
-            default => ''
-        };
+        ], '');
     }
 }

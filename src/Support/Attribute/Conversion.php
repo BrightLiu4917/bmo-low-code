@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Support\Attribute;
 
+use BrightLiu\LowCode\Support\Attribute\Converters\DynamicConverter;
 use BrightLiu\LowCode\Support\Attribute\Foundation\ConvertAction;
 use BrightLiu\LowCode\Support\Attribute\Foundation\Converted;
 use BrightLiu\LowCode\Support\Attribute\Foundation\Converter;
@@ -27,6 +28,16 @@ class Conversion
      */
     protected ?array $convertClassCollection = null;
 
+    /**
+     * 默认上下文（通过 withContext() 设置，合并到每次 fetch/fetchOnce 的 context 中）
+     */
+    protected array $defaultContext = [];
+
+    /**
+     * 是否启用 fallback 模式（无匹配 Converter 时走 DynamicConverter）
+     */
+    protected bool $fallbackEnabled = false;
+
     public static function make(?array $convertClassCollection = null): static
     {
         $instance = new static();
@@ -39,11 +50,65 @@ class Conversion
     }
 
     /**
+     * 设置默认上下文
+     */
+    public function withContext(array $context): static
+    {
+        $this->defaultContext = $context;
+
+        return $this;
+    }
+
+    /**
+     * 启用/禁用 fallback 模式
+     * 启用后，无匹配 Converter 的字段将走 DynamicConverter 统一回退处理
+     */
+    public function withFallback(bool $enabled = true): static
+    {
+        $this->fallbackEnabled = $enabled;
+
+        return $this;
+    }
+
+    /**
+     * 获取当前已注册的所有字段 key
+     *
+     * @return array<int,string>
+     */
+    public function getRegisteredKeys(): array
+    {
+        return array_keys($this->getConvertClassCollection());
+    }
+
+    /**
+     * 获取需要获取 API 元信息的字段 keys
+     * 排除 fetchFieldMeta() 返回 false 的 Converter（如计算/组合字段）
+     *
+     * @return array<int,string>
+     */
+    public function getFieldKeysForMeta(): array
+    {
+        $keys = [];
+
+        foreach ($this->getConvertClassCollection() as $key => $converterClass) {
+            /** @var class-string<Converter> $converterClass */
+            if ($converterClass::fetchFieldMeta()) {
+                $keys[] = $key;
+            }
+        }
+
+        return $keys;
+    }
+
+    /**
      * 获取转换数据
      */
-    public function fetch(array $attributes, array $context = [], array $actions = ['*'], bool $realityKey = false): array
+    public function fetch(array $attributes, array $context = [], array $actions = ['*'], bool $realityKey = false, array $convertibles = []): array
     {
-        $convertibles = array_keys($this->getConvertClassCollection());
+        $context = array_merge($this->defaultContext, $context);
+
+        // 当 $convertibles 非空时，优先遍历指定字段（允许处理未注册 Converter 的非枚举字段）
+        $convertibles = !empty($context) && !empty($convertibles) ? $convertibles : array_keys($this->getConvertClassCollection());
 
         $convertedData = [];
 
@@ -66,6 +131,8 @@ class Conversion
         if (empty($key)) {
             return new Converted($key);
         }
+
+        $context = array_merge($this->defaultContext, $context);
 
         $converter = $this->resolveConverter($key, $attributes, $context);
 
@@ -123,12 +190,17 @@ class Conversion
     {
         $converters = $this->getConvertClassCollection();
 
-        if (empty($converterClass = ($converters[$key] ?? null))) {
-            return null;
+        if (!empty($converterClass = ($converters[$key] ?? null))) {
+            /** @var class-string<Converter> $converterClass */
+            return new $converterClass($attributes[$key] ?? null, $attributes, $context);
         }
 
-        /** @var class-string<Converter> $converterClass */
-        return new $converterClass($attributes[$key] ?? null, $attributes, $context);
+        // Fallback: 非 converter 注册字段走 DynamicConverter
+        if ($this->fallbackEnabled) {
+            return new DynamicConverter($key, $attributes[$key] ?? null, $attributes, $context);
+        }
+
+        return null;
     }
 
     /**

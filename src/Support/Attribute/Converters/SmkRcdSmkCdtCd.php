@@ -12,11 +12,10 @@ class SmkRcdSmkCdtCd extends Converter
     {
         $value = parent::variant();
 
-        return match (intval($value)) {
+        return $this->resolveEnumVariant(intval($value), [
             1 => '从不吸烟',
             2 => '过去吸，已戒烟',
             3 => '吸烟',
-            default => ''
-        };
+        ], '');
     }
 }

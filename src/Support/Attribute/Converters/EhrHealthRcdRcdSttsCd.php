@@ -12,11 +12,10 @@ class EhrHealthRcdRcdSttsCd extends Converter
     {
         $value = parent::variant();
 
-        return match (intval($value)) {
+        return $this->resolveEnumVariant(intval($value), [
             0 => '正常',
             1 => '已注销',
             2 => '未审核',
-            default => ''
-        };
+        ], '');
     }
 }

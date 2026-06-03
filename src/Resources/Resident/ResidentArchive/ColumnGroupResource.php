@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Resources\Resident\ResidentArchive;
 
+use BrightLiu\LowCode\Services\PatientColumnContext;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MissingValue;
@@ -41,12 +42,15 @@ class ColumnGroupResource extends JsonResource
             'id' => $this['id'] ?? '',
             'name' => $this['name'] ?? '',
             'columns' => $columns->map(function ($column) {
+                $key = $column['column'] ?? '';
+
                 return array_merge($column, [
                     'value' => '',
                     'value.variant' => '',
                     'unit' => '',
                     'readonly' => false,
-                    'metadata' => [],
+                    'metadata' => PatientColumnContext::getMeta($key),
+                    'enum' => PatientColumnContext::getEnumOptions($key),
                 ]);
             }),
         ];
