@@ -29,6 +29,17 @@ class ResidentArchiveController extends BaseController
     {
         $data = $kitSrv->getEditableOptionalColumns(onlyShow: true);
 
+        // 预取字段枚举和元信息，供 InfoResource 使用
+        try {
+            $fieldKeys = $data->flatMap(fn($group) => collect($group['columns'] ?? [])->pluck('column'))
+                ->filter()->unique()->values()->toArray();
+
+            if ($fieldKeys) {
+                PatientColumnContext::preload($fieldKeys);
+            }
+        } catch (\Throwable $e) {
+        }
+
         return $this->responseData($data, ColumnGroupResource::class);
     }
 

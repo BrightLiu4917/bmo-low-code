@@ -50,7 +50,7 @@ class ColumnGroupResource extends JsonResource
                     'unit' => '',
                     'readonly' => false,
                     'metadata' => PatientColumnContext::getMeta($key),
-                    'enum' => PatientColumnContext::getEnumOptions($key),
+                    'enum' => PatientColumnContext::getEnumMappingValue($key),
                 ]);
             }),
         ];
