@@ -27,7 +27,10 @@ class PatientColumnContext
      */
     public static function preload(array $columnKeys): void
     {
-        static::$displayedKeys = $columnKeys;
+        // 排除掉"_"前缀的字段, 该类字段为Column字段，不需要额外处理
+        static::$displayedKeys = array_values(
+            array_filter($columnKeys, fn ($key) => !str_starts_with($key, '_'))
+        );
 
         $context = PatientColumnService::instance()->buildConversionContext($columnKeys);
 
