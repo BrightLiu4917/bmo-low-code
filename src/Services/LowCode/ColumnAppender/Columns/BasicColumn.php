@@ -27,6 +27,13 @@ abstract class BasicColumn implements IColumn
                 $item->{$columnName . '.variant'} = $this->handleItemVariant($item, $sources, $item->{$columnName});
             }
 
+            // 附属子列
+            if (!empty($subColumns = $this->subColumns($item, $sources))) {
+                foreach ($subColumns as $subColumn => $subColumnValue) {
+                    $item->{$subColumn} = $subColumnValue;
+                }
+            }
+
             return $item;
         });
     }
@@ -39,5 +46,10 @@ abstract class BasicColumn implements IColumn
     public function handleItem($item, $sources): mixed
     {
         return null;
+    }
+
+    public function subColumns($item, $sources): array
+    {
+        return [];
     }
 }
