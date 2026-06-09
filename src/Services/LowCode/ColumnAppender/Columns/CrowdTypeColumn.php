@@ -30,8 +30,8 @@ class CrowdTypeColumn extends BasicColumn implements IColumn
         }
 
         return collect($sources[$item->empi] ?? null)
-             // select_type=9为基线人群，排除再外
-            ->where('select_type', '<>', 9)
+            // 只查特征人群
+            ->where('select_type', 1)
             ->pluck('group_name')
             ->unique()
             ->join(',');
@@ -44,8 +44,8 @@ class CrowdTypeColumn extends BasicColumn implements IColumn
         }
 
         return collect($sources[$item->empi] ?? null)
-             // select_type=9为基线人群，排除再外
-            ->where('select_type', '<>', 9)
+            // 只查特征人群
+            ->where('select_type', 1)
             ->unique('group_name')
             ->values()
             ->map(fn ($sitem) => ['group_name' => $sitem->group_name ?? '', 'group_id' => $sitem->group_id ?? 0])

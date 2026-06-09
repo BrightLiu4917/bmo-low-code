@@ -105,8 +105,8 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
                 );
             }
 
-            // 如果存在非“9”，则需要关联人群分类表
-            return !empty(array_diff($groupTypes, ['9']));
+            // 如果存在非“9”、“3”，则需要关联人群分类表
+            return !empty(array_diff($groupTypes, ['9', '3']));
         }
 
         // 兜底处理，兼容深度的条件

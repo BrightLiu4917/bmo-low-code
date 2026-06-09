@@ -163,7 +163,7 @@ final class CrowdKitService extends LowCodeBaseService
             fn () => array_column(
                 array_filter(
                     BmpCheetahMedicalCrowdkitApiService::instance()->getCrowds(selectType: $selectType),
-                    fn ($item) => empty($item['select_type']) || 9 != $item['select_type']
+                    fn ($item) => empty($item['select_type']) || 1 == $item['select_type']
                 ),
                 'group_name',
                 'id'
