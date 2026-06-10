@@ -48,7 +48,7 @@ class CrowdTypeColumn extends BasicColumn implements IColumn
             ->where('select_type', 1)
             ->unique('group_name')
             ->values()
-            ->map(fn ($sitem) => ['group_name' => $sitem->group_name ?? '', 'group_id' => $sitem->group_id ?? 0])
+            ->map(fn ($sitem) => ['group_name' => $sitem->group_name ?? '', 'group_id' => (string) ($sitem->group_id ?? 0)])
             ->toArray();
     }
 
