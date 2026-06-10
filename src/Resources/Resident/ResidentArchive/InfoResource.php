@@ -76,8 +76,13 @@ class InfoResource extends JsonResource
 
                 $value = $convertData->getValue($column['value'] ?? null);
 
+                $isReadonly = false;
+                // 优先从(bmp)配置中获取
+                if (isset($column['_is_editable'])) {
+                    $isReadonly = ($column['_is_editable'] ?? 0) != 1;
+                }
                 // 判定是否为只读(优先级：转换器指定 > 资源指定)
-                if (is_null($isReadonly = $convertData->getReadonly(null))) {
+                else if (is_null($isReadonly = $convertData->getReadonly(null))) {
                     $isReadonly = is_array($readonly) && in_array($column['column'] ?? '', $readonly, true);
                 }
 
