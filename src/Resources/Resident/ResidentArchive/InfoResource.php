@@ -96,6 +96,7 @@ class InfoResource extends JsonResource
                     'readonly' => $isReadonly,
                     'metadata' => $convertData->getMetadata([]),
                     'enum' => PatientColumnContext::getEnumMappingValue($column['column'] ?? ''),
+                    'required' => isset($metadata['is_required']) ? $metadata['is_required'] : $column['required']
                 ]);
             }),
         ];

@@ -54,6 +54,7 @@ class ColumnGroupResource extends JsonResource
                     'readonly' => isset($column['_is_editable']) ? ($column['_is_editable'] ?? 0) != 1 : false,
                     'metadata' => $metadata,
                     'enum' => PatientColumnContext::getEnumMappingValue($key),
+                    'required' => isset($metadata['is_required']) ? $metadata['is_required'] : $column['required']
                 ]);
             }),
         ];
