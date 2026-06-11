@@ -44,12 +44,15 @@ class ColumnGroupResource extends JsonResource
             'columns' => $columns->map(function ($column) {
                 $key = $column['column'] ?? '';
 
+                $metadata = PatientColumnContext::getMeta($key);
+
                 return array_merge($column, [
+                    'name' => !empty($metadata['field_short_name']) ? $metadata['field_short_name'] : $column['name'],
                     'value' => '',
                     'value.variant' => '',
-                    'unit' => '',
-                    'readonly' => false,
-                    'metadata' => PatientColumnContext::getMeta($key),
+                    'unit' => $metadata['unit'] ?? '',
+                    'readonly' => isset($column['_is_editable']) ? ($column['_is_editable'] ?? 0) != 1 : false,
+                    'metadata' => $metadata,
                     'enum' => PatientColumnContext::getEnumMappingValue($key),
                 ]);
             }),

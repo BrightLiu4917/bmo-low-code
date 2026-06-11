@@ -76,6 +76,8 @@ class InfoResource extends JsonResource
 
                 $value = $convertData->getValue($column['value'] ?? null);
 
+                $metadata = $convertData->getMetadata([]);
+
                 $isReadonly = false;
                 // 优先从(bmp)配置中获取
                 if (isset($column['_is_editable'])) {
@@ -87,6 +89,7 @@ class InfoResource extends JsonResource
                 }
 
                 return array_merge($column, [
+                    "name" => !empty($metadata['field_short_name']) ? $metadata['field_short_name'] : $column['name'],
                     'value' => $value,
                     'value.variant' => $convertData->getVariant($value),
                     'unit' => $convertData->getUnit(''),

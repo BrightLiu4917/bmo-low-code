@@ -46,11 +46,20 @@ class DynamicConverter extends Converter
         $context = $this->getContext();
         $enumMapping = $context['_enum_mapping'][$this->fieldKey] ?? null;
 
-        if (is_array($enumMapping) && array_key_exists((string) $this->value, $enumMapping)) {
-            return $enumMapping[(string) $this->value]['enum_label'];
-        }
+        $values = $this->wrapValue(
+            (string) ($context['_field_meta'][$this->fieldKey]['input_type'] ?? null)
+        );
 
-        return $this->value;
+        return implode(',', array_map(
+            function($value) use ($enumMapping) {
+                if (is_array($enumMapping) && array_key_exists((string) $value, $enumMapping)) {
+                    return $enumMapping[(string) $value]['enum_label'];
+                }
+
+                return $value;
+            },
+            $values
+        ));
     }
 
     /**
@@ -61,5 +70,13 @@ class DynamicConverter extends Converter
         $context = $this->getContext();
 
         return $context['_field_meta'][$this->fieldKey] ?? [];
+    }
+
+    protected function wrapValue(string $inputType): array
+    {
+        return match ($inputType) {
+            'SELECT_MULTI' => explode(',', (string) $this->value),
+            default => [$this->value],
+        };
     }
 }

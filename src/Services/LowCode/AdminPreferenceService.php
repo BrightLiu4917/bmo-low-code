@@ -81,7 +81,10 @@ final class AdminPreferenceService extends BaseService
             return array_map(function (array $column): array {
                 $key = $column['key'] ?? '';
 
+                $metadata = PatientColumnContext::getMeta($key);
+
                 return array_merge($column, [
+                    'title' => !empty($metadata['field_short_name']) ? $metadata['field_short_name'] : $column['title'],
                     'metadata' => PatientColumnContext::getMeta($key),
                     'enum' => PatientColumnContext::getEnumMappingValue($key),
                 ]);
