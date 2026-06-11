@@ -40,7 +40,7 @@ class ResidentArchiveService extends BaseService
         $following = FollowResidentService::make()->getFollowing($empi);
 
         // 人群分类
-        $crowdInfo = $kitSrv->rescue->getCrowdTypes($empi);
+        $crowdInfo = $kitSrv->rescue->getCrowdTypes($empi, true);
 
         // 出组信息
         $outGroupInfo = [

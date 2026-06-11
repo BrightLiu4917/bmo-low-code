@@ -217,7 +217,7 @@ final class CrowdKitService extends LowCodeBaseService
             ->where('t2.is_deleted', 0)
             ->select(['t1.empi', 't1.group_id', 't2.group_name', 't2.select_type'])
             ->get()
-            ->when($excludeBaseline, fn (Collection $collection) => $collection->where('select_type', '<>', 9))
+            ->when($excludeBaseline, fn (Collection $collection) => $collection->where('select_type', '=', 1))
             ->values()
             ->toArray();
     }
