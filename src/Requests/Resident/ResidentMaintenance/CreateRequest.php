@@ -14,10 +14,10 @@ final class CreateRequest extends BaseRequest
     {
         return [
             'params.id_crd_no' => ['bail', 'required', 'string', new IdCardRule()],
-            'params.slf_tel_no' => ['bail', 'required', 'string', new PhoneRule()],
+            'params.slf_tel_no' => ['bail', 'nullable', 'string', new PhoneRule()],
             'params.rsdnt_nm' => ['bail', 'required', 'string', 'min:2', 'max:16'],
-            'params.bth_dt' => ['bail', 'required', 'string', 'date_format:Y-m-d'],
-            'params.gdr_cd' => ['bail', 'required', 'numeric', 'in:1,2'],
+            'params.bth_dt' => ['bail', 'nullable', 'string', 'date_format:Y-m-d'],
+            'params.gdr_cd' => ['bail', 'nullable', 'numeric', 'in:1,2'],
         ];
     }
 
