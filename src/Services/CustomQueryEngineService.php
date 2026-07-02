@@ -72,6 +72,8 @@ class CustomQueryEngineService extends QueryEngineService
             $listSrv = LowCodeListService::make();
 
             $paginator = CustomLengthAwarePaginator::resolve([]);
+            $currentPage = $paginator->currentPage();
+            $perPage = $paginator->perPage();
 
             // 简单分页查询提前量用与判断是否有下一页
             $isSimplePaginateAdvance = $isSimplePaginate ? 1 : 0;
@@ -86,9 +88,16 @@ class CustomQueryEngineService extends QueryEngineService
                 ->getQueryBuilder();
 
             // 之前的查询结果只为获取empi(减少回表操作)
-            $empis = $empiQueryBuilder
-                ->forPage($paginator->currentPage(), $paginator->perPage() + $isSimplePaginateAdvance)
-                ->pluck('empi');
+            if ($isSimplePaginate) {
+                $empis = $empiQueryBuilder
+                    ->offset(($currentPage - 1) * $perPage)
+                    ->limit($perPage + $isSimplePaginateAdvance)
+                    ->pluck('empi');
+            } else {
+                $empis = $empiQueryBuilder
+                    ->forPage($currentPage, $perPage)
+                    ->pluck('empi');
+            }
 
             // 根据empi获取完整数据列表
             $items = $this->fetchItems($empis->toArray(), $columns);
@@ -110,7 +119,7 @@ class CustomQueryEngineService extends QueryEngineService
 
             if ($isSimplePaginate) {
                 return new LowCodeCustomPaginator(
-                    new Paginator($items, $paginator->perPage(), $paginator->currentPage()),
+                    new Paginator($items, $perPage, $currentPage),
                 );
             } else {
                 $countQueryBuilder = $listSrv->buildQueryConditions(
@@ -127,7 +136,7 @@ class CustomQueryEngineService extends QueryEngineService
                 $total = $countQueryBuilder->count(DB::raw('distinct ' . $empiColumnForPluck));
 
                 return new CustomLengthAwarePaginator(
-                    new LengthAwarePaginator($items, $total, $paginator->perPage(), $paginator->currentPage()),
+                    new LengthAwarePaginator($items, $total, $perPage, $currentPage),
                 );
             }
         } catch (\Throwable $e) {
