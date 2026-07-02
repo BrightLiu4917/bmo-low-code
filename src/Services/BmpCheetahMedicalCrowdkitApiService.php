@@ -8,7 +8,6 @@ use Gupo\BetterLaravel\Exceptions\ServiceException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
-use BrightLiu\LowCode\Services\LowCode\ColumnAppender\Columns\CrowdTypeColumn;
 use BrightLiu\LowCode\Traits\Context\WithContext;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
 
@@ -147,7 +146,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
             'personal_batch_list' => array_map(
                 fn ($attributes) => [
                     'col_values' => array_values(Arr::map(
-                        $attributes,
+                        array_filter($attributes, fn ($value) => $value !== null),
                         fn ($value, $key) => ['col_name' => $key, 'col_value' => $value]
                     )),
                 ],
@@ -191,7 +190,7 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
         $data = [
             'empi' => $empi,
             'col_values' => array_values(Arr::map(
-                $attributes,
+                array_filter($attributes, fn ($value) => $value !== null),
                 fn ($value, $key) => ['col_name' => $key, 'col_value' => $value]
             )),
             'data_source' => 1,
@@ -306,10 +305,11 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
 
             $args['user_id'] = md5($idCardNo);
             $args['id_crd_no'] = $idCardNo;
+            $filteredArgs = array_filter($args, fn ($value) => $value !== null);
             $data =  Http::asJson()->timeout(3)
                 ->post($this->baseUriVia() .'innerapi/personal-crowd/create',[
                     'personal_batch_list' => [
-                        ['col_values' => BmpBaseLineService::instance()->formatColumnValues($args)],
+                        ['col_values' => BmpBaseLineService::instance()->formatColumnValues($filteredArgs)],
                     ],
                     'data_source'  => 1,
                     'org_code'     => $this->getOrgCode(),
