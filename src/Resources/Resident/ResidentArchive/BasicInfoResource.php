@@ -22,6 +22,11 @@ class BasicInfoResource extends JsonResource
 
         [$manageStatus, $manageStatusDefinition] = $this->resolveBusinessStatus($info);
 
+        $outGroupStatus = intval($this['out_group_info']['status'] ?? 0);
+
+        // 已出组或已死亡则归档
+        $isArchived = 1 == $outGroupStatus || ($info['dth_flg'] ?? 0) == 1;
+
         return [
             // TODO：敏感信息，后期需要国密处理
             // 原始身份证号
@@ -65,7 +70,10 @@ class BasicInfoResource extends JsonResource
                 ->toArray(),
 
             // 出组状态
-            'out_group_status' => intval($this['out_group_info']['status'] ?? 0)
+            'out_group_status' => $outGroupStatus,
+
+            // 是否归档
+            'is_archived' => $isArchived ? 1 : 0,
         ];
     }
 
