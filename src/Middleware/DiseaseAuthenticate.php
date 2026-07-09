@@ -37,19 +37,19 @@ class DiseaseAuthenticate
                 throw new AuthenticateException('Token invalid.');
             }
 
-            if (empty($arcCode = $request->header(HeaderEnum::ARC_CODE, ''))) {
+            if (empty($arcCode = $request->header(HeaderEnum::ARC_CODE, (string) $request->input('arc_code', '')))) {
                 throw new AuthenticateException('x-gp-arc-code invalid.');
             }
 
-            if (empty($request->header(HeaderEnum::SCENE_CODE, ''))) {
+            if (empty($request->header(HeaderEnum::SCENE_CODE, (string) $request->input('scene_code', '')))) {
                 throw new AuthenticateException('x-gp-scene_code invalid.');
             }
 
-            if (empty($request->header(HeaderEnum::SYSTEM_CODE, ''))) {
+            if (empty($request->header(HeaderEnum::SYSTEM_CODE, (string) $request->input('sys_code', '')))) {
                 throw new AuthenticateException('x-gp-system_code invalid.');
             }
 
-            if (empty($request->header(HeaderEnum::DISEASE_CODE, ''))) {
+            if (empty($request->header(HeaderEnum::DISEASE_CODE, (string) $request->input('disease_code', '')))) {
                 throw new AuthenticateException('x-gp-disease_code invalid.');
             }
 
