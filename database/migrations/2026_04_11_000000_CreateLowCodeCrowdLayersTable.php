@@ -13,6 +13,7 @@ class CreateLowCodeCrowdLayersTable extends Migration
 
             // 模块相关字段
             $table->string('disease_code', 32)->default('')->comment('病种编码');
+            $table->string('scene_code', 32)->default('')->comment('场景编码');
             $table->string('org_code', 64)->default('')->comment('机构编码');
             $table->string('module_id', 64)->default('')->comment('模块ID');
             $table->string('module_type', 32)->default('')->comment('模块类型');

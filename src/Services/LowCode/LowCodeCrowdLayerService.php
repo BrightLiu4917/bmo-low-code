@@ -26,6 +26,7 @@ final class LowCodeCrowdLayerService extends LowCodeBaseService
     {
         $formattedItems = collect($items)->map(fn ($item, $index) => [
             'disease_code' => $this->getDiseaseCode(),
+            'scene_code' => $this->getSceneCode(),
             'org_code' => $this->getAffiliatedOrgCode(),
             'title' => $item['title'] ?? '',
             'module_id' => $moduleId,
@@ -49,6 +50,7 @@ final class LowCodeCrowdLayerService extends LowCodeBaseService
         DB::transaction(function () use ($formattedItems) {
             LowCodeCrowdLayer::query()
                 ->where('disease_code', $this->getDiseaseCode())
+                ->where('scene_code', $this->getSceneCode())
                 ->where('org_code', $this->getAffiliatedOrgCode())
                 ->delete();
 

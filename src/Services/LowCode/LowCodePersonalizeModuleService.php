@@ -117,6 +117,7 @@ final class LowCodePersonalizeModuleService extends LowCodeBaseService
         foreach ($moduleIdMap as $oldModuleId => $newModuleId) {
             LowCodeCrowdLayer::query()
                 ->where('disease_code', $this->getDiseaseCode())
+                ->where('scene_code', $this->getSceneCode())
                 ->where('org_code', $this->getAffiliatedOrgCode())
                 ->where('module_type', 'personalize_module')
                 ->where('module_id', $oldModuleId)
@@ -131,6 +132,7 @@ final class LowCodePersonalizeModuleService extends LowCodeBaseService
         if (!empty($staleModuleIds)) {
             LowCodeCrowdLayer::query()
                 ->where('disease_code', $this->getDiseaseCode())
+                ->where('scene_code', $this->getSceneCode())
                 ->where('org_code', $this->getAffiliatedOrgCode())
                 ->where('module_type', 'personalize_module')
                 ->whereIn('module_id', $staleModuleIds)

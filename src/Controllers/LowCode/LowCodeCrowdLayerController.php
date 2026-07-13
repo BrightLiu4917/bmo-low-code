@@ -10,6 +10,7 @@ use BrightLiu\LowCode\Resources\LowCode\LowCodeCrowdLayer\ListResource;
 use BrightLiu\LowCode\Services\LowCode\LowCodeCrowdLayerService;
 use BrightLiu\LowCode\Services\LowCode\LowCodeListService;
 use BrightLiu\LowCode\Services\LowCode\LowCodePersonalizeModuleService;
+use BrightLiu\LowCode\Traits\Context\WithDiseaseContext;
 use BrightLiu\LowCode\Traits\Context\WithOrgContext;
 use Gupo\BetterLaravel\Http\BaseController;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +18,7 @@ use Illuminate\Http\Request;
 
 final class LowCodeCrowdLayerController extends BaseController
 {
-    use WithOrgContext;
+    use WithOrgContext, WithDiseaseContext;
 
     /**
      * 列表
@@ -34,6 +35,7 @@ final class LowCodeCrowdLayerController extends BaseController
 
         $data = LowCodeCrowdLayer::query()
             ->byContextDisease()
+            ->where('scene_code', $this->getSceneCode())
             ->where('org_code', $this->getAffiliatedOrgCode())
             ->where('module_id', $moduleId)
             ->where('module_type', $moduleType)
