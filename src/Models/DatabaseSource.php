@@ -34,6 +34,7 @@ final class DatabaseSource extends LowCodeBaseModel
         [
             "id",//bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
             "disease_code",//varchar(64) NOT NULL DEFAULT '' COMMENT '病种编码',
+            "scene_code",//varchar(32) NOT NULL DEFAULT '' COMMENT '场景编码',
             "code",//varchar(64) NOT NULL DEFAULT '' COMMENT '编码',
             "name",//varchar(64) NOT NULL DEFAULT '' COMMENT '名字',
             "host",//varchar(64) NOT NULL DEFAULT '' COMMENT '主机地址',
