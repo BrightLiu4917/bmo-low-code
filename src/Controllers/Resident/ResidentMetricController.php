@@ -15,6 +15,7 @@ use BrightLiu\LowCode\Services\BmpCheetahMedicalCrowdkitApiService;
 use BrightLiu\LowCode\Services\BmpCheetahMedicalPlatformApiService;
 use BrightLiu\LowCode\Services\Resident\ResidentMetricService;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
+use BrightLiu\LowCode\Context\DiseaseContext;
 use BrightLiu\LowCode\Traits\Context\WithDiseaseContext;
 use BrightLiu\LowCode\Traits\Context\WithOrgContext;
 use Gupo\BetterLaravel\Http\BaseController;
@@ -55,6 +56,7 @@ class ResidentMetricController extends BaseController
 
         $data = ResidentMonitorMetric::query()
             ->byContextDisease()
+            ->where('scene_code', DiseaseContext::instance()->getSceneCode())
             ->where('resident_empi', $empi)
             ->orderBy('id')
             ->get();

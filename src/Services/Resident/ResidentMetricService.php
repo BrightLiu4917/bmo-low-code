@@ -133,6 +133,7 @@ class ResidentMetricService extends BaseService
         DB::transaction(function () use ($empi, $metricIds, $optionalMetricMap) {
             ResidentMonitorMetric::query()
                 ->where('disease_code', $this->getDiseaseCode())
+                ->where('scene_code', $this->getSceneCode())
                 ->where('resident_empi', $empi)
                 ->delete();
 
@@ -142,6 +143,7 @@ class ResidentMetricService extends BaseService
                         array_map(
                             fn ($metricId) => [
                                 'disease_code' => $this->getDiseaseCode(),
+                                'scene_code' => $this->getSceneCode(),
                                 'resident_empi' => $empi,
                                 'metric_title' => $optionalMetricMap[$metricId] ?? null,
                                 'metric_id' => $metricId,
