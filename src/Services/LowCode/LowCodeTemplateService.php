@@ -157,7 +157,7 @@ final class LowCodeTemplateService extends LowCodeBaseService
     protected function syncTemplateParts($template, $syncData, $templateCode): void
     {
         $template->bindPartList()->sync($syncData);
-        $listCodes = LowCodeList::query()->orwhere(
+        $listCodes = LowCodeList::query()->byContextDisease()->byContextScene()->orwhere(
             'template_code_filter', $templateCode
         )->orWhere('template_code_field', $templateCode)->orWhere(
             'template_code_column', $templateCode
@@ -180,7 +180,7 @@ final class LowCodeTemplateService extends LowCodeBaseService
      */
     public function clearCache(string $templateCode = '')
     {
-        $listCodes = LowCodeList::query()->orwhere(
+        $listCodes = LowCodeList::query()->byContextDisease()->byContextScene()->orwhere(
             'template_code_filter', $templateCode
         )->orWhere('template_code_field', $templateCode)->orWhere(
             'template_code_column', $templateCode

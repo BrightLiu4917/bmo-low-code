@@ -11,6 +11,7 @@ use BrightLiu\LowCode\Models\Traits\OrgDiseaseRelation;
 use BrightLiu\LowCode\Models\Traits\OrgRelation;
 use BrightLiu\LowCode\Models\Traits\Cacheable\CacheableModel;
 use BrightLiu\LowCode\Models\Traits\UniqueCodeRelation;
+use BrightLiu\LowCode\Models\Traits\SceneRelation;
 use BrightLiu\LowCode\Models\Traits\AdministratorRelation;
 
 
@@ -28,10 +29,12 @@ class LowCodeList extends LowCodeBaseModel
         UniqueCodeRelation,
         OrgDiseaseRelation,
         OrgRelation,
+        SceneRelation,
         CacheableModel;
 
     protected $casts = [
         'disease_code' => 'string', // varchar(32) NOT NULL DEFAULT ''
+        'scene_code'   => 'string', // varchar(32) NOT NULL DEFAULT ''
         'code'         => 'string', // varchar(32) NOT NULL DEFAULT ''
         'parent_code'  => 'string', // varchar(32) NOT NULL DEFAULT ''
         'org_code'     => 'string', // varchar(64) NOT NULL DEFAULT ''
@@ -92,7 +95,7 @@ class LowCodeList extends LowCodeBaseModel
      */
     protected $fillable
         = [
-            "id", "disease_code", "code", "parent_code", "org_code",
+            "id", "disease_code", "scene_code", "code", "parent_code", "org_code",
             "admin_name", "family_doctor_name", "mobile_doctor_name",
             "admin_weight", "family_doctor_weight", "mobile_doctor_weight",
             "crowd_type_code", "template_code_filter", "template_code_column",

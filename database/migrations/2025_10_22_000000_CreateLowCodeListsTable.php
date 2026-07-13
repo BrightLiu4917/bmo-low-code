@@ -14,6 +14,7 @@ class CreateLowCodeListsTable extends Migration
                 $table->bigIncrements('id')->comment('主键');
                 $table->string('data_permission_code', 64)->default('')->comment('数据权限编码');
                 $table->string('disease_code', 32)->default('')->comment('病种编码');
+                $table->string('scene_code', 32)->default('')->comment('场景编码');
                 $table->string('code', 64)->default('')->unique()->comment('列表编码');
                 $table->string('parent_code', 64)->default('')->comment('上级列表编码');
                 $table->string('org_code', 64)->default('')->comment('机构编码');

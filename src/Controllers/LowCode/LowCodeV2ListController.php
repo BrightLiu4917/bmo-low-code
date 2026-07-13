@@ -51,6 +51,7 @@ final class LowCodeV2ListController extends BaseController
     {
         $list = LowCodeList::query()
             ->byContextDisease()
+            ->byContextScene()
             ->where(
                 'list_type',
                 '<>',

@@ -130,9 +130,9 @@ final class InitOrgDiseaseService extends LowCodeBaseService
             LowCodeTemplate::query()->whereIn('code', $templateCodes)->delete();
         }
 
-        $this->lastLowCodeList = LowCodeList::query()->where('disease_code', $diseaseCode)->get(['code', 'admin_name']);
+        $this->lastLowCodeList = LowCodeList::query()->where('disease_code', $diseaseCode)->where('scene_code', $this->getSceneCode())->get(['code', 'admin_name']);
 
-        LowCodeList::query()->where('disease_code', $diseaseCode)->delete();
+        LowCodeList::query()->where('disease_code', $diseaseCode)->where('scene_code', $this->getSceneCode())->delete();
     }
 
     /**
@@ -201,6 +201,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
                     ...$item,
                     'code' => $codePrefix . Uuid::generate(),
                     'disease_code' => $this->getDiseaseCode(),
+                    'scene_code' => $this->getSceneCode(),
                     'org_code' => $this->getOrgCode(),
 //                    'creator_id' => $this->getAdminId(),
 //                    'updater_id' => $this->getAdminId(),

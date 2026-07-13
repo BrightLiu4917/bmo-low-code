@@ -45,6 +45,7 @@ final class LowCodeListController extends BaseController
         //权限判断
         $query = LowCodeList::query()
                             ->byContextDisease()
+                            ->byContextScene()
                             ->where('list_type', '<>', ListTypeEnum::GENERAL);
         if ($name !== '') {
             $query->where(function($q) use ($name) {
@@ -124,7 +125,7 @@ final class LowCodeListController extends BaseController
      */
     public function simpleList(Request $request): JsonResponse
     {
-        $list = LowCodeList::query()->byContextOrg()->byContextDisease()
+        $list = LowCodeList::query()->byContextOrg()->byContextDisease()->byContextScene()
                            ->where('list_type', '<>', ListTypeEnum::GENERAL)
                            ->select([
                                'id', 'admin_name', 'code', 'parent_code',

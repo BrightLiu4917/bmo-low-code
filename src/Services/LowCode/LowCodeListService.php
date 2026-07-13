@@ -471,6 +471,7 @@ class LowCodeListService extends LowCodeBaseService
     {
         $firstList = LowCodeList::query()
             ->byContextDisease()
+            ->byContextScene()
             ->where('list_type', '<>', ListTypeEnum::GENERAL)
             ->where('admin_name', '全部')
             ->first(['data_permission_code']);
@@ -478,6 +479,7 @@ class LowCodeListService extends LowCodeBaseService
         if (empty($firstList)) {
             $firstList = LowCodeList::query()
                 ->byContextDisease()
+                ->byContextScene()
                 ->where('list_type', '<>', ListTypeEnum::GENERAL)
                 ->orderByDesc('id')
                 ->first(['data_permission_code']);
