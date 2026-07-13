@@ -314,7 +314,7 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
          * 添加 t1.dth_flg = 0 条件以过滤掉已死亡的患者。
          */
         if (config('low-code.died-patient-exclude-enabled', true)) {
-            $this->queryEngine->getQueryBuilder()->where('t1.dth_flg', '=', 0);
+            $this->queryEngine->getQueryBuilder()->where(fn ($query) => $query->where('t1.dth_flg', '=', 0)->orWhereNull('t1.dth_flg'));
         }
     }
 
