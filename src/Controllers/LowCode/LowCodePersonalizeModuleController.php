@@ -30,6 +30,7 @@ final class LowCodePersonalizeModuleController extends BaseController
 
         $data = LowCodePersonalizeModule::query()
                                         ->byContextDisease()
+                                        ->byContextScene()
                                         ->where('org_code', $this->getAffiliatedOrgCode())
                                         ->where('module_type', $moduleType)
                                         ->orderByDesc('weight')
@@ -49,6 +50,7 @@ final class LowCodePersonalizeModuleController extends BaseController
 
         $data = LowCodePersonalizeModule::query()
                                         ->byContextDisease()
+                                        ->byContextScene()
                                         ->where('org_code', $this->getAffiliatedOrgCode())
                                         ->where('module_type', $moduleType)
                                         ->orderByDesc('weight')

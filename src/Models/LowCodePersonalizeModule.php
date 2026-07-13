@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use BrightLiu\LowCode\Models\Traits\UniqueCodeRelation;
 use BrightLiu\LowCode\Models\Traits\AdministratorRelation;
 use BrightLiu\LowCode\Models\Traits\Cacheable\NewEloquentBuilder;
+use BrightLiu\LowCode\Models\Traits\SceneRelation;
 
 /**
  * @Class
@@ -22,7 +23,7 @@ use BrightLiu\LowCode\Models\Traits\Cacheable\NewEloquentBuilder;
  */
 final class LowCodePersonalizeModule extends LowCodeBaseModel
 {
-    use DiseaseRelation;
+    use DiseaseRelation, SceneRelation;
 
     protected $table = 'personalize_modules';
 

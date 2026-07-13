@@ -66,7 +66,7 @@ final class LowCodeV2ListController extends BaseController
 
         try {
             // 获取个性化菜单
-            $personalizeModules = LowCodePersonalizeModule::query()->byContextDisease()->where(
+            $personalizeModules = LowCodePersonalizeModule::query()->byContextDisease()->byContextScene()->where(
                     'org_code',
                     $this->getAffiliatedOrgCode()
                 )->where(

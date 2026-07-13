@@ -26,6 +26,7 @@ final class LowCodePersonalizeModuleService extends LowCodeBaseService
     {
         $formattedItems = collect($items)->map(fn ($item, $index) => [
             'disease_code' => $this->getDiseaseCode(),
+            'scene_code' => $this->getSceneCode(),
             'org_code' => $this->getAffiliatedOrgCode(),
             'title' => $item['title'] ?? '',
             'metadata' => json_encode($item['metadata'] ?? []),
@@ -48,6 +49,7 @@ final class LowCodePersonalizeModuleService extends LowCodeBaseService
             $historyModules = LowCodePersonalizeModule::query()
                 ->where('org_code', $this->getAffiliatedOrgCode())
                 ->where('disease_code', $this->getDiseaseCode())
+                ->where('scene_code', $this->getSceneCode())
                 ->get(['id', 'metadata']);
         } catch (Throwable $e) {
             // 兼容低版本数据库可能缺失personalize_module表的情况，避免因迁移未完成导致的功能不可用
@@ -61,6 +63,7 @@ final class LowCodePersonalizeModuleService extends LowCodeBaseService
         DB::transaction(function () use ($formattedItems, $historyModules) {
             LowCodePersonalizeModule::query()
                 ->where('org_code', $this->getAffiliatedOrgCode())
+                ->where('scene_code', $this->getSceneCode())
                 ->where('disease_code', $this->getDiseaseCode())
                 ->delete();
 
@@ -88,6 +91,7 @@ final class LowCodePersonalizeModuleService extends LowCodeBaseService
 
         $newModules = LowCodePersonalizeModule::query()
             ->where('org_code', $this->getAffiliatedOrgCode())
+            ->where('scene_code', $this->getSceneCode())
             ->where('disease_code', $this->getDiseaseCode())
             ->get(['id', 'metadata']);
 
