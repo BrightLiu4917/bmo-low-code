@@ -49,6 +49,10 @@ final class RefreshAdminPreferenceCommand extends Command
                 $query->where('pkey', $listCode);
             }
 
+            if (!empty($sceneCode = (string) $this->option('scene-code'))) {
+                $query->where('scene_code', $sceneCode);
+            }
+
             $preferences = $query->get();
 
             if ($preferences->isEmpty()) {

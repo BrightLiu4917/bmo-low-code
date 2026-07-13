@@ -15,6 +15,7 @@ class CreateAdminPreferencesTable extends Migration
 
                 // 基础字段
                 $table->string('disease_code', 32)->default('')->comment('病种编码');
+                $table->string('scene_code', 32)->default('')->comment('场景编码');
                 $table->string('org_code', 32)->default('')->comment('所属机构编码');
                 $table->unsignedBigInteger('admin_id')->default(0)->comment('管理员id');
                 $table->string('scene', 32)->default('')->comment('场景');

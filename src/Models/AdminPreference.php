@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Models;
 
+use BrightLiu\LowCode\Models\Traits\DiseaseRelation;
 use BrightLiu\LowCode\Models\Traits\OrgDiseaseRelation;
 
 /**
@@ -14,7 +15,7 @@ use BrightLiu\LowCode\Models\Traits\OrgDiseaseRelation;
  */
 final class AdminPreference extends LowCodeBaseModel
 {
-    use OrgDiseaseRelation;
+    use OrgDiseaseRelation, DiseaseRelation;
 
     protected $casts = [
         'pvalue' => 'json',

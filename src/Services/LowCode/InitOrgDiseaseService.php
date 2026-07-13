@@ -372,6 +372,8 @@ final class InitOrgDiseaseService extends LowCodeBaseService
 
         AdminPreference::query()
             ->where('scene', SceneEnum::LIST_COLUMNS)
+            ->where('disease_code', $this->getDiseaseCode())
+            ->where('scene_code', $this->getSceneCode())
             ->get(['id', 'pkey'])
             ->each(function (AdminPreference $item) use ($combiSrv, $codeMapping, &$deleted) {
                 // 解析出list.code
