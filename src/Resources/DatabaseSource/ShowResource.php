@@ -24,6 +24,7 @@ final class ShowResource extends JsonResource
             ...$this->only([
                 'id',
                 'disease_code',
+                'scene_code',
                 'code',
                 'name',
                 'host',

@@ -13,30 +13,31 @@ use BrightLiu\LowCode\Context\DiseaseContext;
 
 class CrowdConnection
 {
-    public static function select(string $query, array $bindings = [], bool $useReadPdo = true, ?string $diseaseCode = null): array
+    public static function select(string $query, array $bindings = [], bool $useReadPdo = true, ?string $diseaseCode = null, ?string $sceneCode = null): array
     {
         return BetterArr::toArray(
-            self::connection($diseaseCode)->select($query, $bindings, $useReadPdo)
+            self::connection($diseaseCode, $sceneCode)->select($query, $bindings, $useReadPdo)
         );
     }
 
-    public static function query(?string $diseaseCode = null): Builder
+    public static function query(?string $diseaseCode = null, ?string $sceneCode = null): Builder
     {
-        $connection = self::connection($diseaseCode);
+        $connection = self::connection($diseaseCode, $sceneCode);
 
         return $connection->table($connection->getConfig('table'));
     }
 
-    public static function table(string $table, ?string $diseaseCode = null): Builder
+    public static function table(string $table, ?string $diseaseCode = null, ?string $sceneCode = null): Builder
     {
-        return self::connection($diseaseCode)->table($table);
+        return self::connection($diseaseCode, $sceneCode)->table($table);
     }
 
-    public static function connection(?string $diseaseCode = null): Connection
+    public static function connection(?string $diseaseCode = null, ?string $sceneCode = null): Connection
     {
         $diseaseCode ??= DiseaseContext::instance()->getDiseaseCode();
+        $sceneCode ??= DiseaseContext::instance()->getSceneCode();
 
         return DbConnectionManager::getInstance()
-            ->getConnection(DatabaseSourceService::instance()->getDataByDiseaseCode($diseaseCode));
+            ->getConnection(DatabaseSourceService::instance()->getDataByDiseaseCode($diseaseCode, $sceneCode));
     }
 }

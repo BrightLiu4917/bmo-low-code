@@ -66,13 +66,13 @@ abstract class QueryEngineAbstract implements QueryEngineContract
      * @return $this
      * @throws ServiceException
      */
-    public function autoClient(?string $diseaseCode = null): self
+    public function autoClient(?string $diseaseCode = null, ?string $sceneCode = null): self
     {
 
         try {
             // 模式1：显式传参优先（定时任务）
             if ($diseaseCode !== null) {
-                $this->initWithDiseaseCode($diseaseCode);
+                $this->initWithDiseaseCode($diseaseCode, $sceneCode);
                 return $this;
             }
 
@@ -86,7 +86,7 @@ abstract class QueryEngineAbstract implements QueryEngineContract
             // 模式2：自动上下文（常规请求）
             if (!empty($contextCode)) {
                 // 尝试从上下文获取疾病编码
-                $this->initWithDiseaseCode($contextCode);
+                $this->initWithDiseaseCode($contextCode, $sceneCode);
             }
 
         } catch (ServiceException $e) {
@@ -98,11 +98,11 @@ abstract class QueryEngineAbstract implements QueryEngineContract
     /**
      * 使用疾病编码初始化
      */
-    private function initWithDiseaseCode(string $diseaseCode): void
+    private function initWithDiseaseCode(string $diseaseCode, ?string $sceneCode = null): void
     {
         try {
             $sourceCode = DatabaseSourceService::instance()
-                ->getDataByDiseaseCode($diseaseCode);
+                ->getDataByDiseaseCode($diseaseCode, $sceneCode);
             $this->clientConnByCode($sourceCode);
             $this->useTable();
             $this->fillableFields();

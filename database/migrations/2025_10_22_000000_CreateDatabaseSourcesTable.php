@@ -13,6 +13,7 @@ class CreateDatabaseSourcesTable extends Migration
                 // 主键和基础字段
                 $table->bigIncrements('id')->comment('主键');
                 $table->string('disease_code', 32)->default('')->comment('病种编码');
+                $table->string('scene_code', 32)->default('')->comment('场景编码');
                 $table->string('code', 32)->default('')->unique()->comment('编码');
                 $table->string('name', 64)->default('')->comment('名字');
 

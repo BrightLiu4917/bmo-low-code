@@ -27,6 +27,7 @@ final class ListResource extends JsonResource
             ...$this->only([
                 'id',
                 'disease_code',
+                'scene_code',
                 'code',
                 'name',
                 'host',

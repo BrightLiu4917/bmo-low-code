@@ -43,7 +43,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
         }
 
         if (!$force) {
-            if (DatabaseSource::query()->where('disease_code', $this->getDiseaseCode())->exists()) {
+            if (DatabaseSource::query()->where('disease_code', $this->getDiseaseCode())->where('scene_code', $this->getSceneCode())->exists() ) {
                 throw new ServiceException('该机构病种已初始化过');
             }
         }
@@ -115,7 +115,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
             return;
         }
 
-        DatabaseSource::query()->where('disease_code', $diseaseCode)->delete();
+        DatabaseSource::query()->where('disease_code', $diseaseCode)->where('scene_code', $this->getSceneCode())->delete();
 
         $templateCodes = LowCodeTemplate::query()->where('disease_code', $diseaseCode)->pluck('code')->toArray();
 
@@ -155,6 +155,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
         };
 
         $data['disease_code'] = $disease_code;
+        $data['scene_code'] = $this->getSceneCode();
         $data['name'] = $this->getDiseaseCode();
         $data['host'] = $dataWarehouseConfig['host'] ?? '';
         $data['database'] = $dataWarehouseConfig['database'] ?? '';

@@ -14,6 +14,7 @@ use BrightLiu\LowCode\Models\Traits\DiseaseRelation;
 use BrightLiu\LowCode\Core\DbConnectionManager;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use BrightLiu\LowCode\Enums\Foundation\BlinkCacheable;
+use BrightLiu\LowCode\Context\DiseaseContext;
 
 /**
  * 数据库源
@@ -25,6 +26,11 @@ final class DatabaseSourceService extends LowCodeBaseService
     public function create(array $data): ?DatabaseSource
     {
         try {
+            // 自动注入 scene_code（若未传入则从上下文获取）
+            if (empty($data['scene_code'])) {
+                $data['scene_code'] = DiseaseContext::instance()->getSceneCode();
+            }
+
             $filterArgs = $this->fixInputDataByCasts($data,DatabaseSource::class);
             $result = DatabaseSource::query()->create($filterArgs);
             if (!$result) {
@@ -112,12 +118,14 @@ final class DatabaseSourceService extends LowCodeBaseService
 
     }
 
-    public function getDataByDiseaseCode(string $diseaseCode = '')
+    public function getDataByDiseaseCode(string $diseaseCode = '', ?string $sceneCode = null)
     {
+        $sceneCode = $sceneCode ?: DiseaseContext::instance()->getSceneCode();
+
         return BlinkCacheable::MODEL_DATABASESOURCE->remember(
-            key: (string) $diseaseCode,
+            key: (string) $diseaseCode . ':' . $sceneCode,
             ttl: 60 * 60,
-            callback: fn () => DatabaseSource::query()->where('disease_code', $diseaseCode)->value('code')
+            callback: fn () => DatabaseSource::query()->where('disease_code', $diseaseCode)->where('scene_code', $sceneCode)->value('code')
         );
     }
 }

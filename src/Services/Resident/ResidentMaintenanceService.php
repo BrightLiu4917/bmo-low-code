@@ -123,7 +123,7 @@ final class ResidentMaintenanceService extends BaseService
         }
 
         $connection = DbConnectionManager::getInstance()->getConnection(
-            DatabaseSourceService::instance()->getDataByDiseaseCode($this->getDiseaseCode())
+            DatabaseSourceService::instance()->getDataByDiseaseCode($this->getDiseaseCode(), $this->getSceneCode())
         );
 
         if (empty($table = config('low-code.bmo-baseline.database.crowd-psn-wdth-table'))) {
@@ -168,7 +168,7 @@ final class ResidentMaintenanceService extends BaseService
     protected function connection(): Connection
     {
         return DbConnectionManager::getInstance()
-            ->getConnection(DatabaseSourceService::instance()->getDataByDiseaseCode($this->getDiseaseCode()));
+            ->getConnection(DatabaseSourceService::instance()->getDataByDiseaseCode($this->getDiseaseCode(), $this->getSceneCode()));
     }
 
     protected function query(?Connection $connection = null): Builder
