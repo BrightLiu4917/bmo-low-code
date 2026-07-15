@@ -175,6 +175,8 @@ class ResidentService extends BaseService
             default => now()->toDateTimeString(),
         };
 
+        $attributes = $this->appendBmiField($empi, $attributes);
+
         BmpCheetahMedicalCrowdkitApiService::make()->updatePatientInfo(
             $empi,
             $attributes,
@@ -184,6 +186,60 @@ class ResidentService extends BaseService
         silence_event(new ResidentInfoUpdated($empi, $attributes, (array) $this->getAdmin(), $updatedAt));
     }
 
+    /**
+     * 当更新字段包含身高或体重时，自动计算并补充BMI字段
+     * TODO: 实现方式待优化
+     *
+     * @param  string  $empi
+     * @param  array  $attributes
+     * @return array
+     */
+    private function appendBmiField(string $empi, array $attributes): array
+    {
+        // 如果已传入BMI，则以传入值为准，不再计算
+        if (array_key_exists('bmi_arr_bmi', $attributes)) {
+            return $attributes;
+        }
+
+        $hasHeight = array_key_exists('height_arr_height', $attributes);
+        $hasWeight = array_key_exists('weight_arr_weight', $attributes);
+
+        if (!$hasHeight && !$hasWeight) {
+            return $attributes;
+        }
+
+        $height = $hasHeight ? $attributes['height_arr_height'] : null;
+        $weight = $hasWeight ? $attributes['weight_arr_weight'] : null;
+
+        // 缺少某个字段时从数据库查询
+        if (!$hasHeight || !$hasWeight) {
+            $columns = [];
+            if (!$hasHeight) {
+                $columns[] = 't1.height_arr_height';
+            }
+            if (!$hasWeight) {
+                $columns[] = 't1.weight_arr_weight';
+            }
+
+            $info = $this->getInfo($empi, $columns);
+            if (!empty($info)) {
+                if (!$hasHeight && isset($info['height_arr_height'])) {
+                    $height = $info['height_arr_height'];
+                }
+                if (!$hasWeight && isset($info['weight_arr_weight'])) {
+                    $weight = $info['weight_arr_weight'];
+                }
+            }
+        }
+
+        // 身高体重均存在时计算BMI
+        if ($height !== null && $weight !== null && (float) $height > 0) {
+            $heightInMeters = (float) $height / 100;
+            $attributes['bmi_arr_bmi'] = round((float) $weight / ($heightInMeters * $heightInMeters), 2);
+        }
+
+        return $attributes;
+    }
 
     public function manageResident(string $empi, array $attributes): void
     {
@@ -218,9 +274,11 @@ class ResidentService extends BaseService
         $latestData['manage_doctor_code'] = (string)($this->getAdminId() ?? '');
         $latestData['manage_doctor_name'] = ($this->getAdminName() ?? '');
 
+        $mergedData = $this->appendBmiField($empi, array_merge($attributes, $latestData));
+
         BmpCheetahMedicalCrowdkitApiService::make()->updatePatientInfo(
             $empi,
-            array_merge($attributes, $latestData)
+            $mergedData
         );
     }
 
@@ -311,9 +369,11 @@ class ResidentService extends BaseService
 //            $latestData['manage_arc_name']   = '';
         }
 
+        $mergedData = $this->appendBmiField($empi, array_merge($attributes, $latestData));
+
         BmpCheetahMedicalCrowdkitApiService::make()->updatePatientInfo(
             $empi,
-            array_merge($attributes, $latestData)
+            $mergedData
         );
     }
 
