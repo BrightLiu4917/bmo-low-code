@@ -14,6 +14,7 @@ use BrightLiu\LowCode\Traits\Context\WithContext;
 use Carbon\Carbon;
 use Gupo\BetterLaravel\Service\BaseService;
 use Gupo\DBQuery\DBQuery;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -423,20 +424,22 @@ class ResidentMetricService extends BaseService
      *
      * @return array<int, array>
      */
-    public function getVitalsWarningRules(string $metricId): array
+    public function getVitalsWarningRules(array|string $metricId): array
     {
+        $metricIds = Arr::wrap($metricId);
+
         $cacheEnabled = config('low-code.resident-metric.warning-rule-cache.enabled', false);
         $cacheTtl = (int) config('low-code.resident-metric.warning-rule-cache.ttl', 1800);
 
         if ($cacheEnabled) {
-            $cacheKey = 'resident:metric_warning_rules:' . md5($metricId);
+            $cacheKey = 'resident:metric_warning_rules:' . md5(join(',', $metricIds));
 
-            return Cache::remember($cacheKey, $cacheTtl, function () use ($metricId) {
-                return BmpCheetahMedicalPlatformApiService::make()->getVitalsWarningRules([$metricId]);
+            return Cache::remember($cacheKey, $cacheTtl, function () use ($metricIds) {
+                return BmpCheetahMedicalPlatformApiService::make()->getVitalsWarningRules($metricIds);
             });
         }
 
-        return BmpCheetahMedicalPlatformApiService::make()->getVitalsWarningRules([$metricId]);
+        return BmpCheetahMedicalPlatformApiService::make()->getVitalsWarningRules($metricIds);
     }
 
     /**
@@ -449,9 +452,9 @@ class ResidentMetricService extends BaseService
      * @param  int|null    $gender     患者性别 1=男 2=女
      * @return array{tag: string, remark: string, risk_level_color: string, dispose_advice: string, direction: int}|null
      */
-    public function matchWarning(float $value, array $rules, string $dataDate, ?string $birthDate, ?int $gender = null): ?array
+    public function matchWarning(?float $value, array $rules, string $dataDate, ?string $birthDate, ?int $gender = null): ?array
     {
-        if (empty($rules)) {
+        if (empty($rules) || empty($dataDate) || empty($gender)) {
             return null;
         }
 
@@ -511,6 +514,25 @@ class ResidentMetricService extends BaseService
         return $matched;
     }
 
+    /**
+     * 匹配某字段的预警规则
+     *
+     * @param  string      $field      字段名
+     * @param  float       $value      监测值
+     * @param  array       $rules      规则列表
+     * @param  string      $dataDate   数据日期
+     * @param  string|null $birthDate  患者出生日期
+     * @param  int|null    $gender     患者性别 1=男 2=女
+     * @return array{tag: string, remark: string, risk_level_color: string, dispose_advice: string, direction: int}|null
+     */
+    public function matchFieldWarning(string $field, ?float $value, array $rules, string $dataDate, ?string $birthDate, ?int $gender = null): ?array
+    {
+        $rules = array_values(
+            array_filter($rules, fn ($rule) => ($rule['field_code'] ?? '') === $field)
+        );
+
+        return $this->matchWarning($value, $rules, $dataDate, $birthDate, $gender);
+    }
     /**
      * 为监测趋势数据批量附加预警信息
      *

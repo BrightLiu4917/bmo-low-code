@@ -81,7 +81,9 @@ class ResidentArchiveController extends BaseController
 
         $updatedAt = (string) $request->input('updated_at', '');
 
-        $srv->updateInfo($empi, $attributes, $updatedAt);
+        $dataSource = $request->input('data_source');
+
+        $srv->updateInfo($empi, $attributes, $updatedAt, $dataSource);
 
         return $this->responseSuccess();
     }

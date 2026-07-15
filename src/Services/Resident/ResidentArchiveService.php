@@ -117,13 +117,13 @@ class ResidentArchiveService extends BaseService
      *
      * @throws ServiceException
      */
-    public function updateInfo(string $empi, array $attributes, Carbon|string $updatedAt = ''): void
+    public function updateInfo(string $empi, array $attributes, Carbon|string $updatedAt = '', ?int $dataSource = null): void
     {
         // TODO: 待完善
         $guarded = ['id_crd_no', 'empi', 'is_deleted', 'gmt_created', 'gmt_modified'];
 
         $attributes = array_diff_key($attributes, array_flip($guarded));
 
-        ResidentService::make()->updateInfo($empi, $attributes, $updatedAt);
+        ResidentService::make()->updateInfo($empi, $attributes, $updatedAt, $dataSource);
     }
 }

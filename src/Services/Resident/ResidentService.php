@@ -159,7 +159,7 @@ class ResidentService extends BaseService
      *
      * @throws ServiceException
      */
-    public function updateInfo(string $empi, array $attributes, Carbon|string $updatedAt = ''): void
+    public function updateInfo(string $empi, array $attributes, Carbon|string $updatedAt = '', ?int $dataSource = null): void
     {
         if (empty($empi) || empty($attributes)) {
             return;
@@ -180,7 +180,8 @@ class ResidentService extends BaseService
         BmpCheetahMedicalCrowdkitApiService::make()->updatePatientInfo(
             $empi,
             $attributes,
-            $updatedAt
+            $updatedAt,
+            $dataSource
         );
 
         silence_event(new ResidentInfoUpdated($empi, $attributes, (array) $this->getAdmin(), $updatedAt));

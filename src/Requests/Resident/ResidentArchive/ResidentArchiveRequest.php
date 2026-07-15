@@ -17,6 +17,7 @@ class ResidentArchiveRequest extends BaseRequest
             'empi' => ['bail', 'nullable', 'required'],
             'attributes' => ['bail', 'required', 'array'],
             'updated_at' => ['bail', 'nullable', 'string'],
+            'data_source' => ['bail', 'nullable', 'integer'],
         ];
     }
 
@@ -26,6 +27,7 @@ class ResidentArchiveRequest extends BaseRequest
             'empi' => '居民主索引',
             'attributes' => '属性',
             'updated_at' => '更新时间',
+            'data_source' => '数据来源',
         ];
     }
 
@@ -38,7 +40,7 @@ class ResidentArchiveRequest extends BaseRequest
             'maskTesting' => ['empi'],
             'unmaskTesting' => ['empi'],
             'info' => ['empi'],
-            'updateInfo' => ['empi', 'attributes', 'updated_at'],
+            'updateInfo' => ['empi', 'attributes', 'updated_at', 'data_source'],
         ];
     }
 }
