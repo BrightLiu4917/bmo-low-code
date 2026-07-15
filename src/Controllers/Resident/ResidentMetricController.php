@@ -9,6 +9,7 @@ use BrightLiu\LowCode\Models\Resident\ResidentMonitorMetric;
 use BrightLiu\LowCode\Requests\Resident\ResidentMetric\MonitorListRequest;
 use BrightLiu\LowCode\Requests\Resident\ResidentMetric\MonitorTrendCountRequest;
 use BrightLiu\LowCode\Requests\Resident\ResidentMetric\MonitorTrendItemsRequest;
+use BrightLiu\LowCode\Requests\Resident\ResidentMetric\MonitorTrendListRequest;
 use BrightLiu\LowCode\Requests\Resident\ResidentMetric\SaveMonitorRequest;
 use BrightLiu\LowCode\Resources\Resident\ResidentMetric\MonitorListResource;
 use BrightLiu\LowCode\Resources\Resident\ResidentMetric\MonitorTrendItemsResource;
@@ -122,6 +123,74 @@ class ResidentMetricController extends BaseController
         return $this->responseData([
             'items' => MonitorTrendItemsResource::collection($data),
         ]);
+    }
+
+    /**
+     * 监测指标趋势（分页）
+     */
+    public function monitorTrendList(MonitorTrendListRequest $request): JsonResponse
+    {
+        // 居民主索引
+        $empi = (string) $request->input('empi', '');
+
+        // 指标ID
+        $metricId = (string) $request->input('metric_id', '');
+
+        // 时间范围-开始
+        $dateRangeMin = (string) $request->input('date_range.0', '');
+
+        // 时间范围-截至
+        $dateRangeMax = (string) $request->input('date_range.1', '');
+
+        // 排序方式：asc 升序、desc 降序，默认降序
+        $sort = (string) $request->input('sort', 'desc');
+
+        try {
+            $srv = ResidentMetricService::make();
+
+            // 获取趋势分页数据（现有逻辑）
+            $data = $srv->getMonitorTrendList(
+                empi: $empi,
+                metricId: $metricId,
+                minDate: $dateRangeMin,
+                maxDate: $dateRangeMax,
+                sort: $sort,
+            );
+
+            // 获取患者人口学信息
+            $demographic = $srv->resolvePatientDemographic($empi);
+
+            // 获取预警规则（不传 sex，统一拉取后再本地过滤）
+            $rules = $srv->getVitalsWarningRules($metricId);
+
+            // 为每条数据附加预警判定
+            $birthDate = $demographic['bth_dt'] ?? null;
+            $gender = $demographic['gender'] ?? null;
+            $data->through(function ($item) use ($srv, $rules, $birthDate, $gender) {
+                $value = (float) ($item->col_value ?? 0);
+                $item->warning = $srv->matchWarning(
+                    value: $value,
+                    rules: $rules,
+                    dataDate: (string) ($item->fill_date ?? ''),
+                    birthDate: $birthDate,
+                    gender: $gender,
+                );
+
+                return $item;
+            });
+        } catch (\Throwable $e) {
+            logs()->error('获取居民监测指标趋势分页失败', [
+                'empi' => $empi,
+                'metric_id' => $metricId,
+                'date_range_min' => $dateRangeMin,
+                'date_range_max' => $dateRangeMax,
+                'error_msg' => $e->getMessage(),
+            ]);
+
+            return $this->responseError('获取居民监测指标趋势分页失败');
+        }
+
+        return $this->responseData($data, MonitorTrendItemsResource::class);
     }
 
     /**

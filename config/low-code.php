@@ -197,6 +197,17 @@ return [
         'metric-from-upstream-enabled' => env('BLC_RESIDENT_ARCHIVE_METRIC_FROM_UPSTREAM_ENABLED', true),
     ],
 
+    // 居民监测指标配置
+    'resident-metric' => [
+        // 预警规则缓存
+        'warning-rule-cache' => [
+            // 是否启用缓存
+            'enabled' => env('BLC_RESIDENT_METRIC_WARNING_RULE_CACHE_ENABLED', false),
+            // 缓存有效期（秒），默认 30 分钟
+            'ttl' => env('BLC_RESIDENT_METRIC_WARNING_RULE_CACHE_TTL', 1800),
+        ],
+    ],
+
     // 患者字段枚举&元信息配置
     'patient-column' => [
         'cache-enabled' => env('BLC_PATIENT_COLUMN_CACHE_ENABLED', false),

@@ -21,6 +21,7 @@ class MonitorTrendItemsResource extends JsonResource
             'datetime' => $this->fill_date ?? '',
             'date' => Carbon::make($this->fill_date ?? '')->format('Y-m-d'),
             'value' => $this->col_value ?? '',
+            'warning' => $this->warning ?? null,
         ];
     }
 }

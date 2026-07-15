@@ -207,4 +207,26 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
 
         return (array) data_get($respData, 'data', []);
     }
+
+    /**
+     * 获取体征预警规则定义
+     *
+     * @param  array<int, string>  $fieldCodes  字段编号列表，如 ['TEMP']
+     * @param  int|null            $sex         性别 0=未知 1=男 2=女
+     * @return array<int, array>
+     */
+    public function getVitalsWarningRules(array $fieldCodes, ?int $sex = null): array
+    {
+        $params = ['field_codes' => $fieldCodes];
+        if ($sex !== null) {
+            $params['sex'] = $sex;
+        }
+
+        $respData = Http::asJson()->timeout(5)->post(
+            $this->baseUriVia() . 'innerapi/warning/vitals/rule',
+            $params
+        )->json();
+
+        return (array) data_get($respData, 'data', []);
+    }
 }
