@@ -229,4 +229,28 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
 
         return (array) data_get($respData, 'data', []);
     }
+
+    /**
+     * 获取专病场景健康看板字段分组配置
+     *
+     * @param  string $configKey 配置项 key
+     * @return array<int, array{group_name: string, field_list: array<int, string>, remark: string|null}>
+     */
+    public function getDiseaseSceneConfig(string $configKey = ''): array
+    {
+        $params = [
+            'scene_code' => $this->getSceneCode(),
+            'disease_code' => $this->getDiseaseCode(),
+        ];
+
+        if ($configKey !== '') {
+            $params['config_key'] = $configKey;
+        }
+
+        $respData = Http::asJson()->timeout(3)->post($this->baseUriVia() . '/innerapi/settings/getDiseaseSceneConfig',
+            $params
+        )->json();
+
+        return (array) data_get($respData, 'data.config_data', []);
+    }
 }
