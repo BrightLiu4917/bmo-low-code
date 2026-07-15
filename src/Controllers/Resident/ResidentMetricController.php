@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Controllers\Resident;
 
+use BrightLiu\LowCode\Context\DiseaseContext;
 use BrightLiu\LowCode\Models\Resident\ResidentMonitorMetric;
 use BrightLiu\LowCode\Requests\Resident\ResidentMetric\MonitorListRequest;
+use BrightLiu\LowCode\Requests\Resident\ResidentMetric\MonitorTrendCountRequest;
 use BrightLiu\LowCode\Requests\Resident\ResidentMetric\MonitorTrendItemsRequest;
 use BrightLiu\LowCode\Requests\Resident\ResidentMetric\SaveMonitorRequest;
 use BrightLiu\LowCode\Resources\Resident\ResidentMetric\MonitorListResource;
@@ -15,7 +17,6 @@ use BrightLiu\LowCode\Services\BmpCheetahMedicalCrowdkitApiService;
 use BrightLiu\LowCode\Services\BmpCheetahMedicalPlatformApiService;
 use BrightLiu\LowCode\Services\Resident\ResidentMetricService;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
-use BrightLiu\LowCode\Context\DiseaseContext;
 use BrightLiu\LowCode\Traits\Context\WithDiseaseContext;
 use BrightLiu\LowCode\Traits\Context\WithOrgContext;
 use Gupo\BetterLaravel\Http\BaseController;
@@ -121,6 +122,45 @@ class ResidentMetricController extends BaseController
         return $this->responseData([
             'items' => MonitorTrendItemsResource::collection($data),
         ]);
+    }
+
+    /**
+     * 监测指标趋势数量统计
+     */
+    public function monitorTrendCount(MonitorTrendCountRequest $request): JsonResponse
+    {
+        // 居民主索引
+        $empi = (string) $request->input('empi', '');
+
+        // 指标ID
+        $metricId = (string) $request->input('metric_id', '');
+
+        // 时间范围-开始
+        $dateRangeMin = (string) $request->input('date_range.0', '');
+
+        // 时间范围-截至
+        $dateRangeMax = (string) $request->input('date_range.1', '');
+
+        try {
+            $total = ResidentMetricService::make()->getMonitorTrendCount(
+                empi: $empi,
+                metricId: $metricId,
+                minDate: $dateRangeMin,
+                maxDate: $dateRangeMax,
+            );
+        } catch (\Throwable $e) {
+            logs()->error('获取居民监测指标趋势数量统计失败', [
+                'empi' => $empi,
+                'metric_id' => $metricId,
+                'date_range_min' => $dateRangeMin,
+                'date_range_max' => $dateRangeMax,
+                'error_msg' => $e->getMessage(),
+            ]);
+
+            return $this->responseError('获取居民监测指标趋势数量统计失败');
+        }
+
+        return $this->responseData(['total' => $total]);
     }
 
     /**

@@ -16,6 +16,9 @@ Route::group(['prefix' => 'v2/resident', 'middleware' => [Middleware::AUTH_DISEA
     Route::get('resident-metric/monitor-trend-items', [ResidentMetricController::class, 'monitorTrendItems'])
         ->comment('居民-居民指标:监测指标趋势');
 
+    Route::get('resident-metric/monitor-trend-count', [ResidentMetricController::class, 'monitorTrendCount'])
+        ->comment('居民-居民指标:监测指标趋势数量统计');
+
     Route::post('resident-metric/save-monitor', [ResidentMetricController::class, 'saveMonitor'])
         ->comment('居民-居民指标:保存监测指标项');
 });

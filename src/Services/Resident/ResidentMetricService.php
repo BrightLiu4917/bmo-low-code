@@ -191,6 +191,106 @@ class ResidentMetricService extends BaseService
     }
 
     /**
+     * 获取 监测指标趋势数量统计
+     */
+    public function getMonitorTrendCount(
+        string $empi,
+        string $metricId,
+        string|Carbon|null $minDate = null,
+        string|Carbon|null $maxDate = null
+    ): int {
+        $metricConfig = null;
+        if (config('low-code.resident-archive.metric-from-upstream-enabled', false)) {
+            // 获取上游指标
+            $personalArchiveConfig = BmpCheetahMedicalCrowdkitApiService::make()->getPersonalArchiveConfig();
+            $personalArchiveFields = array_column($personalArchiveConfig['data'] ?? [], null, 'src_col_name');
+
+            $metricConfig = $personalArchiveFields[$metricId] ?? null;
+        }
+
+        return match (true) {
+            // 存在指标配置时，为上游指标
+            !is_null($metricConfig) => $this->getMonitorTrendCountByUpstream(
+                $empi, $metricId, $minDate, $maxDate, $metricConfig
+            ),
+            default => $this->getMonitorTrendCountByBusiness(
+                $empi, $metricId, $minDate, $maxDate
+            ),
+        };
+    }
+
+    /**
+     * 获取来自业务的监测指标趋势数量统计
+     */
+    public function getMonitorTrendCountByBusiness(
+        string $empi,
+        string $metricId,
+        string|Carbon|null $minDate = null,
+        string|Carbon|null $maxDate = null
+    ): int {
+        $connection = null;
+
+        // 优先使用内置连接
+        if (!empty($baselineDbConfig = config('low-code.bmo-baseline.database.default'))) {
+            $connection = DBQuery::connection($baselineDbConfig)->getConnection()->table('personal_archive');
+        } else {
+            $connection = CrowdConnection::table('personal_archive');
+        }
+
+        return (int) $connection
+            ->where('col_name', $metricId)
+            ->where('empi', $empi)
+            ->when(!empty($minDate) && !empty($maxDate), fn ($query) => $query
+                ->whereBetween('fill_date', [Carbon::make($minDate)->startOfDay(), Carbon::make($maxDate)->endOfDay()])
+            )
+            ->count();
+    }
+
+    /**
+     * 获取来自上游的监测指标趋势数量统计
+     */
+    public function getMonitorTrendCountByUpstream(
+        string $empi,
+        string $metricId,
+        string|Carbon|null $minDate = null,
+        string|Carbon|null $maxDate = null,
+        array $metricConfig
+    ): int {
+        // 根据empi获取身份证号
+        $cardNo = null;
+        if (!empty($psnTable = config('low-code.bmo-baseline.database.crowd-psn-wdth-table'))) {
+            $cardNo = Cache::remember(
+                'resident:' . md5('resolve_card_no:' . $psnTable . $empi),
+                60 * 30,
+                fn () => CrowdConnection::table($psnTable)->where('empi', $empi)->value('id_crd_no')
+            );
+        }
+
+        if (empty($cardNo)) {
+            return 0;
+        }
+
+        // 业务时间字段(用于排序及区间查询)
+        $businessDateField = $metricConfig['time_col'] ?? 'upd_tm';
+
+        // 目标字段
+        $columnName = $metricConfig['tgt_col_name'];
+
+        $query = CrowdConnection::table($metricConfig['tbl_name'])
+            ->where('id_crd_no', $cardNo);
+
+        if (0 != $metricConfig['is_vertical']) {
+            $query->where('item_name', $columnName);
+        }
+
+        return (int) $query
+            ->when(!empty($minDate) && !empty($maxDate), fn ($query) => $query
+                ->whereBetween($businessDateField, [Carbon::make($minDate)->startOfDay(), Carbon::make($maxDate)->endOfDay()])
+            )
+            ->count();
+    }
+
+    /**
      * 获取来自业务的监测指标趋势
      */
     public function getMonitorTrendItemsByBusiness(
