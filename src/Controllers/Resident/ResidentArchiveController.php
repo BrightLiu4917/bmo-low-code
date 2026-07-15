@@ -79,7 +79,9 @@ class ResidentArchiveController extends BaseController
 
         $attributes = (array) $request->input('attributes', []);
 
-        $srv->updateInfo($empi, $attributes);
+        $updatedAt = (string) $request->input('updated_at', '');
+
+        $srv->updateInfo($empi, $attributes, $updatedAt);
 
         return $this->responseSuccess();
     }

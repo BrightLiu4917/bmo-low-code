@@ -16,6 +16,7 @@ class ResidentArchiveRequest extends BaseRequest
         return [
             'empi' => ['bail', 'nullable', 'required'],
             'attributes' => ['bail', 'required', 'array'],
+            'updated_at' => ['bail', 'nullable', 'string'],
         ];
     }
 
@@ -24,6 +25,7 @@ class ResidentArchiveRequest extends BaseRequest
         return [
             'empi' => '居民主索引',
             'attributes' => '属性',
+            'updated_at' => '更新时间',
         ];
     }
 
@@ -36,7 +38,7 @@ class ResidentArchiveRequest extends BaseRequest
             'maskTesting' => ['empi'],
             'unmaskTesting' => ['empi'],
             'info' => ['empi'],
-            'updateInfo' => ['empi', 'attributes'],
+            'updateInfo' => ['empi', 'attributes', 'updated_at'],
         ];
     }
 }

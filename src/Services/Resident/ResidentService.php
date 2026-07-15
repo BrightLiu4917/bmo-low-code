@@ -19,6 +19,7 @@ use Closure;
 use BrightLiu\LowCode\Events\Resident\ResidentInfoUpdated;
 use BrightLiu\LowCode\Traits\Context\WithAdminContext;
 use BrightLiu\LowCode\Services\LowCode\Tools\EmpiFullFilterTools;
+use Carbon\Carbon;
 
 /**
  * 居民相关
@@ -158,7 +159,7 @@ class ResidentService extends BaseService
      *
      * @throws ServiceException
      */
-    public function updateInfo(string $empi, array $attributes): void
+    public function updateInfo(string $empi, array $attributes, Carbon|string $updatedAt = ''): void
     {
         if (empty($empi) || empty($attributes)) {
             return;
@@ -168,12 +169,19 @@ class ResidentService extends BaseService
             throw new ServiceException('居民不存在');
         }
 
+        $updatedAt = match (true) {
+            $updatedAt instanceof Carbon => $updatedAt->toDateTimeString(),
+            !empty($updatedAt) => Carbon::parse($updatedAt)->toDateTimeString(),
+            default => now()->toDateTimeString(),
+        };
+
         BmpCheetahMedicalCrowdkitApiService::make()->updatePatientInfo(
             $empi,
-            $attributes
+            $attributes,
+            $updatedAt
         );
 
-        silence_event(new ResidentInfoUpdated($empi, $attributes, (array) $this->getAdmin()));
+        silence_event(new ResidentInfoUpdated($empi, $attributes, (array) $this->getAdmin(), $updatedAt));
     }
 
 

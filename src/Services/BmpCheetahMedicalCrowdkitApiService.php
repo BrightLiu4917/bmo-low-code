@@ -177,21 +177,24 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
     /**
      * @param string $empi
      * @param array  $attributes
+     * @param string $updatedAt
      *
      * @return void
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function updatePatientInfo(string $empi, array $attributes): void
+    public function updatePatientInfo(string $empi, array $attributes, string $updatedAt = ''): void
     {
         if (empty($attributes)) {
             return;
         }
 
+        $updatedAt = $updatedAt ?: now()->toDateTimeString();
+
         $data = [
             'empi' => $empi,
             'col_values' => array_values(Arr::map(
                 array_filter($attributes, fn ($value) => $value !== null),
-                fn ($value, $key) => ['col_name' => $key, 'col_value' => $value]
+                fn ($value, $key) => ['col_name' => $key, 'col_value' => $value, 'fill_date' => $updatedAt]
             )),
             'data_source' => 1,
             'org_code' => $this->getOrgCode(),

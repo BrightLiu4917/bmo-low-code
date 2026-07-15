@@ -6,6 +6,7 @@ namespace BrightLiu\LowCode\Services\Resident;
 
 use BrightLiu\LowCode\Services\CrowdKitService;
 use BrightLiu\LowCode\Traits\Context\WithContext;
+use Carbon\Carbon;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
 use Gupo\BetterLaravel\Service\BaseService;
 use Illuminate\Support\Collection;
@@ -116,13 +117,13 @@ class ResidentArchiveService extends BaseService
      *
      * @throws ServiceException
      */
-    public function updateInfo(string $empi, array $attributes): void
+    public function updateInfo(string $empi, array $attributes, Carbon|string $updatedAt = ''): void
     {
         // TODO: 待完善
         $guarded = ['id_crd_no', 'empi', 'is_deleted', 'gmt_created', 'gmt_modified'];
 
         $attributes = array_diff_key($attributes, array_flip($guarded));
 
-        ResidentService::make()->updateInfo($empi, $attributes);
+        ResidentService::make()->updateInfo($empi, $attributes, $updatedAt);
     }
 }

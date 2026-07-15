@@ -12,7 +12,8 @@ class ResidentInfoUpdated
     public function __construct(
         public readonly string $empi,
         public readonly array $attributes,
-        public readonly array $operator = []
+        public readonly array $operator = [],
+        public readonly string $updatedAt = ''
     ) {
     }
 
