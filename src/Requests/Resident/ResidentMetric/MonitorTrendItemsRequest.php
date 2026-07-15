@@ -16,6 +16,7 @@ class MonitorTrendItemsRequest extends BaseRequest
             'date_range.0' => ['bail', 'nullable', 'date_format:Y-m-d'],
             'date_range.1' => ['bail', 'nullable', 'date_format:Y-m-d'],
             'limit' => ['bail', 'nullable', 'numeric'],
+            'with_warning' => ['bail', 'nullable', 'boolean'],
         ];
     }
 

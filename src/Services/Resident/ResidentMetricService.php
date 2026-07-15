@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Services\Resident;
 
+use App\Support\Tools\BetterArr;
 use BrightLiu\LowCode\Models\Resident\ResidentMonitorMetric;
 use BrightLiu\LowCode\Services\BmpCheetahMedicalCrowdkitApiService;
 use BrightLiu\LowCode\Services\BmpCheetahMedicalPlatformApiService;
@@ -508,6 +509,38 @@ class ResidentMetricService extends BaseService
         }
 
         return $matched;
+    }
+
+    /**
+     * 为监测趋势数据批量附加预警信息
+     *
+     * 内部完成：获取患者人口学信息 → 获取预警规则 → 逐条匹配预警
+     *
+     * @param  array<int, array>  $items     监测数据
+     * @param  string             $empi      居民主索引
+     * @param  string             $metricId  指标ID
+     * @return array<int, array>
+     */
+    public function attachWarningToItems(array $items, string $empi, string $metricId): array
+    {
+        $items = BetterArr::toArray($items);
+
+        // 获取患者人口学信息
+        $demographic = $this->resolvePatientDemographic($empi);
+        $birthDate = $demographic['bth_dt'] ?? null;
+        $gender = $demographic['gender'] ?? null;
+
+        // 获取预警规则
+        $rules = $this->getVitalsWarningRules($metricId);
+
+        foreach ($items as &$item) {
+            $value = (float) ($item['col_value'] ?? 0);
+            $fillDate = (string) ($item['fill_date'] ?? '');
+
+            $item['warning'] = $this->matchWarning($value, $rules, $fillDate, $birthDate, $gender);
+        }
+
+        return $items;
     }
 
     /**

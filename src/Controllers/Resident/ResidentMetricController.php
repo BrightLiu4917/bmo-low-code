@@ -13,10 +13,12 @@ use BrightLiu\LowCode\Requests\Resident\ResidentMetric\MonitorTrendListRequest;
 use BrightLiu\LowCode\Requests\Resident\ResidentMetric\SaveMonitorRequest;
 use BrightLiu\LowCode\Resources\Resident\ResidentMetric\MonitorListResource;
 use BrightLiu\LowCode\Resources\Resident\ResidentMetric\MonitorTrendItemsResource;
+use BrightLiu\LowCode\Resources\Resident\ResidentMetric\MonitorTrendListResource;
 use BrightLiu\LowCode\Resources\Resident\ResidentMetric\OptionalResource;
 use BrightLiu\LowCode\Services\BmpCheetahMedicalCrowdkitApiService;
 use BrightLiu\LowCode\Services\BmpCheetahMedicalPlatformApiService;
 use BrightLiu\LowCode\Services\Resident\ResidentMetricService;
+use BrightLiu\LowCode\Tools\BetterArr;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
 use BrightLiu\LowCode\Traits\Context\WithDiseaseContext;
 use BrightLiu\LowCode\Traits\Context\WithOrgContext;
@@ -99,14 +101,26 @@ class ResidentMetricController extends BaseController
         // 限制条数
         $limit = (int) $request->input('limit', 0);
 
+        // 是否附加预警信息
+        $withWarning = (bool) $request->input('with_warning', false);
+
         try {
-            $data = ResidentMetricService::make()->getMonitorTrendItems(
+            $srv = ResidentMetricService::make();
+
+            $data = $srv->getMonitorTrendItems(
                 empi: $empi,
                 metricId: $metricId,
                 minDate: $dateRangeMin,
                 maxDate: $dateRangeMax,
                 limit: $limit
             );
+
+            $data = BetterArr::toArray($data);
+
+            // 附加预警信息
+            if ($withWarning) {
+                $data = $srv->attachWarningToItems($data, $empi, $metricId);
+            }
         } catch (\Throwable $e) {
             logs()->error('获取居民监测指标趋势失败', [
                 'empi' => $empi,
@@ -157,27 +171,10 @@ class ResidentMetricController extends BaseController
                 sort: $sort,
             );
 
-            // 获取患者人口学信息
-            $demographic = $srv->resolvePatientDemographic($empi);
-
-            // 获取预警规则（不传 sex，统一拉取后再本地过滤）
-            $rules = $srv->getVitalsWarningRules($metricId);
-
-            // 为每条数据附加预警判定
-            $birthDate = $demographic['bth_dt'] ?? null;
-            $gender = $demographic['gender'] ?? null;
-            $data->through(function ($item) use ($srv, $rules, $birthDate, $gender) {
-                $value = (float) ($item->col_value ?? 0);
-                $item->warning = $srv->matchWarning(
-                    value: $value,
-                    rules: $rules,
-                    dataDate: (string) ($item->fill_date ?? ''),
-                    birthDate: $birthDate,
-                    gender: $gender,
-                );
-
-                return $item;
-            });
+            // 附加预警信息（分页对象转数组 → 处理 → 塞回分页）
+            $data->setCollection(collect(
+                $srv->attachWarningToItems($data->getCollection()->toArray(), $empi, $metricId)
+            ));
         } catch (\Throwable $e) {
             logs()->error('获取居民监测指标趋势分页失败', [
                 'empi' => $empi,
@@ -190,7 +187,7 @@ class ResidentMetricController extends BaseController
             return $this->responseError('获取居民监测指标趋势分页失败');
         }
 
-        return $this->responseData($data, MonitorTrendItemsResource::class);
+        return $this->responseData($data, MonitorTrendListResource::class);
     }
 
     /**

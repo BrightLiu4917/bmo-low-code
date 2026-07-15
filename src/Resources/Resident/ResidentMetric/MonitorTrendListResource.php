@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 
-class MonitorTrendItemsResource extends JsonResource
+class MonitorTrendListResource extends JsonResource
 {
     /**
      * @param Request $request
@@ -18,8 +18,6 @@ class MonitorTrendItemsResource extends JsonResource
      */
     public function toArray($request)
     {
-        $withWarning = (bool) $request->input('with_warning', false);
-
         $dataSource = (int) ($this['data_source'] ?? 0);
 
         return [
@@ -28,7 +26,7 @@ class MonitorTrendItemsResource extends JsonResource
             'value' => $this['col_value'] ?? '',
             'data_source' => $dataSource,
             'data_source_name' => DataSourceEnum::make()->translate($dataSource, ''),
-            'warning' => $this->when($withWarning, $this['warning'] ?? null),
+            'warning' => $this['warning'] ?? null,
         ];
     }
 }
