@@ -72,6 +72,9 @@ class BasicInfoResource extends JsonResource
             // 出组状态
             'out_group_status' => $outGroupStatus,
 
+            // 知情同意书签署状态
+            'infmd_agr_rcd_stts' => $info['infmd_agr_rcd_stts'] ?? 0,
+
             // 是否归档
             'is_archived' => $isArchived ? 1 : 0,
         ];
