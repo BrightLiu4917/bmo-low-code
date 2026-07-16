@@ -255,8 +255,8 @@ class ResidentMetricService extends BaseService
     public function getMonitorTrendCountByUpstream(
         string $empi,
         string $metricId,
-        string|Carbon|null $minDate = null,
-        string|Carbon|null $maxDate = null,
+        string|Carbon|null $minDate,
+        string|Carbon|null $maxDate,
         array $metricConfig
     ): int {
         // 根据empi获取身份证号
@@ -328,8 +328,8 @@ class ResidentMetricService extends BaseService
     public function getMonitorTrendItemsByUpstream(
         string $empi,
         string $metricId,
-        string|Carbon|null $minDate = null,
-        string|Carbon|null $maxDate = null,
+        string|Carbon|null $minDate,
+        string|Carbon|null $maxDate,
         int $limit,
         array $metricConfig
     ): array {
@@ -363,18 +363,18 @@ class ResidentMetricService extends BaseService
                 ->get(["{$businessDateField} as fill_date", "{$columnName} as col_value"])
                 ->sortBy($businessDateField)
                 ->toArray();
-        } else {
-            return CrowdConnection::table($metricConfig['tbl_name'])
-                ->where('id_crd_no', $cardNo)
-                ->where('item_name', $columnName)
-                ->when(!empty($minDate) && !empty($maxDate), fn ($query) => $query
-                    ->whereBetween($businessDateField, [Carbon::make($minDate)->startOfDay(), Carbon::make($maxDate)->endOfDay()])
-                )
-                ->when($limit > 0, fn ($query) => $query->limit($limit))
-                ->get(["{$businessDateField} as fill_date", 'item_value as col_value'])
-                ->sortBy($businessDateField)
-                ->toArray();
         }
+
+        return CrowdConnection::table($metricConfig['tbl_name'])
+            ->where('id_crd_no', $cardNo)
+            ->where('item_name', $columnName)
+            ->when(!empty($minDate) && !empty($maxDate), fn ($query) => $query
+                ->whereBetween($businessDateField, [Carbon::make($minDate)->startOfDay(), Carbon::make($maxDate)->endOfDay()])
+            )
+            ->when($limit > 0, fn ($query) => $query->limit($limit))
+            ->get(["{$businessDateField} as fill_date", 'item_value as col_value'])
+            ->sortBy($businessDateField)
+            ->toArray();
     }
 
     /**
@@ -445,11 +445,12 @@ class ResidentMetricService extends BaseService
     /**
      * 匹配预警规则
      *
-     * @param  float       $value      监测值
-     * @param  array       $rules      规则列表
-     * @param  string      $dataDate   数据日期
-     * @param  string|null $birthDate  患者出生日期
-     * @param  int|null    $gender     患者性别 1=男 2=女
+     * @param float $value 监测值
+     * @param array $rules 规则列表
+     * @param string $dataDate 数据日期
+     * @param string|null $birthDate 患者出生日期
+     * @param int|null $gender 患者性别 1=男 2=女
+     *
      * @return array{tag: string, remark: string, risk_level_color: string, dispose_advice: string, direction: int}|null
      */
     public function matchWarning(?float $value, array $rules, string $dataDate, ?string $birthDate, ?int $gender = null): ?array
@@ -473,21 +474,21 @@ class ResidentMetricService extends BaseService
 
         foreach ($rules as $rule) {
             // 性别过滤：rule.sex=0 表示不限，否则需匹配患者性别
-            if ($gender !== null) {
+            if (null !== $gender) {
                 $ruleSex = (int) ($rule['sex'] ?? 0);
-                if ($ruleSex !== 0 && $ruleSex !== $gender) {
+                if (0 !== $ruleSex && $ruleSex !== $gender) {
                     continue;
                 }
             }
 
             // 年龄过滤（仅在能推算年龄时）
-            if ($age !== null) {
+            if (null !== $age) {
                 $minAge = (int) ($rule['min_age'] ?? -1);
                 $maxAge = (int) ($rule['max_age'] ?? 999999);
-                if ($minAge !== -1 && $age < $minAge) {
+                if (-1 !== $minAge && $age < $minAge) {
                     continue;
                 }
-                if ($maxAge !== 999999 && $age > $maxAge) {
+                if (999999 !== $maxAge && $age > $maxAge) {
                     continue;
                 }
             }
@@ -517,12 +518,13 @@ class ResidentMetricService extends BaseService
     /**
      * 匹配某字段的预警规则
      *
-     * @param  string      $field      字段名
-     * @param  float       $value      监测值
-     * @param  array       $rules      规则列表
-     * @param  string      $dataDate   数据日期
-     * @param  string|null $birthDate  患者出生日期
-     * @param  int|null    $gender     患者性别 1=男 2=女
+     * @param string $field 字段名
+     * @param float $value 监测值
+     * @param array $rules 规则列表
+     * @param string $dataDate 数据日期
+     * @param string|null $birthDate 患者出生日期
+     * @param int|null $gender 患者性别 1=男 2=女
+     *
      * @return array{tag: string, remark: string, risk_level_color: string, dispose_advice: string, direction: int}|null
      */
     public function matchFieldWarning(string $field, ?float $value, array $rules, string $dataDate, ?string $birthDate, ?int $gender = null): ?array
@@ -533,14 +535,16 @@ class ResidentMetricService extends BaseService
 
         return $this->matchWarning($value, $rules, $dataDate, $birthDate, $gender);
     }
+
     /**
      * 为监测趋势数据批量附加预警信息
      *
      * 内部完成：获取患者人口学信息 → 获取预警规则 → 逐条匹配预警
      *
-     * @param  array<int, array>  $items     监测数据
-     * @param  string             $empi      居民主索引
-     * @param  string             $metricId  指标ID
+     * @param array<int, array> $items 监测数据
+     * @param string $empi 居民主索引
+     * @param string $metricId 指标ID
+     *
      * @return array<int, array>
      */
     public function attachWarningToItems(array $items, string $empi, string $metricId): array
@@ -561,6 +565,128 @@ class ResidentMetricService extends BaseService
 
             $item['warning'] = $this->matchWarning($value, $rules, $fillDate, $birthDate, $gender);
         }
+
+        return $items;
+    }
+
+    /**
+     * 为监测趋势数据批量附加预警信息 + 同批次指标
+     *
+     * 内部完成：附加预警 → 附加同批次指标及预警
+     *
+     * @param array<int, array> $items 监测数据
+     * @param string $empi 居民主索引
+     * @param string $metricId 指标ID
+     *
+     * @return array<int, array>
+     */
+    public function attachBatchAndWarnings(array $items, string $empi, string $metricId): array
+    {
+        $items = $this->attachWarningToItems($items, $empi, $metricId);
+
+        return $this->attachBatchMetricsToItems($items, $empi);
+    }
+
+    /**
+     * 为监测趋势数据附加同批次指标
+     *
+     * 同一批次上传（相同 bsns_no）中的其他指标会作为 batch 数组附加到每条记录上，
+     * batch 中的每条指标也会计算对应的预警信息。
+     *
+     * @param array<int, array> $items 监测数据（需包含 id、bsns_no 字段）
+     * @param string $empi 居民主索引
+     *
+     * @return array<int, array>
+     */
+    public function attachBatchMetricsToItems(array $items, string $empi, bool $withWarning = true): array
+    {
+        $items = BetterArr::toArray($items);
+
+        // 收集所有非空 bsns_no
+        $bsnsNos = array_values(array_filter(array_unique(array_column($items, 'bsns_no'))));
+        if (empty($bsnsNos)) {
+            return $items;
+        }
+
+        // 获取数据库连接
+        if (!empty($baselineDbConfig = config('low-code.bmo-baseline.database.default'))) {
+            $connection = DBQuery::connection($baselineDbConfig)->getConnection()->table('personal_archive');
+        } else {
+            $connection = CrowdConnection::table('personal_archive');
+        }
+
+        $batchRecords = $connection
+            ->whereIn('bsns_no', $bsnsNos)
+            ->where('empi', $empi)
+            ->select(['id', 'col_name', 'col_value', 'fill_date', 'bsns_no'])
+            ->get()
+            ->toArray();
+
+        // 按 bsns_no 分组
+        $grouped = [];
+        foreach ($batchRecords as $record) {
+            $record = (array) $record;
+            $bsnsNo = $record['bsns_no'] ?? '';
+            if (empty($bsnsNo)) {
+                continue;
+            }
+            $grouped[$bsnsNo][] = $record;
+        }
+
+        // 获取患者人口学信息（一次）
+        $residentBirthDate = null;
+        $residentGender = null;
+        $rules = [];
+
+        if ($withWarning) {
+            $demographic = $this->resolvePatientDemographic($empi);
+            $residentBirthDate = $demographic['bth_dt'] ?? null;
+            $residentGender = $demographic['gender'] ?? null;
+
+            // 获取预警规则
+            $distinctColNames = array_values(array_filter(array_unique(array_column($batchRecords, 'col_name'))));
+            $rules = !empty($distinctColNames) ? $this->getVitalsWarningRules($distinctColNames) : [];
+        }
+
+        // 为每条主记录附加同批次指标
+        foreach ($items as &$item) {
+            $bsnsNo = $item['bsns_no'] ?? '';
+            $itemId = $item['id'] ?? 0;
+
+            if (empty($bsnsNo) || !isset($grouped[$bsnsNo])) {
+                $item['batch'] = null;
+                continue;
+            }
+
+            $batch = [];
+            foreach ($grouped[$bsnsNo] as $sibling) {
+                if (($sibling['id'] ?? 0) == $itemId) {
+                    continue;
+                }
+
+                $colName = $sibling['col_name'] ?? '';
+                $value = (float) ($sibling['col_value'] ?? 0);
+                $fillDate = (string) ($sibling['fill_date'] ?? '');
+
+                $warning = null;
+                if ($withWarning) {
+                    $warning = $this->matchFieldWarning(
+                        $colName, $value, $rules,
+                        $fillDate, $residentBirthDate, $residentGender
+                    );
+                }
+
+                $batch[] = [
+                    'id' => $sibling['id'] ?? 0,
+                    'metric_id' => $colName,
+                    'value' => (string) ($sibling['col_value'] ?? ''),
+                    'warning' => $warning,
+                ];
+            }
+
+            $item['batch'] = !empty($batch) ? $batch : null;
+        }
+        unset($item);
 
         return $items;
     }
@@ -596,6 +722,29 @@ class ResidentMetricService extends BaseService
     }
 
     /**
+     * 获取单条监测指标详情
+     *
+     * @param int $id 指标记录ID
+     *
+     * @return array<string, mixed>|null
+     */
+    public function getMonitorTrendDetail(int $id): ?array
+    {
+        if (!empty($baselineDbConfig = config('low-code.bmo-baseline.database.default'))) {
+            $connection = DBQuery::connection($baselineDbConfig)->getConnection()->table('personal_archive');
+        } else {
+            $connection = CrowdConnection::table('personal_archive');
+        }
+
+        $record = $connection
+            ->where('id', $id)
+            ->select(['id', 'col_value', 'fill_date', 'data_source', 'bsns_no', 'col_name', 'empi'])
+            ->first();
+
+        return $record ? (array) $record : null;
+    }
+
+    /**
      * 获取来自业务的监测指标趋势（分页）
      */
     public function getMonitorTrendListByBusiness(
@@ -618,7 +767,7 @@ class ResidentMetricService extends BaseService
             ->where('col_name', $metricId)
             ->where('empi', $empi)
             ->whereBetweenDate('fill_date', $minDate, $maxDate, forceFullDay: true)
-            ->select(['col_value', 'fill_date', 'data_source'])
+            ->select(['id', 'col_value', 'fill_date', 'data_source', 'bsns_no'])
             ->orderBy('fill_date', $sort)
             ->customPaginate(true);
     }
@@ -629,8 +778,8 @@ class ResidentMetricService extends BaseService
     public function getMonitorTrendListByUpstream(
         string $empi,
         string $metricId,
-        string|Carbon|null $minDate = null,
-        string|Carbon|null $maxDate = null,
+        string|Carbon|null $minDate,
+        string|Carbon|null $maxDate,
         array $metricConfig,
         string $sort = 'desc',
     ): mixed {

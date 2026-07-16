@@ -8,10 +8,12 @@ use BrightLiu\LowCode\Context\DiseaseContext;
 use BrightLiu\LowCode\Models\Resident\ResidentMonitorMetric;
 use BrightLiu\LowCode\Requests\Resident\ResidentMetric\MonitorListRequest;
 use BrightLiu\LowCode\Requests\Resident\ResidentMetric\MonitorTrendCountRequest;
+use BrightLiu\LowCode\Requests\Resident\ResidentMetric\MonitorTrendDetailsRequest;
 use BrightLiu\LowCode\Requests\Resident\ResidentMetric\MonitorTrendItemsRequest;
 use BrightLiu\LowCode\Requests\Resident\ResidentMetric\MonitorTrendListRequest;
 use BrightLiu\LowCode\Requests\Resident\ResidentMetric\SaveMonitorRequest;
 use BrightLiu\LowCode\Resources\Resident\ResidentMetric\MonitorListResource;
+use BrightLiu\LowCode\Resources\Resident\ResidentMetric\MonitorTrendDetailsResource;
 use BrightLiu\LowCode\Resources\Resident\ResidentMetric\MonitorTrendItemsResource;
 use BrightLiu\LowCode\Resources\Resident\ResidentMetric\MonitorTrendListResource;
 use BrightLiu\LowCode\Resources\Resident\ResidentMetric\OptionalResource;
@@ -159,6 +161,12 @@ class ResidentMetricController extends BaseController
         // 排序方式：asc 升序、desc 降序，默认降序
         $sort = (string) $request->input('sort', 'desc');
 
+        // 是否获取同批次指标
+        $withBatch = (bool) $request->input('with_batch', false);
+
+        // 是否获取预警信息
+        $withWarning = (bool) $request->input('with_warning', false);
+
         try {
             $srv = ResidentMetricService::make();
 
@@ -171,10 +179,17 @@ class ResidentMetricController extends BaseController
                 sort: $sort,
             );
 
-            // 附加预警信息（分页对象转数组 → 处理 → 塞回分页）
-            $data->setCollection(collect(
-                $srv->attachWarningToItems($data->getCollection()->toArray(), $empi, $metricId)
-            ));
+            $items = BetterArr::toArray($data->getCollection());
+
+            if ($withWarning) {
+                $items = $srv->attachWarningToItems($items, $empi, $metricId);
+            }
+
+            if ($withBatch) {
+                $items = $srv->attachBatchMetricsToItems($items, $empi, $withWarning);
+            }
+
+            $data->setCollection(collect($items));
         } catch (\Throwable $e) {
             logs()->error('获取居民监测指标趋势分页失败', [
                 'empi' => $empi,
@@ -188,6 +203,49 @@ class ResidentMetricController extends BaseController
         }
 
         return $this->responseData($data, MonitorTrendListResource::class);
+    }
+
+    /**
+     * 监测指标趋势详情
+     */
+    public function monitorTrendDetails(MonitorTrendDetailsRequest $request): JsonResponse
+    {
+        $id = (int) $request->input('id', 0);
+
+        // 是否获取同批次指标
+        $withBatch = (bool) $request->input('with_batch', false);
+
+        // 是否获取预警信息
+        $withWarning = (bool) $request->input('with_warning', false);
+
+        try {
+            $srv = ResidentMetricService::make();
+
+            $details = $srv->getMonitorTrendDetail($id);
+            if (empty($details)) {
+                return $this->responseError('指标记录不存在');
+            }
+
+            if ($withWarning) {
+                $empi = (string) ($details['empi'] ?? '');
+                $metricId = (string) ($details['col_name'] ?? '');
+                [0 => $details] = $srv->attachWarningToItems([$details], $empi, $metricId);
+            }
+
+            if ($withBatch) {
+                $empi = (string) ($details['empi'] ?? '');
+                [0 => $details] = $srv->attachBatchMetricsToItems([$details], $empi, $withWarning);
+            }
+        } catch (\Throwable $e) {
+            logs()->error('获取居民监测指标趋势详情失败', [
+                'id' => $id,
+                'error_msg' => $e->getMessage(),
+            ]);
+
+            return $this->responseError('获取居民监测指标趋势详情失败');
+        }
+
+        return $this->responseData($details, MonitorTrendDetailsResource::class);
     }
 
     /**

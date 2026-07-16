@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 
-class MonitorTrendListResource extends JsonResource
+class MonitorTrendDetailsResource extends JsonResource
 {
     /**
      * @param Request $request

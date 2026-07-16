@@ -17,6 +17,8 @@ class MonitorTrendListRequest extends BaseRequest
             'date_range.0' => ['bail', 'nullable', 'date_format:Y-m-d'],
             'date_range.1' => ['bail', 'nullable', 'date_format:Y-m-d'],
             'sort' => ['bail', 'nullable', 'string', 'in:asc,desc'],
+            'with_batch' => ['bail', 'nullable', 'boolean'],
+            'with_warning' => ['bail', 'nullable', 'boolean'],
         ];
     }
 
@@ -27,6 +29,9 @@ class MonitorTrendListRequest extends BaseRequest
             'metric_id' => '指标ID',
             'date_range' => '时间范围',
             'sort' => '排序方式',
+            'with_batch' => '是否获取同批次指标',
+            'with_warning' => '是否获取预警信息',
         ];
     }
+
 }
