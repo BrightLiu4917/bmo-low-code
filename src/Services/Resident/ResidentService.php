@@ -184,7 +184,17 @@ class ResidentService extends BaseService
             $dataSource
         );
 
-        silence_event(new ResidentInfoUpdated($empi, $attributes, (array) $this->getAdmin(), $updatedAt));
+        silence_event(new ResidentInfoUpdated(
+            empi: $empi,
+            attributes: $attributes,
+            operator: (array) $this->getAdmin(),
+            updatedAt: $updatedAt,
+            context: [
+                'disease_code' => $this->getDiseaseCode(),
+                'scene_code'   => $this->getSceneCode(),
+                'org_code'     => $this->getOrgCode(),
+            ],
+        ));
     }
 
     /**

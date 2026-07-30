@@ -231,6 +231,26 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
     }
 
     /**
+     * 触发体征指标预警监测
+     *
+     * @param  string  $empi  患者 empi
+     * @param  array<int, array{name: string, value: string, create_time: string}>  $vitals  体征指标列表
+     * @return void
+     */
+    public function warningCheck(string $empi, array $vitals): void
+    {
+        Http::asJson()->timeout(5)->post(
+            $this->baseUriVia() . 'innerapi/patient/metrics/warningCheck',
+            [
+                'patient_id'  => $empi,
+                'vitals_list' => $vitals,
+                'scene_code' => $this->getSceneCode(),
+                'disease_code' => $this->getDiseaseCode(),
+            ]
+        );
+    }
+
+    /**
      * 获取专病场景健康看板字段分组配置
      *
      * @param  string $configKey 配置项 key

@@ -13,7 +13,8 @@ class ResidentInfoUpdated
         public readonly string $empi,
         public readonly array $attributes,
         public readonly array $operator = [],
-        public readonly string $updatedAt = ''
+        public readonly string $updatedAt = '',
+        public readonly array $context = [],
     ) {
     }
 
