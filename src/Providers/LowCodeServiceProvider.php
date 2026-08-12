@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Route;
 use BrightLiu\LowCode\Console\Commands\PublishDataPermissionsCommand;
 use BrightLiu\LowCode\Console\Commands\RefreshAdminPreferenceCommand;
+use BrightLiu\LowCode\Events\Resident\ResidentInfoUpdated;
+use BrightLiu\LowCode\Listeners\Resident\PlatformWarningCheckListener;
+use Illuminate\Support\Facades\Event;
 
 class LowCodeServiceProvider extends ServiceProvider
 {
@@ -54,6 +57,11 @@ class LowCodeServiceProvider extends ServiceProvider
         $this->publishResources();
 
         $this->registerModuleRoutes();
+
+        Event::listen(
+            ResidentInfoUpdated::class,
+            [PlatformWarningCheckListener::class, '__invoke']
+        );
     }
 
     /**
