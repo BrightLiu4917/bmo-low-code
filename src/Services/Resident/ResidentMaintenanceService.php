@@ -9,6 +9,7 @@ use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Imports\ResidentMaintenance\ResidentImport;
 use BrightLiu\LowCode\Services\BmpCheetahMedicalCrowdkitApiService;
 use BrightLiu\LowCode\Services\LowCode\DatabaseSourceService;
+use BrightLiu\LowCode\Tools\Human;
 use BrightLiu\LowCode\Traits\Context\WithContext;
 use Gupo\BetterLaravel\Exceptions\ServiceException;
 use Gupo\BetterLaravel\Service\BaseService;
@@ -39,6 +40,9 @@ final class ResidentMaintenanceService extends BaseService
             throw new ServiceException('参数错误');
         }
 
+        // 补全人口学字段（性别、出生日期、年龄），缺失时根据身份证号解析
+        $data = $this->fillDemographic($data);
+
         $query = $this->query($connection = $this->connection());
 
         if (empty($psnTable = config('low-code.bmo-baseline.database.crowd-psn-wdth-table'))) {
@@ -61,6 +65,53 @@ final class ResidentMaintenanceService extends BaseService
             Logger::LARAVEL->error('导入失败：' . $e->getMessage());
             throw new ServiceException('数据格式不正确');
         }
+    }
+
+    /**
+     * 补全人口学字段（性别、出生日期、年龄）
+     *
+     * 判断 $data 中是否存在 gdr_cd、bth_dt、age，若某项缺失，则根据 id_crd_no 身份证号解析补全。
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    protected function fillDemographic(array $data): array
+    {
+        $idCardNo = (string) ($data['id_crd_no'] ?? '');
+
+        if (empty($idCardNo)) {
+            return $data;
+        }
+
+        // 性别：身份证解析性别编码 1=男 0=女，映射为 gdr_cd 1=男 2=女
+        if (empty($data['gdr_cd'])) {
+            $data['gdr_cd'] = match (Human::getIdcardGenderCode($idCardNo)) {
+                1 => 1,
+                0 => 2,
+                default => $data['gdr_cd'] ?? null,
+            };
+        }
+
+        // 出生日期：身份证解析为 Y-m-d
+        if (empty($data['bth_dt'])) {
+            $birthDate = Human::getFormattedBirthDate($idCardNo);
+
+            if ('' !== $birthDate) {
+                $data['bth_dt'] = $birthDate;
+            }
+        }
+
+        // 年龄：身份证解析为周岁
+        if (empty($data['age'])) {
+            $age = Human::getIdcardAge($idCardNo);
+
+            if ($age > 0) {
+                $data['age'] = $age;
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -96,8 +147,11 @@ final class ResidentMaintenanceService extends BaseService
             // TODO: 写法待完善(需要过滤掉不存在的字段)
             $crowdSrv = BmpCheetahMedicalCrowdkitApiService::make();
 
-            $data->chunk(100)->each(function ($data) use ($crowdSrv) {
-                $crowdSrv->createPatients($data->toArray(), manageOrgCode: (string) $this->getAffiliatedOrgCode());
+            $data->chunk(100)->each(function ($chunk) use ($crowdSrv) {
+                // 补全人口学字段（性别、出生日期、年龄），缺失时根据身份证号解析
+                $rows = $chunk->map(fn ($row) => $this->fillDemographic($row))->toArray();
+
+                $crowdSrv->createPatients($rows, manageOrgCode: (string) $this->getAffiliatedOrgCode());
             });
         } catch (\Throwable $e) {
             Logger::LARAVEL->error('导入失败：' . $e->getMessage());
