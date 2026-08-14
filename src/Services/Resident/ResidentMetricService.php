@@ -171,7 +171,8 @@ class ResidentMetricService extends BaseService
         string $metricId,
         string|Carbon|null $minDate = null,
         string|Carbon|null $maxDate = null,
-        int $limit = 0
+        int $limit = 0,
+        string $sort = 'asc',
     ): array {
         $metricConfig = null;
         if (config('low-code.resident-archive.metric-from-upstream-enabled', false)) {
@@ -185,10 +186,10 @@ class ResidentMetricService extends BaseService
         return match (true) {
             // 存在指标配置时，为上游指标
             !is_null($metricConfig) => $this->getMonitorTrendItemsByUpstream(
-                $empi, $metricId, $minDate, $maxDate, $limit, $metricConfig
+                $empi, $metricId, $minDate, $maxDate, $limit, $metricConfig, $sort
             ),
             default => $this->getMonitorTrendItemsByBusiness(
-                $empi, $metricId, $minDate, $maxDate, $limit
+                $empi, $metricId, $minDate, $maxDate, $limit, $sort
             ),
         };
     }
@@ -301,7 +302,8 @@ class ResidentMetricService extends BaseService
         string $metricId,
         string|Carbon|null $minDate = null,
         string|Carbon|null $maxDate = null,
-        int $limit = 0
+        int $limit = 0,
+        string $sort = 'asc',
     ): array {
         $connection = null;
 
@@ -316,9 +318,9 @@ class ResidentMetricService extends BaseService
             ->where('col_name', $metricId)
             ->where('empi', $empi)
             ->whereBetweenDate('fill_date', $minDate, $maxDate, forceFullDay: true)
+            ->orderBy('fill_date', $sort)
             ->when($limit > 0, fn ($query) => $query->limit($limit))
             ->get(['col_value', 'fill_date', 'data_source'])
-            ->sortBy('fill_date')
             ->toArray();
     }
 
@@ -331,7 +333,8 @@ class ResidentMetricService extends BaseService
         string|Carbon|null $minDate,
         string|Carbon|null $maxDate,
         int $limit,
-        array $metricConfig
+        array $metricConfig,
+        string $sort = 'asc',
     ): array {
         // 根据empi获取身份证号
         $cardNo = null;
@@ -359,9 +362,9 @@ class ResidentMetricService extends BaseService
                 ->when(!empty($minDate) && !empty($maxDate), fn ($query) => $query
                     ->whereBetween($businessDateField, [Carbon::make($minDate)->startOfDay(), Carbon::make($maxDate)->endOfDay()])
                 )
+                ->orderBy($businessDateField, $sort)
                 ->when($limit > 0, fn ($query) => $query->limit($limit))
                 ->get(["{$businessDateField} as fill_date", "{$columnName} as col_value"])
-                ->sortBy($businessDateField)
                 ->toArray();
         }
 
@@ -371,9 +374,9 @@ class ResidentMetricService extends BaseService
             ->when(!empty($minDate) && !empty($maxDate), fn ($query) => $query
                 ->whereBetween($businessDateField, [Carbon::make($minDate)->startOfDay(), Carbon::make($maxDate)->endOfDay()])
             )
+            ->orderBy($businessDateField, $sort)
             ->when($limit > 0, fn ($query) => $query->limit($limit))
             ->get(["{$businessDateField} as fill_date", 'item_value as col_value'])
-            ->sortBy($businessDateField)
             ->toArray();
     }
 

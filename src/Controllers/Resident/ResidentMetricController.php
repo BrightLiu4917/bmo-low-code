@@ -103,6 +103,9 @@ class ResidentMetricController extends BaseController
         // 限制条数
         $limit = (int) $request->input('limit', 0);
 
+        // 排序方式：asc 升序、desc 降序，默认升序
+        $sort = (string) $request->input('sort', 'asc');
+
         // 是否附加预警信息
         $withWarning = (bool) $request->input('with_warning', false);
 
@@ -114,7 +117,8 @@ class ResidentMetricController extends BaseController
                 metricId: $metricId,
                 minDate: $dateRangeMin,
                 maxDate: $dateRangeMax,
-                limit: $limit
+                limit: $limit,
+                sort: $sort
             );
 
             $data = BetterArr::toArray($data);
