@@ -318,7 +318,7 @@ class ResidentMetricService extends BaseService
             ->where('col_name', $metricId)
             ->where('empi', $empi)
             ->whereBetweenDate('fill_date', $minDate, $maxDate, forceFullDay: true)
-            ->orderBy('fill_date', $sort)
+            ->orderBy('fill_date', $sort ?: 'asc')
             ->when($limit > 0, fn ($query) => $query->limit($limit))
             ->get(['col_value', 'fill_date', 'data_source'])
             ->toArray();
@@ -362,7 +362,7 @@ class ResidentMetricService extends BaseService
                 ->when(!empty($minDate) && !empty($maxDate), fn ($query) => $query
                     ->whereBetween($businessDateField, [Carbon::make($minDate)->startOfDay(), Carbon::make($maxDate)->endOfDay()])
                 )
-                ->orderBy($businessDateField, $sort)
+                ->orderBy($businessDateField, $sort ?: 'asc')
                 ->when($limit > 0, fn ($query) => $query->limit($limit))
                 ->get(["{$businessDateField} as fill_date", "{$columnName} as col_value"])
                 ->toArray();
@@ -374,7 +374,7 @@ class ResidentMetricService extends BaseService
             ->when(!empty($minDate) && !empty($maxDate), fn ($query) => $query
                 ->whereBetween($businessDateField, [Carbon::make($minDate)->startOfDay(), Carbon::make($maxDate)->endOfDay()])
             )
-            ->orderBy($businessDateField, $sort)
+            ->orderBy($businessDateField, $sort ?: 'asc')
             ->when($limit > 0, fn ($query) => $query->limit($limit))
             ->get(["{$businessDateField} as fill_date", 'item_value as col_value'])
             ->toArray();
@@ -771,7 +771,7 @@ class ResidentMetricService extends BaseService
             ->where('empi', $empi)
             ->whereBetweenDate('fill_date', $minDate, $maxDate, forceFullDay: true)
             ->select(['id', 'col_value', 'fill_date', 'data_source', 'bsns_no'])
-            ->orderBy('fill_date', $sort)
+            ->orderBy('fill_date', $sort ?: 'desc')
             ->customPaginate(true);
     }
 
@@ -813,7 +813,7 @@ class ResidentMetricService extends BaseService
                     ->whereBetween($businessDateField, [Carbon::make($minDate)->startOfDay(), Carbon::make($maxDate)->endOfDay()])
                 )
                 ->select(["{$businessDateField} as fill_date", "{$columnName} as col_value"])
-                ->orderBy($businessDateField, $sort)
+                ->orderBy($businessDateField, $sort ?: 'desc')
                 ->customPaginate(true);
         }
 
@@ -824,7 +824,7 @@ class ResidentMetricService extends BaseService
                 ->whereBetween($businessDateField, [Carbon::make($minDate)->startOfDay(), Carbon::make($maxDate)->endOfDay()])
             )
             ->select(["{$businessDateField} as fill_date", 'item_value as col_value'])
-            ->orderBy($businessDateField, $sort)
+            ->orderBy($businessDateField, $sort ?: 'desc')
             ->customPaginate(true);
     }
 }
