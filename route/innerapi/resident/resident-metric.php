@@ -27,4 +27,7 @@ Route::group(['prefix' => 'v2/resident', 'middleware' => [Middleware::AUTH_DISEA
 
     Route::post('resident-metric/save-monitor', [ResidentMetricController::class, 'saveMonitor'])
         ->comment('居民-居民指标:保存监测指标项');
+
+    Route::post('resident-metric/latest-metrics', [ResidentMetricController::class, 'latestMetrics'])
+        ->comment('居民-居民指标:指标最新值与测量时间');
 });

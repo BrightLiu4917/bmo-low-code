@@ -27,6 +27,7 @@ use BrightLiu\LowCode\Traits\Context\WithOrgContext;
 use Gupo\BetterLaravel\Http\BaseController;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 /**
  * 居民指标
@@ -305,5 +306,42 @@ class ResidentMetricController extends BaseController
         $srv->saveMonitor($empi, $metricIds);
 
         return $this->responseSuccess();
+    }
+
+    /**
+     * 批量获取指标最新值与最新测量时间
+     */
+    public function latestMetrics(Request $request): JsonResponse
+    {
+        $empi = (string) $request->input('empi', '');
+
+        if (empty($empi)) {
+            return $this->responseError('empi 不能为空');
+        }
+
+        // 批量指标 id（即 personal_archive.col_name）
+        $metricIds = (array) $request->input('metric_ids', []);
+        $metricIds = array_values(array_unique(array_filter($metricIds)));
+
+        if (empty($metricIds)) {
+            return $this->responseError('metric_ids 不能为空');
+        }
+
+        if (count($metricIds) > 100) {
+            return $this->responseError('metric_ids 数量不能超过 100');
+        }
+
+        try {
+            $data = ResidentMetricService::make()->getLatestMetrics($empi, $metricIds);
+        } catch (\Throwable $e) {
+            logs()->error('批量查询指标最新值失败', [
+                'empi' => $empi,
+                'metric_ids' => $metricIds,
+                'error_msg' => $e->getMessage(),
+            ]);
+            $data = [];
+        }
+
+        return $this->responseData($data);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BrightLiu\LowCode\Services\Resident;
 
 use App\Support\Tools\BetterArr;
+use BrightLiu\LowCode\Enums\Model\Resident\DataSourceEnum;
 use BrightLiu\LowCode\Models\Resident\ResidentMonitorMetric;
 use BrightLiu\LowCode\Services\BmpCheetahMedicalCrowdkitApiService;
 use BrightLiu\LowCode\Services\BmpCheetahMedicalPlatformApiService;
@@ -826,5 +827,99 @@ class ResidentMetricService extends BaseService
             ->select(["{$businessDateField} as fill_date", 'item_value as col_value'])
             ->orderBy($businessDateField, $sort ?: 'desc')
             ->customPaginate(true);
+    }
+
+    /**
+     * 批量获取指标最新值与最新测量时间
+     *
+     * @param  string[]  $metricIds
+     * @return array<int, array{column: string, value: mixed, latest_at: ?string, data_source: ?int, data_source_name: ?string, latest_id: ?int}>
+     */
+    public function getLatestMetrics(string $empi, array $metricIds): array
+    {
+        // 指标为空直接返回
+        if (empty($metricIds)) {
+            return [];
+        }
+
+        // 档案宽表当前值（字段值来源）
+        $residentInfo = (array) ResidentService::make()->getInfo($empi);
+
+        // personal_archive 各字段最新一条记录（时间、数据来源、id）
+        $latestRecords = $this->getLatestArchiveRecords($empi, $metricIds);
+
+        // 按指标入参顺序组装返回
+        return collect($metricIds)
+            ->map(function (string $metricId) use ($residentInfo, $latestRecords) {
+                $value = $residentInfo[$metricId] ?? null;
+                $latest = $latestRecords[$metricId] ?? null;
+                $latestAt = $latest['latest_time'] ?? null;
+                $dataSource = $latest['data_source'] ?? null;
+                $dataSourceName = is_null($dataSource) ? null : DataSourceEnum::make()->translate((int) $dataSource, '');
+                $latestId = $latest['latest_id'] ?? null;
+
+                return [
+                    'column' => $metricId,
+                    'value' => $value,
+                    'latest_at' => $latestAt,
+                    'data_source' => is_null($dataSource) ? null : (int) $dataSource,
+                    'data_source_name' => $dataSourceName,
+                    'latest_id' => is_null($latestId) ? null : (int) $latestId,
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
+     * 查询 personal_archive 中各字段的最新一条记录
+     *
+     * @param  string[]  $metricIds
+     * @return array<string, array{latest_time: string, data_source: mixed, latest_id: int}> ['field_key' => ['latest_time' => ..., 'data_source' => ..., 'latest_id' => ...], ...]
+     */
+    private function getLatestArchiveRecords(string $empi, array $metricIds): array
+    {
+        if (empty($metricIds)) {
+            return [];
+        }
+
+        // 优先使用内置连接
+        if (!empty($baselineDbConfig = config('low-code.bmo-baseline.database.default'))) {
+            $query = DBQuery::connection($baselineDbConfig)->getConnection()->table('personal_archive');
+        } else {
+            $query = CrowdConnection::table('personal_archive');
+        }
+
+        // 各字段最新 fill_date（聚合查询，每字段仅一行）
+        $latestSub = (clone $query)
+            ->selectRaw('col_name, MAX(fill_date) AS max_fill_date')
+            ->where('empi', $empi)
+            ->whereIn('col_name', $metricIds)
+            ->groupBy('col_name');
+
+        // 联表取回最新记录，同时拿到该记录的 data_source
+        $latestRecords = [];
+        $query
+            ->from('personal_archive as pa')
+            ->joinSub($latestSub, 't', function ($join) {
+                $join->on('pa.col_name', '=', 't.col_name')
+                    ->on('pa.fill_date', '=', 't.max_fill_date');
+            })
+            ->where('pa.empi', $empi)
+            ->orderByDesc('pa.id')
+            ->select(['pa.col_name', 'pa.fill_date', 'pa.data_source', 'pa.id'])
+            ->get()
+            ->each(function (object $row) use (&$latestRecords) {
+                // id 降序，同字段同 fill_date 时仅保留第一条（即 id 最大的那条）
+                if (! isset($latestRecords[(string) $row->col_name])) {
+                    $latestRecords[(string) $row->col_name] = [
+                        'latest_time' => (string) $row->fill_date,
+                        'data_source' => $row->data_source,
+                        'latest_id' => (int) $row->id,
+                    ];
+                }
+            });
+
+        return $latestRecords;
     }
 }
