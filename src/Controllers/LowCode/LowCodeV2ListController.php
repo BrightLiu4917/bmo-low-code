@@ -429,4 +429,24 @@ final class LowCodeV2ListController extends BaseController
 
         return $this->responseSuccess();
     }
+
+    /**
+     * 根据 code_prefix 解析完整 list_code。
+     */
+    public function resolveListCode(Request $request): JsonResponse
+    {
+        $codePrefix = (string) $request->input('code_prefix', '');
+
+        if (empty($codePrefix)) {
+            return $this->responseError('参数错误');
+        }
+
+        $listCode = LowCodeList::query()
+            ->byContextDisease()
+            ->byContextScene()
+            ->where('code', 'like', $codePrefix.'%')
+            ->value('code');
+
+        return $this->responseData(['list_code' => (string) $listCode]);
+    }
 }
