@@ -213,9 +213,9 @@ final class InitOrgDiseaseService extends LowCodeBaseService
                     'match_rules' => json_encode($item['match_rules'] ?? ['*'], JSON_UNESCAPED_UNICODE),
                     'preset_condition_json' => json_encode($item['preset_condition_json'] ?? [], JSON_UNESCAPED_UNICODE),
                     'default_order_by_json' => json_encode($item['default_order_by_json'] ?? [], JSON_UNESCAPED_UNICODE),
+                    'template_code_selection' => ''
                 ];
 
-                // 低版本low_code_list表可能缺少template_code_selection字段，兼容处理
                 if (!empty($templateMapping['selection'])) {
                     $listItem['template_code_selection'] = $templateMapping['selection']['code'] ?? '';
                 }
