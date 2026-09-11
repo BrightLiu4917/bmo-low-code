@@ -61,6 +61,7 @@ final class LowCodeV2ListController extends BaseController
                 'parent_code',
                 'crowd_type_code',
                 'route_group',
+                'match_rules',
             ])->customPaginate(true);
 
         try {
@@ -80,7 +81,7 @@ final class LowCodeV2ListController extends BaseController
                     'created_at',
                 ])->map(fn(
                     LowCodePersonalizeModule $item,
-                ) => new LowCodeList([
+                ) => (new LowCodeList([
                     'id'          => $item->id,
                     'admin_name'  => $item->title,
                     'code'        => $item->module_id,
@@ -88,7 +89,7 @@ final class LowCodeV2ListController extends BaseController
                     'route_group' => [
                         $item->metadata['path'],
                     ],
-                ]));
+                ]))->setAttribute('metadata', $item->metadata));
 
 
             $combiSrv = LowCodeCombiService::make();
@@ -109,6 +110,10 @@ final class LowCodeV2ListController extends BaseController
                             $personalizeList,
                             $combiSrv
                         ) {
+                            if (!$this->matchPersonalizeModule($item, $personalizeModule)) {
+                                return;
+                            }
+
                             $listItem = clone $item;
 
                             // 虚拟ID，避免主键冲突
@@ -132,6 +137,58 @@ final class LowCodeV2ListController extends BaseController
         }
 
         return $this->responseData($list, SimpleListSource::class);
+    }
+
+    /**
+     * 列表与个性化模块是否匹配
+     *
+     * match_rules 为空时，按 list.route_group 与 metadata.meta.component 匹配
+     * match_rules 不为空时，按规则匹配 metadata.meta.{type}，目前支持:
+     * - title:正则表达式  按正则匹配 metadata.meta.title
+     */
+    private function matchPersonalizeModule($listItem, $personalizeModule): bool
+    {
+        // 兼容历史数据
+        if (is_null($listItem['match_rules'] ?? null)) {
+            return true;
+        }
+
+        $matchRules = array_filter((array) ($listItem['match_rules']));
+        if (empty($matchRules)) {
+            return in_array(
+                data_get($personalizeModule, 'metadata.meta.component'),
+                (array) ($listItem['route_group'] ?? []),
+                true
+            );
+        }
+
+        // 存在通配符时，直接通过
+        if (in_array('*', $matchRules)) {
+            return true;
+        }
+
+        foreach ($matchRules as $rule) {
+            if (!is_string($rule) || $rule === '') {
+                continue;
+            }
+
+            [$type, $pattern] = array_pad(explode(':', $rule, 2), 2, '');
+            if ($type === '' || $pattern === '') {
+                return false;
+            }
+
+            $subject = (string) data_get($personalizeModule, "metadata.meta.{$type}", '');
+
+            if ($pattern[0] !== '/' || substr_count($pattern, '/') < 2) {
+                $pattern = '/'.str_replace('/', '\/', $pattern).'/u';
+            }
+
+            if (@preg_match($pattern, $subject) !== 1) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

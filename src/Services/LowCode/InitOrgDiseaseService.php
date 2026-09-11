@@ -210,6 +210,7 @@ final class InitOrgDiseaseService extends LowCodeBaseService
                     'template_code_button' => $templateMapping['button']['code'] ?? '',
                     'template_code_top_button' => $templateMapping['top_button']['code'] ?? '',
                     'route_group' => json_encode($item['route_group'] ?? [], JSON_UNESCAPED_UNICODE),
+                    'match_rules' => json_encode($item['match_rules'] ?? ['*'], JSON_UNESCAPED_UNICODE),
                     'preset_condition_json' => json_encode($item['preset_condition_json'] ?? [], JSON_UNESCAPED_UNICODE),
                     'default_order_by_json' => json_encode($item['default_order_by_json'] ?? [], JSON_UNESCAPED_UNICODE),
                 ];

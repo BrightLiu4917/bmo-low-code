@@ -67,6 +67,7 @@ class LowCodeList extends LowCodeBaseModel
         // Assuming it's a string type, adjust if necessary
 
         'route_group' => 'json', // JSON DEFAULT NULL
+        'match_rules' => 'json', // JSON DEFAULT NULL
 
         'append_field_json'      => 'json', // JSON DEFAULT NULL
         'append_column_json'     => 'json', // JSON DEFAULT NULL
@@ -97,7 +98,7 @@ class LowCodeList extends LowCodeBaseModel
             "admin_weight", "family_doctor_weight", "mobile_doctor_weight",
             "crowd_type_code", "template_code_filter", "template_code_column",
             "template_code_field", "template_code_button",
-            "template_code_top_button", "route_group", "append_field_json",
+            "template_code_top_button", "route_group", "match_rules", "append_field_json",
             "append_column_json", "append_filter_json", "append_button_json",
             "append_top_button_json", "remove_field_json", "remove_filter_json",
             "remove_column_json", "remove_button_json",

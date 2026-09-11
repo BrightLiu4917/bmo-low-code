@@ -40,6 +40,7 @@ class CreateLowCodeListsTable extends Migration
 
                 // JSON 字段
                 $table->json('route_group')->nullable()->comment('前端路由组');
+                $table->json('match_rules')->nullable()->comment('匹配规则');
                 $table->json('append_field_json')->nullable()->comment('追加查询字段，模板少了');
                 $table->json('append_column_json')->nullable()->comment('追加表头，模板少了');
                 $table->json('append_filter_json')->nullable()->comment('追加筛选条件，模板少了');
