@@ -188,6 +188,14 @@ class DataPermissionService extends LowCodeBaseService
             return $this->{$handlerMethod}($permissionConfig);
         }
 
+        $permissionKey = $permissionConfig['permission_key'] ?? '';
+        if (str_starts_with($this->channel, 'org:') || str_starts_with($permissionKey, 'org:')) {
+            return $this->handleOrgPermission($permissionConfig);
+        }
+        if (str_starts_with($this->channel, 'region:') || str_starts_with($permissionKey, 'region:')) {
+            return $this->handleRegionPermission($permissionConfig);
+        }
+
         // 默认处理器
         return match ($this->channel) {
             'region' => $this->handleRegionPermission($permissionConfig),//地区
@@ -340,6 +348,9 @@ class DataPermissionService extends LowCodeBaseService
     private function formatSingleFieldPermission(array $permissionConfig): array
     {
         $permissionKey = $permissionConfig['permission_key'] ?? '';
+        if (str_starts_with($permissionKey, 'org:') || str_starts_with($permissionKey, 'region:')) {
+            $permissionKey = explode(':', $permissionKey, 2)[1] ?? $permissionKey;
+        }
         $operationSymbol = $permissionConfig['symbol'] ?? '';
         $permissionValue = $this->getChannelPermissionValue($permissionConfig);
 
