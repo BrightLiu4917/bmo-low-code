@@ -19,11 +19,13 @@ final class RoutesResource extends JsonResource
      */
     public function toArray($request)
     {
-        $metadata = $this->metadata ?? [];
+        $metadata = is_array($this->metadata ?? null) ? $this->metadata : [];
 
+        $metadata['id'] = $this->id;
         $metadata['meta']['personalize_module_id'] = $this->id;
         $metadata['meta']['query'] = [
-            'group_id' => $this->module_id ?? 0
+            'group_id' => $this->module_id ?? 0,
+            'group_ids' => $this->resource->resolveCrowdIds(),
         ];
 
         return $metadata;

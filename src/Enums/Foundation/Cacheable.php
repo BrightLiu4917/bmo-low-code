@@ -52,4 +52,9 @@ enum Cacheable: string
 
     // 行政区域编码与层级映射
     case REGION_CODE_LEVEL_MAPPING = 'lc:region_code_level_mapping';
+
+    /* --------------------------------------------------------------- */
+
+    // 全科绑定慢病场景列表
+    case CHRONIC_BIND_SCENE_LIST = 'lc:chronic_bind_scene_list';
 }

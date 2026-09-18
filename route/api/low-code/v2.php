@@ -25,6 +25,7 @@ Route::group([
         Route::get('list', [LowCodePersonalizeModuleController::class, 'list'])->comment('基础-个性化模块:列表');
         Route::get('routes', [LowCodePersonalizeModuleController::class, 'routes'])->comment('基础-个性化模块:路由');
         Route::post('save', [LowCodePersonalizeModuleController::class, 'save'])->comment('基础-个性化模块:保存');
+        Route::get('related-scenes', [LowCodePersonalizeModuleController::class, 'relatedScenes'])->comment('基础-个性化模块:获取模块关联场景');
     });
 
     // 列表v2版本

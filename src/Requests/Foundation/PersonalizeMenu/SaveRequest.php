@@ -14,7 +14,9 @@ final class SaveRequest extends BaseRequest
             'items' => ['bail', 'array'],
             'items.*.title' => ['bail', 'required', 'string', 'min:1', 'max:15'],
             'items.*.module_type' => ['bail', 'nullable', 'string'],
-            'items.*.module_id' => ['bail', 'required', 'string'],
+            'items.*.module_id' => ['bail', 'nullable', 'string'],
+            'items.*.module_ids' => ['bail', 'nullable', 'array'],
+            'items.*.module_ids.*' => ['bail', 'required'],
             'items.*.metadata' => ['bail', 'nullable', 'array'],
         ];
     }
@@ -26,6 +28,8 @@ final class SaveRequest extends BaseRequest
             'items.*.title' => '菜单项标题',
             'items.*.module_type' => '菜单项模块类型',
             'items.*.module_id' => '菜单项模块ID',
+            'items.*.module_ids' => '菜单项模块ID列表',
+            'items.*.module_ids.*' => '菜单项模块ID',
             'items.*.metadata' => '菜单项元数据',
         ];
     }

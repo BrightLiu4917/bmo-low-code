@@ -77,6 +77,8 @@ final class LowCodeV2ListController extends BaseController
                     'id',
                     'title',
                     'module_id',
+                    'module_ids',
+                    'module_meta',
                     'module_type',
                     'metadata',
                     'created_at',
@@ -85,7 +87,7 @@ final class LowCodeV2ListController extends BaseController
                 ) => new LowCodeList([
                     'id'          => $item->id,
                     'admin_name'  => $item->title,
-                    'code'        => $item->module_id,
+                    'code'        => implode(',', $item->resolveCrowdIds()),
                     'parent_code' => '',
                     'route_group' => [
                         $item->metadata['path'],
@@ -119,8 +121,9 @@ final class LowCodeV2ListController extends BaseController
                             $listItem['route_group']
                                               = $personalizeModule['route_group'];
                             $listItem['code'] = $combiSrv->combiListCode(
-                                (string)$listItem['code'],
-                                (string)$personalizeModule->code
+                                (string) $listItem['code'],
+                                (string) $personalizeModule->code,
+                                (string) $personalizeModule->id
                             );
 
                             $personalizeList->push($listItem);

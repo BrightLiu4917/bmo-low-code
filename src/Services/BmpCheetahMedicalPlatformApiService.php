@@ -6,6 +6,7 @@ namespace BrightLiu\LowCode\Services;
 
 use Gupo\BetterLaravel\Exceptions\ServiceException;
 use Illuminate\Support\Facades\Http;
+use BrightLiu\LowCode\Enums\Foundation\Cacheable;
 use BrightLiu\LowCode\Enums\Foundation\Logger;
 use BrightLiu\LowCode\Traits\Context\WithAuthContext;
 use BrightLiu\LowCode\Traits\Context\WithContext;
@@ -191,6 +192,62 @@ final class BmpCheetahMedicalPlatformApiService extends LowCodeBaseService
         )->json();
 
         return (array) data_get($respData, 'data', []);
+    }
+
+    /**
+     * 全科场景绑定的慢病场景列表
+     *
+     * @return array<int, array{disease_code: string, scene_code: string, scene_name: string}>
+     */
+    public function getChronicBindSceneList(): array
+    {
+        $diseaseCode = $this->getDiseaseCode();
+        $sceneCode = $this->getSceneCode();
+
+        try {
+            return (array) Cacheable::CHRONIC_BIND_SCENE_LIST
+                ->make([$diseaseCode, $sceneCode])
+                ->remember(3 * 60, function () use ($diseaseCode, $sceneCode) {
+                    $respData = Http::timeout(3)->get(
+                        $this->baseUriVia() . '/innerapi/settings/getChronicBindSceneList',
+                        [
+                            'disease_code' => $diseaseCode,
+                            'scene_code' => $sceneCode,
+                        ]
+                    )->json();
+
+                    return array_values(array_filter(
+                        array_map(static function ($row): array {
+                            $row = (array) $row;
+                            $known = ['disease_code', 'diseaseCode', 'scene_code', 'sceneCode', 'scene_name', 'sceneName'];
+                            $metadata = [];
+                            foreach ($row as $key => $value) {
+                                if (in_array((string) $key, $known, true)) {
+                                    continue;
+                                }
+                                $snake = strtolower((string) preg_replace('/([a-z])([A-Z])/', '$1_$2', (string) $key));
+                                $metadata[$snake] = $value;
+                            }
+
+                            return [
+                                'disease_code' => trim((string) ($row['disease_code'] ?? $row['diseaseCode'] ?? '')),
+                                'scene_code' => trim((string) ($row['scene_code'] ?? $row['sceneCode'] ?? '')),
+                                'scene_name' => trim((string) ($row['scene_name'] ?? $row['sceneName'] ?? '')),
+                                'metadata' => $metadata,
+                            ];
+                        }, (array) data_get($respData, 'data', [])),
+                        static fn (array $item) => '' !== $item['scene_code']
+                    ));
+                });
+        } catch (\Throwable $e) {
+            Logger::LARAVEL->error('获取全科绑定场景列表失败', [
+                'disease_code' => $diseaseCode,
+                'scene_code' => $sceneCode,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [];
+        }
     }
 
     /**

@@ -20,6 +20,8 @@ class CreatePersonalizeModulesTable extends Migration
                 $table->string('org_code', 64)->default('')->comment('机构编码');
                 $table->string('title', 32)->default('')->comment('标题');
                 $table->string('module_id', 32)->default('')->comment('模块ID');
+                $table->json('module_ids')->nullable()->comment('关联人群ID列表');
+                $table->json('module_meta')->nullable()->comment('模块额外信息');
                 $table->string('module_type', 32)->default('')->comment('模块类型');
 
                 // JSON 字段

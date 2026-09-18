@@ -86,9 +86,9 @@ final class LowCodeCrowdLayerController extends BaseController
         $moduleType = (string) $request->input('module_type', 'personalize_module');
 
         // 获取模块(自定义菜单)关联的人群id
-        $moduleCrowdId = 0;
+        $moduleCrowdIds = [];
         if (!empty($moduleId)) {
-            $moduleCrowdId = LowCodePersonalizeModuleService::make()->getModuleCrowdId((int) $moduleId);
+            $moduleCrowdIds = LowCodePersonalizeModuleService::make()->getModuleCrowdIds((int) $moduleId);
         }
 
         $result = [];
@@ -111,28 +111,35 @@ final class LowCodeCrowdLayerController extends BaseController
                 $customLowCodeConfig['data_permission_code'] = $defaultDataPermissionCode;
             }
 
-            $result = array_map(function ($layerId) use ($srv, $layers, $moduleCrowdId, $customLowCodeConfig) {
+            $moduleSrv = LowCodePersonalizeModuleService::make();
+            $result = array_map(function ($layerId) use ($srv, $layers, $moduleCrowdIds, $customLowCodeConfig, $moduleSrv) {
                 $layer = $layers->get($layerId);
 
                 $filters = [];
+                $listCrowdIds = [];
                 if (!empty($layer->crowd_id) && !empty($layer->personalizeModule)) {
+                    $crowdIds = $moduleSrv->resolveCrowdIdsForContext($layer->personalizeModule);
                     $filters = array_merge(
-                        // 自定义菜单关联的人群ID
-                        [['crowd_id', '=', $layer->personalizeModule->module_id]],
-
+                        // 自定义菜单关联的人群ID（单个人群仍走原逻辑）
+                        count($crowdIds) === 1 ? [['crowd_id', '=', $crowdIds[0]]] : [],
                         // 人群分层关联的人群ID
                         $layer->preset_filters ?? []
                     );
+                    $listCrowdIds = count($crowdIds) > 1 ? $crowdIds : [];
                 } else {
                     $filters = array_merge(
                         // 自定义菜单关联的人群ID
-                        !empty($moduleCrowdId) ? [['crowd_id', '=', $moduleCrowdId]] : [],
+                        count($moduleCrowdIds) === 1 ? [['crowd_id', '=', $moduleCrowdIds[0]]] : [],
                     );
+                    $listCrowdIds = count($moduleCrowdIds) > 1 ? $moduleCrowdIds : [];
                 }
 
                 $count = 0;
                 if (!($layerId > 0 && empty($layer))) {
-                    $count = $srv->queryCount([['filters' => $filters]], customConfig: $customLowCodeConfig);
+                    $count = $srv->queryCount([[
+                        'filters' => $filters,
+                        'list_crowd_ids' => $listCrowdIds,
+                    ]], customConfig: $customLowCodeConfig);
                 }
 
                 return [

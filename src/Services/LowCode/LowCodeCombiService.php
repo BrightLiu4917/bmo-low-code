@@ -20,7 +20,23 @@ final class LowCodeCombiService extends BaseService
                 $item['original_code'] = $item['code'];
                 $item['code'] = $exploded['code'];
 
-                $item['filters'] = array_merge($item['filters'] ?? [], [['crowd_id', '=', $exploded['crowd_id']]]);
+                $moduleId = (int) ($exploded['personalize_module_id'] ?? 0);
+                $originalCrowdIds = $exploded['crowd_ids'] ?? [];
+                if ($moduleId > 0) {
+                    $crowdIds = LowCodePersonalizeModuleService::make()->getModuleCrowdIds($moduleId);
+                } else {
+                    $crowdIds = $originalCrowdIds;
+                }
+
+                if (count($crowdIds) > 1) {
+                    // 多个人群不进入 crowd_id 条件，避免被 mergeCrowdIdFilters 与分层/filters 合成一条 in
+                    $item['list_crowd_ids'] = $crowdIds;
+                } elseif (count($crowdIds) === 1) {
+                    $item['filters'] = array_merge($item['filters'] ?? [], [['crowd_id', '=', $crowdIds[0]]]);
+                } elseif ($moduleId > 0) {
+                    // 菜单存在，但当前病种/场景一个都匹配不上
+                    $item['filters'] = array_merge($item['filters'] ?? [], [['crowd_id', '=', '0']]);
+                }
 
                 // 过滤掉无效条件
                 if (!empty($item['filters']) && is_array($item['filters'])) {
@@ -115,16 +131,27 @@ final class LowCodeCombiService extends BaseService
         $mapping = [];
 
         foreach ($codes as $code) {
-            $exploded = explode('#', $code);
+            $exploded = explode('#', (string) $code, 3);
+            $crowdIds = array_values(array_unique(array_filter(
+                array_map(static fn ($id) => trim((string) $id), explode(',', (string) ($exploded[1] ?? ''))),
+                static fn (string $id) => '' !== $id
+            )));
 
-            $mapping[] = ['code' => $exploded[0] ?? '', 'crowd_id' => $exploded[1] ?? ''];
+            $mapping[] = [
+                'code' => $exploded[0] ?? '',
+                'crowd_id' => $crowdIds[0] ?? '',
+                'crowd_ids' => $crowdIds,
+                'personalize_module_id' => trim((string) ($exploded[2] ?? '')),
+            ];
         }
 
         return $mapping;
     }
 
-    public function combiListCode(string $code, string $crowdId): string
+    public function combiListCode(string $code, string $crowdId, string $moduleId = ''): string
     {
-        return "{$code}#{$crowdId}";
+        $combined = "{$code}#{$crowdId}";
+
+        return '' !== $moduleId ? "{$combined}#{$moduleId}" : $combined;
     }
 }

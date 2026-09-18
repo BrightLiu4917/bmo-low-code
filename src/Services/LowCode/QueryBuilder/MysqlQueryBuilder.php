@@ -239,6 +239,32 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
     public function applyFilters(array $filters): void
     {
         $this->queryEngine->whereMixed($this->transformCrowdIntersectionFilters($filters));
+        $this->applyListCrowdIdsFilter();
+    }
+
+    /**
+     * 列表自身关联的多个人群：内部 OR，与 filters / 分层的 crowd_id 保持 AND。
+     * 单个人群仍走原有 crowd_id 条件，不经过这里。
+     */
+    protected function applyListCrowdIdsFilter(): void
+    {
+        $groupIds = array_values(array_unique(array_filter(
+            array_map(static fn ($id) => trim((string) $id), (array) ($this->queryParams['list_crowd_ids'] ?? [])),
+            static fn (string $id) => '' !== $id
+        )));
+        if ($groupIds === []) {
+            return;
+        }
+
+        $outerEmpi = $this->recommendJoinEmpi('t2.empi');
+        $crowdTypeTable = config('low-code.bmo-baseline.database.crowd-type-table', 'feature_user_detail');
+
+        $this->queryEngine->getQueryBuilder()->whereExists(function (Builder $subQuery) use ($crowdTypeTable, $outerEmpi, $groupIds) {
+            $subQuery->from($crowdTypeTable . ' as t_list_crowd')
+                ->selectRaw('1')
+                ->whereRaw('t_list_crowd.empi = ' . $outerEmpi)
+                ->whereIn('t_list_crowd.group_id', $groupIds);
+        });
     }
 
     /**
