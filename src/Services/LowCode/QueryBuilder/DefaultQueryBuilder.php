@@ -73,9 +73,7 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
             $this->setFilters($filters);
 
             // 应用过滤条件
-            if (!empty($filters)) {
-                $this->applyFilters($filters);
-            }
+            $this->applyFilters($filters);
 
             // 处理自定义搜索动作
             if (!empty($searchActions)) {
@@ -222,6 +220,10 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
      */
     public function applyFilters(array $filters): void
     {
+        if (empty($filters)) {
+            return;
+        }
+
         // 提交 QueryEngine 处理混合查询条件
         /** @var QueryEngineService $mixedQueryEngine */
         $mixedQueryEngine = tap(

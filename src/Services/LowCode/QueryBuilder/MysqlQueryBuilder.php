@@ -238,7 +238,10 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
      */
     public function applyFilters(array $filters): void
     {
-        $this->queryEngine->whereMixed($this->transformCrowdIntersectionFilters($filters));
+        if (!empty($filters)) {
+            $this->queryEngine->whereMixed($this->transformCrowdIntersectionFilters($filters));
+        }
+
         $this->applyListCrowdIdsFilter();
     }
 
