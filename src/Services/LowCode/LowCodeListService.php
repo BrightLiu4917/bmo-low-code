@@ -389,12 +389,6 @@ class LowCodeListService extends LowCodeBaseService
                 $filters[$crowdIdIndex] = ['t3.group_id', $conditionOfCrowd[1] ?? '=', $conditionOfCrowd[2]];
             }
 
-            // 查询前置准备
-            $queryEngine->useTable($crowdTable . ' as t3')
-                ->innerJoin($widthTable . ' as t1', 't3.empi', '=', 't1.empi')
-                ->leftJoin($bizSceneTable . ' as t2', 't3.empi', '=', 't2.empi')
-                ->select(['t2.*', 't1.*']);
-
             // 安全合并预设条件
             $presetCondition = $config['preset_condition_json'] ?? [];
             if (!empty($presetCondition)) {
@@ -403,6 +397,34 @@ class LowCodeListService extends LowCodeBaseService
                     array_filter($presetCondition)
                 );
             }
+
+            // 同一患者在 feature_user_detail 有多行时，直接 join 会把 empi 乘开。
+            // 先按 empi 收成一行，人群条件放进子查询；外层仍用 t3.empi 关联宽表和场景表。
+            [$crowdFilters, $filters] = $this->partitionFeatureDetailFilters($filters);
+            $qualifiedCrowdTable = $queryEngine->database !== ''
+                ? $queryEngine->database.'.'.$crowdTable
+                : $crowdTable;
+
+            $queryEngine->useTable($widthTable.' as t1');
+            $crowdEmpiQuery = $queryEngine->getQueryBuilder()->newQuery()
+                ->from($qualifiedCrowdTable.' as t3')
+                ->select('t3.empi')
+                ->groupBy('t3.empi');
+
+            if ($crowdFilters !== []) {
+                $crowdEmpiQuery = tap(
+                    QueryEngineService::make(),
+                    function (QueryEngineService $query) use ($crowdEmpiQuery, $crowdFilters) {
+                        $query->setQueryBuilder($crowdEmpiQuery);
+                        $query->whereMixed($crowdFilters);
+                    }
+                )->getQueryBuilder();
+            }
+
+            $queryEngine->getQueryBuilder()->fromSub($crowdEmpiQuery, 't3');
+            $queryEngine->innerJoin($widthTable.' as t1', 't3.empi', '=', 't1.empi')
+                ->leftJoin($bizSceneTable.' as t2', 't3.empi', '=', 't2.empi')
+                ->select(['t2.*', 't1.*']);
 
             if (!empty($filters)) {
                 // 提交 QueryEngine 处理混合查询条件
@@ -483,5 +505,45 @@ class LowCodeListService extends LowCodeBaseService
         }
 
         return (string) ($firstList->data_permission_code ?? '');
+    }
+
+    /**
+     * 拆出引用人群明细表 t3 的条件。这些条件要在按 empi 去重之前生效。
+     *
+     * @return array{0: array, 1: array}
+     */
+    private function partitionFeatureDetailFilters(array $filters): array
+    {
+        $crowdFilters = [];
+        $otherFilters = [];
+
+        foreach ($filters as $filter) {
+            if ($this->filterReferencesAlias($filter, 't3')) {
+                $crowdFilters[] = $filter;
+            } else {
+                $otherFilters[] = $filter;
+            }
+        }
+
+        return [$crowdFilters, $otherFilters];
+    }
+
+    private function filterReferencesAlias(mixed $filter, string $alias): bool
+    {
+        if (is_string($filter)) {
+            return str_contains($filter, $alias.'.') || str_contains($filter, '`'.$alias.'`.');
+        }
+
+        if (!is_array($filter)) {
+            return false;
+        }
+
+        foreach ($filter as $item) {
+            if ($this->filterReferencesAlias($item, $alias)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
