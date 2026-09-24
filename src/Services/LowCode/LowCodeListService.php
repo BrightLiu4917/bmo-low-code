@@ -419,6 +419,28 @@ class LowCodeListService extends LowCodeBaseService
                         $query->whereMixed($crowdFilters);
                     }
                 )->getQueryBuilder();
+
+                // 多个 group_id 收成的 in 在这里是或。按 empi 分组后要求命中全部人群，变成并且。
+                $crowdGroupIds = [];
+                foreach ($crowdFilters as $crowdFilter) {
+                    if (!is_array($crowdFilter) || ($crowdFilter[0] ?? '') !== 't3.group_id') {
+                        continue;
+                    }
+                    $operator = mb_strtolower((string) ($crowdFilter[1] ?? ''));
+                    $value = $crowdFilter[2] ?? null;
+                    if ('in' === $operator && is_array($value)) {
+                        foreach ($value as $groupId) {
+                            if ('' !== $groupId && null !== $groupId) {
+                                $crowdGroupIds[(string) $groupId] = true;
+                            }
+                        }
+                    } elseif ('=' === $operator && '' !== $value && null !== $value && !is_array($value)) {
+                        $crowdGroupIds[(string) $value] = true;
+                    }
+                }
+                if (count($crowdGroupIds) > 1) {
+                    $crowdEmpiQuery->havingRaw('COUNT(DISTINCT t3.group_id) = ?', [count($crowdGroupIds)]);
+                }
             }
 
             $queryEngine->getQueryBuilder()->fromSub($crowdEmpiQuery, 't3');
