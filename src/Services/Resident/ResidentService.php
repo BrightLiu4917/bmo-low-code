@@ -30,10 +30,25 @@ class ResidentService extends BaseService
 
     /**
      * 判断居民是否存在
+     *
+     * @param  bool  $widthTable  true 查宽表，false 查场景表
      */
-    public function exists(string $empi): bool
+    public function exists(string $empi, bool $widthTable = false): bool
     {
-        return !empty(CrowdConnection::query()->where('empi', $empi)->exists());
+        if ($empi === '') {
+            return false;
+        }
+
+        if ($widthTable) {
+            $psnTable = (string) config('low-code.bmo-baseline.database.crowd-psn-wdth-table');
+            if ($psnTable === '') {
+                return false;
+            }
+
+            return (bool) CrowdConnection::table($psnTable)->where('empi', $empi)->exists();
+        }
+
+        return (bool) CrowdConnection::query()->where('empi', $empi)->exists();
     }
 
     /**
@@ -165,7 +180,7 @@ class ResidentService extends BaseService
             return;
         }
 
-        if (!$this->exists($empi)) {
+        if (!$this->exists($empi, widthTable: true)) {
             throw new ServiceException('居民不存在');
         }
 
