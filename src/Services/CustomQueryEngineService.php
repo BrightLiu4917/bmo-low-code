@@ -48,7 +48,7 @@ class CustomQueryEngineService extends QueryEngineService
      * PS：重写父类方法，使用自定义分页逻辑。拆解分页列表查询、分页count查询，分别做优化。
      *
      * @param bool $isSimplePaginate 是否使用简单分页
-     * @param array $columns 查询列，默认查询宽表和场景表所有列（t1.*, t2.*）
+     * @param array $columns 查询列，默认 t1.*、t2.*，同名 empi 取场景表 t2.empi
      * @param bool $forceAppender 是否强制使用完整的Appender
      * @param array $customAppenders 自定义追加器列表
      *
@@ -151,7 +151,7 @@ class CustomQueryEngineService extends QueryEngineService
             return collect();
         }
 
-        $columns = $columns ?: ['t1.*', 't2.*'];
+        $columns = $columns ?: ['t1.*', 't2.*', DB::raw('t2.empi as empi')];
 
         $queryEngine = clone $this->customQueryOptions['query_engine'];
         $bizSceneTable = $this->customQueryOptions['biz_scene_table'];
