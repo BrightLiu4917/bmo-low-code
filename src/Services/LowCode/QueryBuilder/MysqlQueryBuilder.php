@@ -206,7 +206,7 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
         } elseif ($hasBizScene && $hasWidthTable) {
             $this->queryEngine->useTable($this->recommendIndex($bizSceneTable, 't2'))
                 ->rightJoin($this->recommendIndex($widthTable, 't1'), 't2.empi', '=', 't1.empi')
-                ->select([DB::raw(sprintf('DISTINCT(%s)', $this->recommendSortEmpi('t2.empi')))]);
+                ->select([DB::raw(sprintf('DISTINCT(%s)', 't1.empi'))]);
         } elseif ($hasCrowdType && $hasWidthTable) {
             $this->queryEngine->useTable($this->recommendIndex($widthTable, 't1'))
                 ->leftJoin($this->recommendIndex($crowdTypeTable, 't3'), 't1.empi', '=', 't3.empi')
@@ -446,8 +446,8 @@ class MysqlQueryBuilder extends DefaultQueryBuilder implements ILowCodeQueryBuil
     {
         return match (true) {
             $this->hasCrowdType => 't3.empi',
-            $this->hasBizScene => 't2.empi',
             $this->hasWidthTable => 't1.empi',
+            $this->hasBizScene => 't2.empi',
             default => $default
         };
     }

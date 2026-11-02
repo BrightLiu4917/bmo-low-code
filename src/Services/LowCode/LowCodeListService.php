@@ -394,7 +394,7 @@ class LowCodeListService extends LowCodeBaseService
             $queryEngine->useTable($crowdTable . ' as t3')
                 ->innerJoin($widthTable . ' as t1', 't3.empi', '=', 't1.empi')
                 ->leftJoin($bizSceneTable . ' as t2', 't3.empi', '=', 't2.empi')
-                ->select(['t2.*', 't1.*', DB::raw('t2.empi as empi')]);
+                ->select(['t2.*', 't1.*', DB::raw('t1.empi as empi')]);
 
             // 安全合并预设条件
             $presetCondition = $config['preset_condition_json'] ?? [];

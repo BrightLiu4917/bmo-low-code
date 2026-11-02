@@ -151,7 +151,7 @@ class CustomQueryEngineService extends QueryEngineService
             return collect();
         }
 
-        $columns = $columns ?: ['t1.*', 't2.*', DB::raw('t2.empi as empi')];
+        $columns = $columns ?: ['t1.*', 't2.*', DB::raw('t1.empi as empi')];
 
         $queryEngine = clone $this->customQueryOptions['query_engine'];
         $bizSceneTable = $this->customQueryOptions['biz_scene_table'];
