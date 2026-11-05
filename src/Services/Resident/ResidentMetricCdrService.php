@@ -69,7 +69,7 @@ class ResidentMetricCdrService extends BaseService
             return [];
         }
 
-        $orgCode = $this->getOrgCode();
+        $orgCode = $this->getAffiliatedOrgCode();
         if ($orgCode === '') {
             return [];
         }
