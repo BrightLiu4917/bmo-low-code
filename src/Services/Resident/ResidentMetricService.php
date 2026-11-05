@@ -184,7 +184,7 @@ class ResidentMetricService extends BaseService
             $metricConfig = $personalArchiveFields[$metricId] ?? null;
         }
 
-        return match (true) {
+        $rows = match (true) {
             // 存在指标配置时，为上游指标
             !is_null($metricConfig) => $this->getMonitorTrendItemsByUpstream(
                 $empi, $metricId, $minDate, $maxDate, $limit, $metricConfig, $sort
@@ -193,6 +193,17 @@ class ResidentMetricService extends BaseService
                 $empi, $metricId, $minDate, $maxDate, $limit, $sort
             ),
         };
+
+        // limit 只限制原查询，合并 CDR 后不再截断
+        $cdrSrv = ResidentMetricCdrService::make();
+        if ($cdrSrv->enabled()) {
+            $cdrRows = $cdrSrv->getRows($empi, $metricId, $minDate, $maxDate);
+            if ($cdrRows !== []) {
+                $rows = $cdrSrv->merge($rows, $cdrRows, $sort ?: 'asc');
+            }
+        }
+
+        return $rows;
     }
 
     /**
@@ -213,7 +224,7 @@ class ResidentMetricService extends BaseService
             $metricConfig = $personalArchiveFields[$metricId] ?? null;
         }
 
-        return match (true) {
+        $count = match (true) {
             // 存在指标配置时，为上游指标
             !is_null($metricConfig) => $this->getMonitorTrendCountByUpstream(
                 $empi, $metricId, $minDate, $maxDate, $metricConfig
@@ -222,6 +233,13 @@ class ResidentMetricService extends BaseService
                 $empi, $metricId, $minDate, $maxDate
             ),
         };
+
+        $cdrSrv = ResidentMetricCdrService::make();
+        if ($cdrSrv->enabled()) {
+            $count += $cdrSrv->getCount($empi, $metricId, $minDate, $maxDate);
+        }
+
+        return $count;
     }
 
     /**
@@ -714,7 +732,7 @@ class ResidentMetricService extends BaseService
             $metricConfig = $personalArchiveFields[$metricId] ?? null;
         }
 
-        return match (true) {
+        $page = match (true) {
             // 存在指标配置时，为上游指标
             !is_null($metricConfig) => $this->getMonitorTrendListByUpstream(
                 $empi, $metricId, $minDate, $maxDate, $metricConfig, $sort
@@ -723,6 +741,19 @@ class ResidentMetricService extends BaseService
                 $empi, $metricId, $minDate, $maxDate, $sort
             ),
         };
+
+        // 合并到当前页。页内条数可以超过 per_page，不再重查全量或按页截断
+        $cdrSrv = ResidentMetricCdrService::make();
+        if ($cdrSrv->enabled()) {
+            $cdrRows = $cdrSrv->getRows($empi, $metricId, $minDate, $maxDate);
+            if ($cdrRows !== []) {
+                $page->setCollection(collect(
+                    $cdrSrv->merge($page->getCollection()->all(), $cdrRows, $sort ?: 'desc')
+                ));
+            }
+        }
+
+        return $page;
     }
 
     /**
@@ -848,15 +879,34 @@ class ResidentMetricService extends BaseService
         // personal_archive 各字段最新一条记录（时间、数据来源、id）
         $latestRecords = $this->getLatestArchiveRecords($empi, $metricIds);
 
+        // CDR 检验历史。单个指标失败时跳过，不影响其余字段
+        $cdrSrv = ResidentMetricCdrService::make();
+        $cdrRowsByField = $cdrSrv->enabled() ? $cdrSrv->getRowsByMetric($empi, $metricIds) : [];
+
         // 按指标入参顺序组装返回
         return collect($metricIds)
-            ->map(function (string $metricId) use ($residentInfo, $latestRecords) {
+            ->map(function (string $metricId) use ($residentInfo, $latestRecords, $cdrSrv, $cdrRowsByField) {
                 $value = $residentInfo[$metricId] ?? null;
                 $latest = $latestRecords[$metricId] ?? null;
                 $latestAt = $latest['latest_time'] ?? null;
                 $dataSource = $latest['data_source'] ?? null;
-                $dataSourceName = is_null($dataSource) ? null : DataSourceEnum::make()->translate((int) $dataSource, '');
                 $latestId = $latest['latest_id'] ?? null;
+
+                $cdrRows = $cdrRowsByField[$metricId] ?? [];
+                if ($cdrRows !== []) {
+                    $current = $cdrSrv->applyLatest([
+                        'value' => $value,
+                        'latest_at' => $latestAt,
+                        'data_source' => $dataSource,
+                        'latest_id' => $latestId,
+                    ], $cdrRows);
+                    $value = $current['value'];
+                    $latestAt = $current['latest_at'];
+                    $dataSource = $current['data_source'];
+                    $latestId = $current['latest_id'];
+                }
+
+                $dataSourceName = is_null($dataSource) ? null : DataSourceEnum::make()->translate((int) $dataSource, '');
 
                 return [
                     'column' => $metricId,

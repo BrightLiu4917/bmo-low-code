@@ -206,6 +206,9 @@ return [
             // 缓存有效期（秒），默认 30 分钟
             'ttl' => env('BLC_RESIDENT_METRIC_WARNING_RULE_CACHE_TTL', 1800),
         ],
+
+        // 是否从资源中心 CDR 补充检验历史
+        'cdr-source-enabled' => env('BLC_RESIDENT_METRIC_CDR_SOURCE_ENABLED', false),
     ],
 
     // 患者字段枚举&元信息配置

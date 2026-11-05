@@ -29,4 +29,7 @@ final class DataSourceEnum extends BaseEnum
 
     #[Message('院内采集')]
     public const IN_HOSPITAL_COLLECTION = 9;
+
+    #[Message('检验报告')]
+    public const CDR_TEST = 10;
 }

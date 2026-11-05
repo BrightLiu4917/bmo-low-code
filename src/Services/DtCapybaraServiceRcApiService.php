@@ -48,4 +48,29 @@ final class DtCapybaraServiceRcApiService extends LowCodeBaseService
                 )
             );
     }
+
+    /**
+     * 患者检验指标历史列表
+     *
+     * @throws \RuntimeException
+     */
+    public function getPatientTestResultHistory(array $params): array
+    {
+        $response = Http::asJson()
+            ->retry(2)
+            ->timeout(30)
+            ->post(
+                $this->baseUriVia().'innerapi/patient/test-result/history',
+                $params
+            )
+            ->json();
+
+        if (!is_array($response) || ($response['code'] ?? null) != 200) {
+            $message = is_array($response) ? ($response['message'] ?? null) : null;
+
+            throw new \RuntimeException((string) ($message ?: '资源中心检验历史查询失败'));
+        }
+
+        return (array) ($response['data'] ?? []);
+    }
 }
