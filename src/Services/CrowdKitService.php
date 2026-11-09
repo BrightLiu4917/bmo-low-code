@@ -97,7 +97,7 @@ final class CrowdKitService extends LowCodeBaseService
             ->map(
                 fn ($sitem) => [
                     'id' => $sitem['col_id'],
-                    'name' => $sitem['col_title'],
+                    'name' => !empty($sitem['field_short_name']) ? $sitem['field_short_name'] : $sitem['col_title'],
                     'type' => $sitem['data_type'],
                     'column' => str_replace('.', '_', $sitem['col_nm']),
 
