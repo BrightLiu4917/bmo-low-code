@@ -79,6 +79,8 @@ class ResidentMetricController extends BaseController
             $srv->enrichMonitorListWithGroupName($data);
         }
 
+        $data = $srv->sortMonitorListByVitalSigns($data);
+
         return $this->responseData([
             'items' => MonitorListResource::collection($data),
         ]);

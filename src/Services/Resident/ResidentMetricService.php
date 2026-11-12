@@ -73,6 +73,43 @@ class ResidentMetricService extends BaseService
     }
 
     /**
+     * 按机构体征指标配置顺序排列监测指标列表。
+     * 未出现在配置中的指标保持原相对顺序，排在后面。
+     */
+    public function sortMonitorListByVitalSigns(Collection $data): Collection
+    {
+        if ($data->isEmpty()) {
+            return $data;
+        }
+
+        $vitalSigns = BmpCheetahMedicalCrowdkitApiService::make()->getVitalSignsList();
+        if ([] === $vitalSigns) {
+            return $data;
+        }
+
+        $order = [];
+        foreach (array_values($vitalSigns) as $index => $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $colName = (string) ($item['col_name'] ?? '');
+            if ('' === $colName || isset($order[$colName])) {
+                continue;
+            }
+            $order[$colName] = $index;
+        }
+        if ([] === $order) {
+            return $data;
+        }
+
+        return $data->sortBy(function ($item) use ($order) {
+            $metricId = (string) ($item->metric_id ?? '');
+
+            return $order[$metricId] ?? PHP_INT_MAX;
+        })->values();
+    }
+
+    /**
      * 解析档案趋势配置中的指标 ID 列表
      */
     public function resolveArchiveTrendMetricIds(array $archiveTrendConfig): array

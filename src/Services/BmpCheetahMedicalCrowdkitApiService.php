@@ -235,6 +235,51 @@ final class BmpCheetahMedicalCrowdkitApiService extends LowCodeBaseService
         return $data['data'] ?? [];
     }
 
+    /**
+     * 机构体征指标列表，返回顺序即展示顺序
+     */
+    public function getVitalSignsList(): array
+    {
+        try {
+            $data = Http::asJson()
+                ->retry(3)
+                ->timeout(15)
+                ->get($this->baseUriVia().'innerapi/org-col/vital-signs/list', [
+                    'org_code' => $this->getOrgCode(),
+                    'sys_code' => $this->getSystemCode(),
+                    'disease_code' => $this->getDiseaseCode(),
+                    'scene_code' => $this->getSceneCode(),
+                ])
+                ->json();
+
+            if (!is_array($data) || ($data['code'] ?? null) != 200) {
+                Logger::BMP_CHEETAH_MEDICAL_CROWDKIT_ERROR->error('获取机构体征指标列表失败', [
+                    'uri' => 'innerapi/org-col/vital-signs/list',
+                    'org_code' => $this->getOrgCode(),
+                    'sys_code' => $this->getSystemCode(),
+                    'disease_code' => $this->getDiseaseCode(),
+                    'scene_code' => $this->getSceneCode(),
+                    'response' => $data,
+                ]);
+
+                return [];
+            }
+
+            return is_array($data['data'] ?? null) ? $data['data'] : [];
+        } catch (\Throwable $e) {
+            Logger::BMP_CHEETAH_MEDICAL_CROWDKIT_ERROR->error('获取机构体征指标列表失败', [
+                'uri' => 'innerapi/org-col/vital-signs/list',
+                'org_code' => $this->getOrgCode(),
+                'sys_code' => $this->getSystemCode(),
+                'disease_code' => $this->getDiseaseCode(),
+                'scene_code' => $this->getSceneCode(),
+                'message' => $e->getMessage(),
+            ]);
+
+            return [];
+        }
+    }
+
 
     /**
      * @param  string  $idCrdNo
