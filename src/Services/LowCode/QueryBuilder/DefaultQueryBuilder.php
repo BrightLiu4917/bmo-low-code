@@ -318,6 +318,8 @@ class DefaultQueryBuilder extends BaseService implements ILowCodeQueryBuilder
         if (config('low-code.died-patient-exclude-enabled', true)) {
             $this->queryEngine->getQueryBuilder()->where(fn ($query) => $query->where('t1.dth_flg', '=', 0)->orWhereNull('t1.dth_flg'));
         }
+
+        $this->queryEngine->getQueryBuilder()->where(fn ($query) => $query->where('t1.is_deleted', '=', 0)->orWhereNull('t1.is_deleted'));
     }
 
     public function setFilters(array $filters): void
