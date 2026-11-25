@@ -129,7 +129,7 @@ final class LowCodeCombiService extends BaseService
 
     public function resolveQueryScope(string $code): string
     {
-        if ('' === $code) {
+        if (!personalize_manage_path_enabled() || '' === $code) {
             return '';
         }
 

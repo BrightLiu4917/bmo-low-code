@@ -23,13 +23,13 @@ final class RoutesResource extends JsonResource
 
         $metadata['id'] = $this->id;
         $metadata['meta']['personalize_module_id'] = $this->id;
-        if ($this->resource->resolveManageProjectIds() === []) {
+        if (personalize_manage_path_enabled() && $this->resource->resolveManageProjectIds() === []) {
             $metadata['meta']['showStatus'] = false;
         }
         $metadata['meta']['query'] = [
             'group_id' => $this->module_id ?? 0,
             'group_ids' => $this->resource->resolveCrowdIds(),
-            'sub_module_ids' => $this->resource->resolveManageProjectIds(),
+            'sub_module_ids' => personalize_manage_path_enabled() ? $this->resource->resolveManageProjectIds() : [],
         ];
 
         return $metadata;

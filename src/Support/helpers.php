@@ -15,6 +15,16 @@ if (!function_exists('class_map')) {
 }
 
 
+if (!function_exists('personalize_manage_path_enabled')) {
+    /**
+     * 个性化菜单管理路径开关。默认关闭。
+     */
+    function personalize_manage_path_enabled(): bool
+    {
+        return (bool) config('low-code.personalize-manage-path.enabled', false);
+    }
+}
+
 if (!function_exists('silence_event')) {
     /**
      * 静默触发事件

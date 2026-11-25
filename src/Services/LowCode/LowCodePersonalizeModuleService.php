@@ -219,6 +219,10 @@ final class LowCodePersonalizeModuleService extends LowCodeBaseService
      */
     public function getModuleManageProjectIds(int $id): array
     {
+        if (!personalize_manage_path_enabled()) {
+            return [];
+        }
+
         $module = LowCodePersonalizeModule::query()
             ->where('id', $id)
             ->first(['sub_module_ids']);

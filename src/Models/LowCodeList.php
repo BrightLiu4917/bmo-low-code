@@ -170,6 +170,10 @@ class LowCodeList extends LowCodeBaseModel
 
     public function resolvedQueryScope(): string
     {
+        if (!personalize_manage_path_enabled()) {
+            return '';
+        }
+
         return trim((string) ($this->query_scope ?? ''));
     }
 
@@ -179,6 +183,10 @@ class LowCodeList extends LowCodeBaseModel
      */
     public function exposeAsStatusTab(bool $hasManagePath): bool
     {
+        if (!personalize_manage_path_enabled()) {
+            return true;
+        }
+
         return match ($this->resolvedQueryScope()) {
             self::QUERY_SCOPE_HIDDEN => false,
             self::QUERY_SCOPE_MANAGE_PATH => $hasManagePath,

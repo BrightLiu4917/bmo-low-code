@@ -14,6 +14,11 @@ return [
         'default_template' => env('BLC_INIT_DEFAULT_TEMPLATE', 'template.json'),
     ],
 
+    // 个性化菜单的管理路径。关闭时不使用 query_scope、sub_module_ids 改变查询和状态展示
+    'personalize-manage-path' => [
+        'enabled' => env('BLC_PERSONALIZE_MANAGE_PATH_ENABLED', false),
+    ],
+
     // 自定义查询构建器
     'custom-query' => [
         'enabled' => env('BLC_CUSTOM_QUERY_ENABLED', false),
