@@ -4,6 +4,7 @@
             "list": [
                 {
                     "admin_name": "全部",
+                    "query_scope": "hidden",
                     "route_group": [
                         "/Patient/ManagedPatient"
                     ],
@@ -28,6 +29,7 @@
                 },
                 {
                     "admin_name": "待纳管",
+                    "query_scope": "crowd",
                     "route_group": [
                         "/Patient/ManagedPatient"
                     ],
@@ -56,6 +58,7 @@
                 },
                 {
                     "admin_name": "评估中",
+                    "query_scope": "manage_path",
                     "route_group": [
                         "/Patient/ManagedPatient"
                     ],
@@ -85,6 +88,7 @@
                 },
                 {
                     "admin_name": "方案制定中",
+                    "query_scope": "manage_path",
                     "route_group": [
                         "/Patient/ManagedPatient"
                     ],
@@ -114,6 +118,7 @@
                 },
                 {
                     "admin_name": "管理中",
+                    "query_scope": "manage_path",
                     "route_group": [
                         "/Patient/ManagedPatient"
                     ],
@@ -143,6 +148,7 @@
                 },
                 {
                     "admin_name": "疗程结束",
+                    "query_scope": "manage_path",
                     "route_group": [
                         "/Patient/ManagedPatient"
                     ],
@@ -172,6 +178,7 @@
                 },
                 {
                     "admin_name": "方案终止",
+                    "query_scope": "manage_path",
                     "route_group": [
                         "/Patient/ManagedPatient"
                     ],

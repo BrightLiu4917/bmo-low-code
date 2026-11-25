@@ -34,7 +34,7 @@ final class LowCodePersonalizeModuleController extends BaseController
                                         ->where('org_code', $this->getAffiliatedOrgCode())
                                         ->where('module_type', $moduleType)
                                         ->orderByDesc('weight')
-                                        ->get(['id', 'title', 'module_id', 'module_ids', 'module_meta', 'module_type', 'metadata', 'created_at']);
+                                        ->get(['id', 'title', 'module_id', 'module_ids', 'module_meta', 'sub_module_ids', 'module_type', 'metadata', 'created_at']);
 
         return $this->responseData([
             'list' => ListResource::collection($data),
@@ -54,7 +54,7 @@ final class LowCodePersonalizeModuleController extends BaseController
                                         ->where('org_code', $this->getAffiliatedOrgCode())
                                         ->where('module_type', $moduleType)
                                         ->orderByDesc('weight')
-                                        ->get(['id', 'title', 'module_id', 'module_ids', 'module_meta', 'module_type', 'metadata', 'created_at']);
+                                        ->get(['id', 'title', 'module_id', 'module_ids', 'module_meta', 'sub_module_ids', 'module_type', 'metadata', 'created_at']);
 
         return $this->responseData($data, RoutesResource::class);
     }

@@ -21,6 +21,7 @@ final class ListResource extends JsonResource
             'title' => $this->title ?? '',
             'module_id' => $this->module_id ?? '',
             'module_ids' => $this->resource->resolveCrowdIds(),
+            'sub_module_ids' => $this->resource->resolveManageProjectIds(),
             'module_type' => $this->module_type ?? '',
             'metadata' => $this->metadata ??' ',
             'created_at' => $this->created_at ?? null,

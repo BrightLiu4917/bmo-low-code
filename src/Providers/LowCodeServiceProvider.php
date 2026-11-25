@@ -11,6 +11,7 @@ use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Route;
+use BrightLiu\LowCode\Console\Commands\PatchManagePathCommand;
 use BrightLiu\LowCode\Console\Commands\PublishDataPermissionsCommand;
 use BrightLiu\LowCode\Console\Commands\RefreshAdminPreferenceCommand;
 use BrightLiu\LowCode\Events\Resident\ResidentInfoUpdated;
@@ -149,6 +150,7 @@ class LowCodeServiceProvider extends ServiceProvider
             $this->commands([
                 PublishDataPermissionsCommand::class,
                 RefreshAdminPreferenceCommand::class,
+                PatchManagePathCommand::class,
             ]);
         }
     }

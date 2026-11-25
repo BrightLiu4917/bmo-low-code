@@ -27,15 +27,18 @@ final class LowCodePersonalizeModuleService extends LowCodeBaseService
     public function save(array $items, string $defaultModuleType = ''): bool
     {
         $normalizedItems = collect($items)->map(function ($item) use ($defaultModuleType) {
-            $moduleIds = LowCodePersonalizeModule::normalizeCrowdIds((array) ($item['module_ids'] ?? []));
+            $moduleIds = LowCodePersonalizeModule::normalizeIds((array) ($item['module_ids'] ?? []));
             if ($moduleIds === [] && '' !== trim((string) ($item['module_id'] ?? ''))) {
                 $moduleIds = [trim((string) $item['module_id'])];
             }
+
+            $subModuleIds = LowCodePersonalizeModule::normalizeIds((array) ($item['sub_module_ids'] ?? []));
 
             return [
                 'title' => $item['title'] ?? '',
                 'metadata' => $item['metadata'] ?? [],
                 'module_ids' => $moduleIds,
+                'sub_module_ids' => $subModuleIds,
                 'module_type' => $item['module_type'] ?? $defaultModuleType,
             ];
         });
@@ -50,6 +53,7 @@ final class LowCodePersonalizeModuleService extends LowCodeBaseService
 
         $formattedItems = $normalizedItems->map(function ($item, $index) use ($userGroups) {
             $moduleIds = $item['module_ids'];
+            $subModuleIds = $item['sub_module_ids'];
             $moduleMeta = 'crowd_patients' === $item['module_type']
                 ? $this->buildModuleMeta($moduleIds, $userGroups)
                 : [];
@@ -63,6 +67,7 @@ final class LowCodePersonalizeModuleService extends LowCodeBaseService
                 'module_id' => $moduleIds[0] ?? '',
                 'module_ids' => json_encode($moduleIds, JSON_UNESCAPED_UNICODE),
                 'module_meta' => json_encode($moduleMeta, JSON_UNESCAPED_UNICODE),
+                'sub_module_ids' => json_encode($subModuleIds, JSON_UNESCAPED_UNICODE),
                 'module_type' => $item['module_type'],
                 'created_at' => date('Y-m-d H:i:s'),
                 'weight' => 10000 - $index,
@@ -210,6 +215,18 @@ final class LowCodePersonalizeModuleService extends LowCodeBaseService
     }
 
     /**
+     * @return array<int, string>
+     */
+    public function getModuleManageProjectIds(int $id): array
+    {
+        $module = LowCodePersonalizeModule::query()
+            ->where('id', $id)
+            ->first(['sub_module_ids']);
+
+        return $module instanceof LowCodePersonalizeModule ? $module->resolveManageProjectIds() : [];
+    }
+
+    /**
      * 按请求头病种/场景从 module_meta 取人群 ID；旧数据无 meta 时回退全部 ID。
      *
      * @return array<int, string>
@@ -242,7 +259,7 @@ final class LowCodePersonalizeModuleService extends LowCodeBaseService
             $ids[] = $id;
         }
 
-        return LowCodePersonalizeModule::normalizeCrowdIds($ids);
+        return LowCodePersonalizeModule::normalizeIds($ids);
     }
 
     /**
@@ -287,7 +304,7 @@ final class LowCodePersonalizeModuleService extends LowCodeBaseService
      */
     private function fetchUserGroupsByIds(array $ids): array
     {
-        $ids = LowCodePersonalizeModule::normalizeCrowdIds($ids);
+        $ids = LowCodePersonalizeModule::normalizeIds($ids);
         if ($ids === []) {
             return [];
         }

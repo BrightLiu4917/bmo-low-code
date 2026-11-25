@@ -29,6 +29,7 @@ final class SimpleListSource extends JsonResource
                 'crowd_type_code',
                 'route_group',
             ]),
+            'query_scope' => $this->resource instanceof LowCodeList ? $this->resource->resolvedQueryScope() : '',
 
             // TODO: 兼容原逻辑，待完善
             'crowd_type_code' => $this->code ?? '',

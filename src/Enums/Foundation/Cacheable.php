@@ -57,4 +57,9 @@ enum Cacheable: string
 
     // 全科绑定慢病场景列表
     case CHRONIC_BIND_SCENE_LIST = 'lc:chronic_bind_scene_list';
+
+    /* --------------------------------------------------------------- */
+
+    // 低代码列表查询来源
+    case LOW_CODE_LIST_QUERY_SCOPE = 'lc:list_query_scope';
 }

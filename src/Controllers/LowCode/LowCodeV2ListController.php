@@ -63,6 +63,7 @@ final class LowCodeV2ListController extends BaseController
                 'parent_code',
                 'crowd_type_code',
                 'route_group',
+                'query_scope',
             ])->customPaginate(true);
 
         try {
@@ -79,20 +80,26 @@ final class LowCodeV2ListController extends BaseController
                     'module_id',
                     'module_ids',
                     'module_meta',
+                    'sub_module_ids',
                     'module_type',
                     'metadata',
                     'created_at',
-                ])->map(fn(
+                ])->map(function (
                     LowCodePersonalizeModule $item,
-                ) => new LowCodeList([
-                    'id'          => $item->id,
-                    'admin_name'  => $item->title,
-                    'code'        => implode(',', $item->resolveCrowdIds()),
-                    'parent_code' => '',
-                    'route_group' => [
-                        $item->metadata['path'],
-                    ],
-                ]));
+                ) {
+                    $virtual = new LowCodeList([
+                        'id'          => $item->id,
+                        'admin_name'  => $item->title,
+                        'code'        => implode(',', $item->resolveCrowdIds()),
+                        'parent_code' => '',
+                        'route_group' => [
+                            $item->metadata['path'],
+                        ],
+                    ]);
+                    $virtual->setAttribute('has_manage_path', $item->resolveManageProjectIds() !== []);
+
+                    return $virtual;
+                });
 
 
             $combiSrv = LowCodeCombiService::make();
@@ -113,6 +120,10 @@ final class LowCodeV2ListController extends BaseController
                             $personalizeList,
                             $combiSrv
                         ) {
+                            if (!$item->exposeAsStatusTab((bool) ($personalizeModule->has_manage_path ?? false))) {
+                                return;
+                            }
+
                             $listItem = clone $item;
 
                             // 虚拟ID，避免主键冲突

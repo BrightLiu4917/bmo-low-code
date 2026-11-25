@@ -34,6 +34,7 @@ final class LowCodePersonalizeModule extends LowCodeBaseModel
         'metadata' => 'json',
         'module_ids' => 'array',
         'module_meta' => 'array',
+        'sub_module_ids' => 'array',
     ];
 
     /**
@@ -41,16 +42,24 @@ final class LowCodePersonalizeModule extends LowCodeBaseModel
      */
     public function resolveCrowdIds(): array
     {
-        $ids = self::normalizeCrowdIds((array) ($this->module_ids ?? []));
+        $ids = self::normalizeIds((array) ($this->module_ids ?? []));
 
-        return $ids !== [] ? $ids : self::normalizeCrowdIds([(string) ($this->module_id ?? '')]);
+        return $ids !== [] ? $ids : self::normalizeIds([(string) ($this->module_id ?? '')]);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function resolveManageProjectIds(): array
+    {
+        return self::normalizeIds((array) ($this->sub_module_ids ?? []));
     }
 
     /**
      * @param array<int, mixed> $ids
      * @return array<int, string>
      */
-    public static function normalizeCrowdIds(array $ids): array
+    public static function normalizeIds(array $ids): array
     {
         return array_values(array_unique(array_filter(
             array_map(static fn ($id) => trim((string) $id), $ids),

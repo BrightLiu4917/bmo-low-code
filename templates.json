@@ -4,6 +4,7 @@
       "list": [
         {
           "admin_name": "全部",
+          "query_scope": "hidden",
           "route_group": [
             "/Patient/ManagedPatient"
           ],
@@ -220,6 +221,7 @@
         },
         {
           "admin_name": "待服务",
+          "query_scope": "crowd",
           "route_group": [
             "/Patient/ManagedPatient"
           ],
@@ -440,6 +442,7 @@
         },
         {
           "admin_name": "在服务",
+          "query_scope": "manage_path",
           "route_group": [
             "/Patient/ManagedPatient"
           ],
@@ -638,6 +641,7 @@
         },
         {
           "admin_name": "已拒绝",
+          "query_scope": "manage_path",
           "route_group": [
             "/Patient/ManagedPatient"
           ],
@@ -833,6 +837,7 @@
         },
         {
           "admin_name": "已退出",
+          "query_scope": "manage_path",
           "route_group": [
             "/Patient/ManagedPatient"
           ],
@@ -1043,6 +1048,7 @@
         },
         {
           "admin_name": "已流转",
+          "query_scope": "manage_path",
           "route_group": [
             "/Patient/ManagedPatient"
           ],
@@ -1227,6 +1233,7 @@
         },
         {
           "admin_name": "待接收",
+          "query_scope": "manage_path",
           "route_group": [
             "/Patient/ManagedPatient"
           ],

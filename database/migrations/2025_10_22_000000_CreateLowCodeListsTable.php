@@ -56,6 +56,7 @@ class CreateLowCodeListsTable extends Migration
 
                 // 其他字段
                 $table->unsignedTinyInteger('list_type')->default(0)->comment('列表类型0默认，9通用（适配多个人群分类）不可删除');
+                $table->string('query_scope', 32)->default('')->comment('查询范围:crowd人群,manage_path管理路径,hidden隐藏');
                 $table->unsignedBigInteger('creator_id')->default(0)->comment('创建人ID');
                 $table->unsignedBigInteger('updater_id')->default(0)->comment('更新人ID');
                 $table->dateTime('created_at')->nullable()->comment('创建时间');

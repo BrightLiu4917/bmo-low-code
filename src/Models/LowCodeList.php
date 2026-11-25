@@ -23,6 +23,12 @@ use BrightLiu\LowCode\Models\Traits\AdministratorRelation;
  */
 class LowCodeList extends LowCodeBaseModel
 {
+    public const QUERY_SCOPE_CROWD = 'crowd';
+
+    public const QUERY_SCOPE_MANAGE_PATH = 'manage_path';
+
+    public const QUERY_SCOPE_HIDDEN = 'hidden';
+
     use
 //        NewEloquentBuilder,
         SoftDeletes,
@@ -160,6 +166,24 @@ class LowCodeList extends LowCodeBaseModel
     public function listTypeDefinition(): Attribute
     {
         return ListTypeEnum::makeAttribute($this);
+    }
+
+    public function resolvedQueryScope(): string
+    {
+        return trim((string) ($this->query_scope ?? ''));
+    }
+
+    /**
+     * 个性化菜单下是否展示该状态 tab。
+     * 未配置 query_scope 时始终展示。
+     */
+    public function exposeAsStatusTab(bool $hasManagePath): bool
+    {
+        return match ($this->resolvedQueryScope()) {
+            self::QUERY_SCOPE_HIDDEN => false,
+            self::QUERY_SCOPE_MANAGE_PATH => $hasManagePath,
+            default => true,
+        };
     }
 
 }

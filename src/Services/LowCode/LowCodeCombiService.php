@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BrightLiu\LowCode\Services\LowCode;
 
+use BrightLiu\LowCode\Enums\Foundation\Cacheable;
+use BrightLiu\LowCode\Models\LowCodeList;
 use Gupo\BetterLaravel\Service\BaseService;
 
 final class LowCodeCombiService extends BaseService
@@ -21,21 +23,33 @@ final class LowCodeCombiService extends BaseService
                 $item['code'] = $exploded['code'];
 
                 $moduleId = (int) ($exploded['personalize_module_id'] ?? 0);
-                $originalCrowdIds = $exploded['crowd_ids'] ?? [];
-                if ($moduleId > 0) {
-                    $crowdIds = LowCodePersonalizeModuleService::make()->getModuleCrowdIds($moduleId);
-                } else {
-                    $crowdIds = $originalCrowdIds;
-                }
+                $queryScope = $this->resolveQueryScope((string) $exploded['code']);
 
-                if (count($crowdIds) > 1) {
-                    // 多个人群不进入 crowd_id 条件，避免被 mergeCrowdIdFilters 与分层/filters 合成一条 in
-                    $item['list_crowd_ids'] = $crowdIds;
-                } elseif (count($crowdIds) === 1) {
-                    $item['filters'] = array_merge($item['filters'] ?? [], [['crowd_id', '=', $crowdIds[0]]]);
-                } elseif ($moduleId > 0) {
-                    // 菜单存在，但当前病种/场景一个都匹配不上
-                    $item['filters'] = array_merge($item['filters'] ?? [], [['crowd_id', '=', '0']]);
+                if (LowCodeList::QUERY_SCOPE_MANAGE_PATH === $queryScope) {
+                    $projectIds = $moduleId > 0
+                        ? LowCodePersonalizeModuleService::make()->getModuleManageProjectIds($moduleId)
+                        : [];
+                    // 没有可选方案时不回落到人群，避免管理路径 tab 查出全部人群患者
+                    $item['filters'] = array_merge($item['filters'] ?? [], $projectIds !== []
+                        ? [['t2.manage_proj_id', 'in', $projectIds]]
+                        : [['raw', '1 = 0']]);
+                } else {
+                    $originalCrowdIds = $exploded['crowd_ids'] ?? [];
+                    if ($moduleId > 0) {
+                        $crowdIds = LowCodePersonalizeModuleService::make()->getModuleCrowdIds($moduleId);
+                    } else {
+                        $crowdIds = $originalCrowdIds;
+                    }
+
+                    if (count($crowdIds) > 1) {
+                        // 多个人群不进入 crowd_id 条件，避免被 mergeCrowdIdFilters 与分层/filters 合成一条 in
+                        $item['list_crowd_ids'] = $crowdIds;
+                    } elseif (count($crowdIds) === 1) {
+                        $item['filters'] = array_merge($item['filters'] ?? [], [['crowd_id', '=', $crowdIds[0]]]);
+                    } elseif ($moduleId > 0) {
+                        // 菜单存在，但当前病种/场景一个都匹配不上
+                        $item['filters'] = array_merge($item['filters'] ?? [], [['crowd_id', '=', '0']]);
+                    }
                 }
 
                 // 过滤掉无效条件
@@ -111,6 +125,19 @@ final class LowCodeCombiService extends BaseService
         }
 
         return $filters;
+    }
+
+    public function resolveQueryScope(string $code): string
+    {
+        if ('' === $code) {
+            return '';
+        }
+
+        return (string) Cacheable::LOW_CODE_LIST_QUERY_SCOPE->remember(
+            key: $code,
+            ttl: 60 * 60,
+            callback: fn () => trim((string) LowCodeList::query()->where('code', $code)->value('query_scope'))
+        );
     }
 
     public function resolveListCode(string|array $codes): string|array

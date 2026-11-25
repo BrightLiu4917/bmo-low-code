@@ -17,6 +17,8 @@ final class SaveRequest extends BaseRequest
             'items.*.module_id' => ['bail', 'nullable', 'string'],
             'items.*.module_ids' => ['bail', 'nullable', 'array'],
             'items.*.module_ids.*' => ['bail', 'required'],
+            'items.*.sub_module_ids' => ['bail', 'nullable', 'array'],
+            'items.*.sub_module_ids.*' => ['bail', 'required'],
             'items.*.metadata' => ['bail', 'nullable', 'array'],
         ];
     }
@@ -30,6 +32,8 @@ final class SaveRequest extends BaseRequest
             'items.*.module_id' => '菜单项模块ID',
             'items.*.module_ids' => '菜单项模块ID列表',
             'items.*.module_ids.*' => '菜单项模块ID',
+            'items.*.sub_module_ids' => '菜单项管理方案ID列表',
+            'items.*.sub_module_ids.*' => '菜单项管理方案ID',
             'items.*.metadata' => '菜单项元数据',
         ];
     }
