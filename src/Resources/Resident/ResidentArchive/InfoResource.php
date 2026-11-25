@@ -18,6 +18,7 @@ use BrightLiu\LowCode\Support\Attribute\Converters\IdCrdNo;
 use BrightLiu\LowCode\Support\Attribute\Converters\IncprtIntoMngFlg;
 use BrightLiu\LowCode\Support\Attribute\Converters\NtnCd;
 use BrightLiu\LowCode\Support\Attribute\Converters\PsnLblPgncFlg;
+use BrightLiu\LowCode\Support\Attribute\Converters\ManageProjId;
 use BrightLiu\LowCode\Support\Attribute\Converters\SlfTelNo;
 use BrightLiu\LowCode\Support\Attribute\Converters\SmkRcdSmkCdtCd;
 use BrightLiu\LowCode\Support\Attribute\Converters\WeightArrWeight;
@@ -119,6 +120,7 @@ class InfoResource extends JsonResource
             ExrcRcdExrcFrqCd::class,
             IncprtIntoMngFlg::class,
             PsnLblPgncFlg::class,
+            ManageProjId::class,
             SmkRcdSmkCdtCd::class
         ]);
     }
